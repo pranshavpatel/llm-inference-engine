@@ -1,6 +1,6 @@
 # LLM inference engine: implementation and portfolio plan
 
-Status: proposed plan, September 8, 2026. No engine implementation or performance results exist yet; the workspace was empty when inspected.
+Status: Phase 0 feasibility and Phase 1 contiguous-cache reference implemented on September 21, 2026. Physical paging, scheduling, serving, and performance measurement remain future work; no performance results exist.
 
 ## 1. Outcome and assumptions
 

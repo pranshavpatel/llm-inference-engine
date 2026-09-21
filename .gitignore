@@ -5,6 +5,7 @@ __pycache__/
 build/
 dist/
 .pytest_cache/
+.hf-cache/
 *.safetensors
 .DS_Store
 

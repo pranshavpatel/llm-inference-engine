@@ -1,0 +1,89 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "dtype": "bfloat16",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "torch": "2.13.0+cu130",
+  "transformers": "4.57.6",
+  "weight_coverage": {
+    "loaded_tensors": 338,
+    "checkpoint_files": [
+      "model.safetensors"
+    ],
+    "tied_lm_head_from_embeddings": true
+  },
+  "results": [
+    {
+      "prompt": "The capital of France is",
+      "shape": [
+        1,
+        5,
+        151936
+      ],
+      "teacher_logits_finite": true,
+      "max_abs_logit_error": 0.25,
+      "mean_abs_logit_error": 0.03252540901303291,
+      "rms_logit_error": 0.04603135213255882,
+      "cached_vs_full_max_abs_error": 0.265625,
+      "cached_vs_full_mean_abs_error": 0.029332071542739868,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " Paris. The capital of France is also",
+      "status": "pass"
+    },
+    {
+      "prompt": "Write one word for the color of grass:",
+      "shape": [
+        1,
+        9,
+        151936
+      ],
+      "teacher_logits_finite": true,
+      "max_abs_logit_error": 0.59375,
+      "mean_abs_logit_error": 0.05159274488687515,
+      "rms_logit_error": 0.07527989149093628,
+      "cached_vs_full_max_abs_error": 1.5625,
+      "cached_vs_full_mean_abs_error": 0.10111786425113678,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " green. The word for the color of",
+      "status": "pass"
+    },
+    {
+      "prompt": "Two plus two equals",
+      "shape": [
+        1,
+        4,
+        151936
+      ],
+      "teacher_logits_finite": true,
+      "max_abs_logit_error": 0.26953125,
+      "mean_abs_logit_error": 0.04211744666099548,
+      "rms_logit_error": 0.059109877794981,
+      "cached_vs_full_max_abs_error": 0.31640625,
+      "cached_vs_full_mean_abs_error": 0.03703220933675766,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " four, but but what if you add",
+      "status": "pass"
+    },
+    {
+      "prompt": "A friendly greeting is",
+      "shape": [
+        1,
+        4,
+        151936
+      ],
+      "teacher_logits_finite": true,
+      "max_abs_logit_error": 0.1875,
+      "mean_abs_logit_error": 0.02273915894329548,
+      "rms_logit_error": 0.03385506942868233,
+      "cached_vs_full_max_abs_error": 0.220703125,
+      "cached_vs_full_mean_abs_error": 0.027325771749019623,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " a great way to start a conversation.",
+      "status": "pass"
+    }
+  ]
+}

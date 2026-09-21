@@ -17,6 +17,21 @@ def doctor() -> dict:
               "packages": {name: importlib.util.find_spec(name) is not None
                            for name in ("torch", "flashinfer", "safetensors", "transformers")},
               "gpu_execution_verified": False}
+    if report["packages"]["torch"]:
+        try:
+            import torch
+
+            report["torch"] = {"version": torch.__version__, "cuda_runtime": torch.version.cuda,
+                               "cuda_available": torch.cuda.is_available()}
+            if torch.cuda.is_available():
+                probe = (torch.arange(8, device="cuda", dtype=torch.float32) ** 2).sum().item()
+                report["torch"].update({"device": torch.cuda.get_device_name(0),
+                                        "compute_capability": list(torch.cuda.get_device_capability(0)),
+                                        "bf16_supported": torch.cuda.is_bf16_supported(),
+                                        "probe_result": probe})
+                report["gpu_execution_verified"] = probe == 140.0
+        except (ImportError, RuntimeError, AssertionError) as exc:
+            report["torch_error"] = f"{type(exc).__name__}: {exc}"
     if report["nvidia_smi"]:
         try:
             result = subprocess.run(
@@ -28,7 +43,7 @@ def doctor() -> dict:
                 report["gpu_query_error"] = result.stderr.strip()
         except (OSError, subprocess.TimeoutExpired) as exc:
             report["gpu_query_error"] = str(exc)
-    report["next_step"] = "Run a CUDA tensor and paged-attention smoke test on the library GPU."
+    report["next_step"] = "Run scripts/phase0_paged_smoke.py before selecting an optimized backend."
     return report
 
 
