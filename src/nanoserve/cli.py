@@ -89,6 +89,79 @@ def scheduler_demo() -> dict:
     }
 
 
+def serve_demo(host: str, port: int) -> int:
+    """Serve a tiny random model for local HTTP contract testing."""
+    import torch
+
+    from .attention import ReferencePagedAttention
+    from .engine import Engine
+    from .memory import BlockManager, KVCacheSpec, PagedKVCache, PagedKVCacheManager
+    from .model import PagedQwen2Runner, Qwen2Config, Qwen2ForCausalLM
+    from .scheduler import Scheduler, SchedulerConfig
+    from .server import make_server
+    from .worker import ByteTokenCodec, InferenceWorker
+
+    if not 0 <= port <= 65535:
+        raise ValueError("port must be in [0, 65535]")
+    torch.manual_seed(17)
+    model_config = Qwen2Config(
+        vocab_size=256,
+        hidden_size=16,
+        intermediate_size=32,
+        num_hidden_layers=1,
+        num_attention_heads=4,
+        num_key_value_heads=2,
+        max_position_embeddings=256,
+        tie_word_embeddings=True,
+    )
+    model = Qwen2ForCausalLM(model_config).eval()
+    blocks = BlockManager(32, block_size=16, watermark=0.05)
+    cache = PagedKVCache(KVCacheSpec(1, 32, 16, 2, 4), dtype=torch.float32)
+    manager = PagedKVCacheManager(blocks, cache)
+    scheduler = Scheduler(
+        manager,
+        SchedulerConfig(
+            max_num_sequences=8,
+            max_batch_tokens=256,
+            max_prefill_tokens=256,
+            max_context_tokens=256,
+            max_waiting_requests=64,
+        ),
+    )
+    worker = InferenceWorker(
+        Engine(scheduler, PagedQwen2Runner(model, manager, ReferencePagedAttention()))
+    )
+    worker.start()
+    server = make_server(
+        worker,
+        ByteTokenCodec(),
+        model="nanoserve-tiny-random",
+        host=host,
+        port=port,
+    )
+    bound_host, bound_port = server.server_address
+    print(
+        json.dumps(
+            {
+                "status": "ready",
+                "address": f"http://{bound_host}:{bound_port}",
+                "model": "nanoserve-tiny-random",
+                "correctness_demo": True,
+                "performance_claim": False,
+            }
+        ),
+        flush=True,
+    )
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+        worker.stop()
+    return 0
+
+
 def doctor() -> dict:
     report = {"python": sys.version.split()[0], "platform": platform.platform(),
               "nvidia_smi": shutil.which("nvidia-smi"),
@@ -130,6 +203,9 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="Inspect hardware/tool availability; does not install or download")
     sub.add_parser("scheduler-demo", help="Run a tiny CPU continuous-scheduling correctness demo")
+    serve = sub.add_parser("serve-demo", help="Serve a tiny random model for HTTP contract testing")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8000)
     memory = sub.add_parser("memory", help="Compute KV capacity from model geometry")
     memory.add_argument("--config", type=Path, required=True)
     memory.add_argument("--pool-mib", type=int, default=4096)
@@ -147,6 +223,8 @@ def main(argv=None) -> int:
             report = doctor()
         elif args.command == "scheduler-demo":
             report = scheduler_demo()
+        elif args.command == "serve-demo":
+            return serve_demo(args.host, args.port)
         elif args.command == "memory":
             geometry = ModelGeometry.from_config(json.loads(args.config.read_text()))
             report = geometry.capacity(args.pool_mib * 1024**2, args.block_size, args.dtype_bytes)
