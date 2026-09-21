@@ -1,0 +1,8 @@
+{
+  "_note": "Geometry fixture only; not a downloaded or revision-pinned model config.",
+  "_source": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/config.json",
+  "num_hidden_layers": 28,
+  "num_attention_heads": 28,
+  "num_key_value_heads": 4,
+  "hidden_size": 3584
+}

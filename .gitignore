@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+*.safetensors
+.DS_Store
+
+# Local coding-agent configuration; not part of the project source.
+.agents/
+.codex/
+AGENTS.md
