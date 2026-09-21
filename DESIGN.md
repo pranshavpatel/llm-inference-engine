@@ -50,6 +50,18 @@ Admission leaves `ceil(num_blocks * watermark)` free pages; growth may consume a
 
 `check_invariants()` verifies the complete partition of physical page IDs, balanced request metadata, and the expected page count per reservation. It is a test/debug audit, not a production scheduling operation. The allocator is not thread safe; the planned engine has one state owner.
 
+## Continuous scheduler
+
+Request state transitions are `WAITING -> PREFILL -> DECODING -> FINISHED`, with `CANCELLED` and `FAILED` as terminal alternatives. A sampled token is appended to request history immediately but gains KV only if the request is selected in a later decode step. The final sampled token therefore never needs a cache slot.
+
+Each scheduling iteration first computes page demand for every existing decode request. If growth would exceed free pages, the newest active request is preempted until the remaining decodes fit. Preemption discards physical KV, retains token history, and returns the request to the FCFS waiting queue. The preempted request is excluded from admission during the same iteration so releasing it always enables forward progress rather than immediate churn.
+
+Decode reservations happen before admission. Waiting requests are admitted in arrival order only when sequence, total-token, prefill-token, watermark, and physical capacity permit a complete prefill. Chunked prefill is not implemented. Decode and prefill work use separate runner calls within an iteration; this keeps the current correctness path simple but adds launch and scheduling overhead.
+
+The scheduler uses a plan/execute/commit boundary. Only one plan may be in flight. A commit first validates every sampled token and every physical KV end position, then updates request histories and emits events. A runner exception fails all selected work and releases its ownership. Cancellation is immediate between synchronous steps; cancellation of work already in flight is rejected until that step resolves.
+
+Preemption reconstruction runs the complete prompt plus already generated history at positions starting from zero. Its sampled result is the next new output; historical tokens are never re-emitted. Counters distinguish preemption count from recomputed KV tokens. Request snapshots and output events expose monotonic timestamps for queue, first-schedule, emission, and completion measurement.
+
 ## Accounting and arrival plans
 
 Reserved slots track space promised for KV writes. Completed KV tokens advance only after every layer finishes an append transaction. Tail fragmentation uses reserved tokens and excludes wholly free pages. Pool counters report physical bytes, bytes per block, completed tokens, active blocks, and pending append count; they are accounting values, not performance measurements.
@@ -58,6 +70,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-An optimized Linux backend, continuous batching, scheduling, serving, and benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. The remaining Phase 2 gate is agreement among contiguous attention, the gather-based paged oracle, and FlashInfer on the exact target geometry before connecting scheduling or serving.
+An optimized Linux backend, asynchronous serving, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler correctness path.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.
