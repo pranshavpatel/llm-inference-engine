@@ -1,8 +1,8 @@
 # nanoserve
 
-`nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation plus a Phase 2 correctness path that writes static batches into allocator-owned physical KV pages and executes gather-based paged attention. The model-memory calculator, environment doctor, and seeded arrival plans remain intact.
+`nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention; an optimized paged kernel, continuous batching, scheduling, HTTP serving, and benchmarks are not implemented, and there are no performance claims.
+This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel, HTTP serving, and controlled performance benchmarks are not implemented, and there are no performance claims.
 
 ## Reproducible setup
 
@@ -31,6 +31,21 @@ $env:NANOSERVE_RUN_GPU_PAGING = "1"
 The exact validated versions are PyTorch `2.13.0+cu130`, Transformers `4.57.6`, safetensors `0.6.2`, and pytest `8.4.2`. `requirements/model.txt` is the platform-neutral model stack; `requirements/flashinfer-linux.txt` records the proposed optimized-backend pin.
 
 FlashInfer `0.6.18.post1` publishes Linux-only wheels. This Windows host has neither WSL nor Docker, so FlashInfer was not installed and no optimized-backend compatibility is claimed. The Phase 0 fallback smoke test gathers noncontiguous physical pages and executes PyTorch SDPA. It is a correctness check, not an optimized backend.
+
+## Continuous scheduling
+
+`Scheduler` owns the request state machine and uses decode-first reservation followed by FCFS admission. It enforces sequence, token, context, waiting-queue, and physical-pool bounds. When decode growth cannot fit, it preempts the newest active request, releases its pages, and later reconstructs KV from the retained prompt and generated-token history. Recomputed tokens are never emitted again or counted as new output.
+
+`Engine.step()` executes decode and prefill groups separately against the shared `PagedQwen2Runner`, greedily samples one token per selected request, and commits results only after physical KV positions match the plan. Completion, EOS, cancellation, and execution failure release pages. Only one synchronous step may be in flight.
+
+Run the deterministic tiny-model demonstration, which intentionally forces one preemption in a three-page pool:
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m nanoserve scheduler-demo
+```
+
+The JSON report includes output tokens, steps, preemptions, recomputed tokens, and final page release. Its elapsed time is diagnostic only and is explicitly not a performance claim.
 
 ## Physical paged reference
 
@@ -85,6 +100,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The physical page pool and reference backend passed all eight CUDA page-size/dtype combinations. CPU coverage includes fragmented page tables, B−1/B/B+1 boundaries, variable-length static batches, transactional failures, clearing, and repeated mixed-length reuse.
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
+- The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration. The full non-GPU suite passes `57` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 
@@ -98,4 +114,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The remaining Phase 2 gate is to validate FlashInfer on a Linux CUDA host and compare its optimized prefill/decode kernels against both contiguous and gather-based paged references. After that, the next milestone is continuous scheduling and recompute preemption.
+The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The next product milestone is Phase 4 serving: a single-owner worker, bounded request ingress, completion streaming, disconnect cancellation, health/readiness, and shared-trace adapters.

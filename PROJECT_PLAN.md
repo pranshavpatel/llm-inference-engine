@@ -1,6 +1,6 @@
 # LLM inference engine: implementation and portfolio plan
 
-Status: Phase 0 and Phase 1 are implemented. Phase 2 now has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; the optimized Linux backend gate remains open. Scheduling, serving, and performance measurement remain future work, and no performance results exist.
+Status: Phases 0, 1, and the Phase 3 scheduler correctness milestone are implemented. Phase 2 has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; its optimized Linux backend gate remains open because this native-Windows host cannot run FlashInfer. The scheduler now provides continuous FCFS admission, decode-first reservation, recompute preemption, cancellation, bounded queues, timing events, and finite-workload tests. Serving and controlled performance measurement remain future work, and no performance results exist.
 
 ## 1. Outcome and assumptions
 
@@ -288,4 +288,4 @@ Prepare concise explanations of request-to-first-token flow, page ownership, pre
 5. Create the trace/manifest schema and one tiny benchmark fixture.
 6. Begin the model reference path only after the compatibility gate passes.
 
-The next implementation milestone is Phase 0. This plan creates no engine code, rents no GPU, publishes no repository, and claims no results.
+The original first implementation milestone was Phase 0. Current progress is summarized at the top of this document; no GPU rental or performance result is claimed.
