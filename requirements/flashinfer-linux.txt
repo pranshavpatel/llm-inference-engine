@@ -1,0 +1,3 @@
+# FlashInfer publishes Linux wheels only. This is the proposed Phase 2 backend
+# pin and must pass the paged-attention smoke test on the eventual Linux host.
+flashinfer-python==0.6.18.post1

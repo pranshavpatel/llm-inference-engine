@@ -1,30 +1,81 @@
 # nanoserve
 
-An LLM inference engine project focused on paged KV memory management and continuous batching. **Early implementation:** CPU page allocation, memory accounting, environment inspection, and seeded arrival plans work. Model execution, GPU attention, scheduling, and serving are not implemented yet. There are no throughput claims.
+`nanoserve` is an educational single-GPU LLM inference engine. Phase 1 now has a custom Qwen2 reference implementation with direct safetensors loading, full-sequence execution, greedy generation, and a contiguous per-layer KV cache. The earlier CPU page allocator, model-memory calculator, environment doctor, and seeded arrival plans remain intact.
 
-## Run the foundation
+This is still a correctness milestone. Physical paged KV tensors, an optimized paged-attention kernel, batching, scheduling, HTTP serving, and benchmarks are not implemented, and there are no performance claims.
 
-Python 3.10 or newer is required. The current foundation has no third-party runtime dependencies. From the repository root:
+## Reproducible setup
 
-```sh
-PYTHONPATH=src python3 -m nanoserve doctor
-PYTHONPATH=src python3 -m nanoserve memory --config configs/qwen2.5-7b.geometry.json
-PYTHONPATH=src python3 -m nanoserve trace --count 100 --rate 2 --seed 42 > trace.json
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+Python 3.10 or newer is required. The allocator and planning utilities retain a dependency-free base install:
+
+```powershell
+py -3.10 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m nanoserve doctor
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_core.py" -v
 ```
 
-Use a Python 3.10+ executable explicitly if `python3` points to an older installation. Alternatively install in your own virtual environment with `python -m pip install -e .` to use the `nanoserve` command.
+The validated GPU environment uses the official PyTorch CUDA 13.0 wheel on Windows:
 
-`doctor` inspects availability without installing packages or downloading models. Run it on the library GPU machine and save its JSON output. An available package or a successful NVIDIA query does **not** validate CUDA execution or the attention backend. Those need a later GPU smoke test.
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements/cuda-cu130.txt
+.\.venv\Scripts\python.exe -m pip install -e .
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m pytest -q -m "not gpu"
+.\.venv\Scripts\python.exe scripts/phase0_paged_smoke.py
+```
 
-`memory` accepts a Hugging Face-style model config. The included geometry file is a small source-attributed fixture, not a revision-pinned model download. `--pool-mib` is KV pool capacity only: it excludes model weights, activations, and backend workspaces. For the included geometry, 16-bit K/V uses **56 KiB per token**, or **896 KiB per 16-token page** across all layers.
+The exact validated versions are PyTorch `2.13.0+cu130`, Transformers `4.57.6`, safetensors `0.6.2`, and pytest `8.4.2`. `requirements/model.txt` is the platform-neutral model stack; `requirements/flashinfer-linux.txt` records the proposed optimized-backend pin.
 
-`trace` creates a synthetic fixed-length arrival plan with exponential inter-arrival times and a checksum. It contains lengths, not prompt text or token IDs, and is not yet an executable serving benchmark. A workload materializer and asynchronous replay client will follow.
+FlashInfer `0.6.18.post1` publishes Linux-only wheels. This Windows host has neither WSL nor Docker, so FlashInfer was not installed and no optimized-backend compatibility is claimed. The Phase 0 fallback smoke test gathers noncontiguous physical pages and executes PyTorch SDPA. It is a correctness check, not an optimized backend.
 
-## Page allocator
+## Reference model
 
-`BlockManager` owns page IDs and reserves KV slots before writes. Admission preserves a configurable watermark; existing requests may consume it while growing. Failed allocation leaves ownership unchanged. Returned page tables are immutable snapshots. Freeing an unknown request raises an error to expose lifecycle bugs.
+`src/nanoserve/model/` implements:
 
-The allocator counts **reserved** tokens, which can include slots scheduled for a write. Later execution metrics must separately count completed KV writes. It owns CPU metadata only; it does not allocate GPU tensors or share prefix pages.
+- Qwen2 configuration validation, RMSNorm, RoPE with cache offsets, grouped-query attention, biased Q/K/V projections, and SwiGLU blocks.
+- Tied and untied language-model heads.
+- Full forward execution and single-request greedy cached decoding without calling `AutoModelForCausalLM.generate()`.
+- Direct single-file or sharded safetensors loading with missing, unexpected, and shape coverage checks.
 
-See [DESIGN.md](DESIGN.md) for invariants and [PROJECT_PLAN.md](PROJECT_PLAN.md) for the full roadmap. Next: verify the library CUDA environment, pin the model/backend stack, and implement the contiguous-cache model reference before optimized paged execution.
+The development checkpoint is `Qwen/Qwen2.5-1.5B-Instruct` at revision `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`. Model files and the local `.hf-cache/` are ignored by Git.
+
+Run the opt-in real-model test with:
+
+```powershell
+$env:PYTHONPATH = "src"
+$env:HF_HOME = "$PWD\.hf-cache"
+$env:NANOSERVE_RUN_MODEL_TESTS = "1"
+.\.venv\Scripts\python.exe -m pytest tests/test_gpu_qwen2.py -q -m gpu
+```
+
+Generate the detailed precision report without using the Hugging Face generation helper:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/model_parity.py --dtype bfloat16 --tokens 8
+.\.venv\Scripts\python.exe scripts/model_parity.py --dtype float32 --tokens 8
+```
+
+## Recorded correctness evidence
+
+On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
+
+- FP32 teacher-forced logits were bit-for-bit identical to Hugging Face eager attention on four fixed prompts. Cached versus full custom logits had maximum absolute error `1.1610984802246094e-4`, and all 32 greedy tokens matched.
+- BF16 produced finite logits and all 32 greedy tokens matched. Across the fixed prompts, custom-versus-HF teacher-forced maximum absolute error was at most `0.59375` and mean absolute error at most `0.05159274488687515`. Cached-versus-full maximum absolute error was at most `1.5625`; use FP32 as the strict numerical oracle.
+- FP16 real-model execution produced non-finite logits in both the custom and Hugging Face eager paths on this stack, so FP16 is rejected and BF16 is the selected inference dtype.
+- The gather-based paged smoke passed page sizes 1, 16, 32, and 64 for FP16 and BF16 at 12 query heads, 2 KV heads, and head dimension 128. The gathered and contiguous SDPA inputs produced identical outputs in these cases.
+
+These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
+
+## Foundation commands
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m nanoserve memory --config configs/qwen2.5-7b.geometry.json
+python -m nanoserve trace --count 100 --rate 2 --seed 42
+```
+
+`BlockManager` still owns only CPU page metadata. It reserves KV slots transactionally, leaves a configurable admission watermark, returns immutable page-table snapshots, and exposes internal fragmentation without allocating GPU tensors.
+
+The next milestone is to connect the block manager to a physical GPU KV pool, add a slow paged-attention oracle, validate FlashInfer on a Linux CUDA host, and compare the optimized path against both contiguous and paged references.

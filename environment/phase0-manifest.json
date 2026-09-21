@@ -1,0 +1,48 @@
+{
+  "recorded_at": "2026-09-21",
+  "operating_system": "Windows 11 build 26200",
+  "python": "3.10.11",
+  "gpu": {
+    "model": "NVIDIA RTX 6000 Ada Generation",
+    "vram_mib": 49140,
+    "compute_capability": "8.9",
+    "driver": "596.36",
+    "nvidia_smi_cuda": "13.2",
+    "display_attached": true,
+    "exclusive": false,
+    "note": "WDDM display device with other GUI processes present; no benchmark isolation is claimed."
+  },
+  "container_runtime": {
+    "docker_available": false,
+    "wsl_available": false
+  },
+  "software": {
+    "torch": "2.13.0+cu130",
+    "torch_cuda_runtime": "13.0",
+    "transformers": "4.57.6",
+    "safetensors": "0.6.2",
+    "pytest": "8.4.2",
+    "flashinfer_proposed": "0.6.18.post1",
+    "flashinfer_installed": false
+  },
+  "cuda_tensor_probe": {
+    "operation": "sum(square(arange(8, float32, cuda)))",
+    "expected": 140.0,
+    "actual": 140.0,
+    "bf16_supported": true,
+    "status": "pass"
+  },
+  "optimized_backend_decision": {
+    "status": "deferred",
+    "reason": "FlashInfer publishes Linux-only wheels; this host has neither WSL nor Docker.",
+    "phase0_fallback": "pytorch-sdpa-gather-reference",
+    "fallback_optimized": false,
+    "smoke_results": "paged-attention-smoke.json"
+  },
+  "development_model": {
+    "id": "Qwen/Qwen2.5-1.5B-Instruct",
+    "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "dtype": "bfloat16",
+    "dtype_reason": "BF16 is finite and greedy-stable on the fixed suite. FP16 produced non-finite real-model logits in both custom and Hugging Face eager execution."
+  }
+}
