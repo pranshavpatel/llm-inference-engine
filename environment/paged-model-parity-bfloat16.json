@@ -1,0 +1,83 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "dtype": "bfloat16",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "torch": "2.13.0+cu130",
+  "block_size": 16,
+  "attention_backend": "pytorch-gather-reference",
+  "weight_coverage": {
+    "loaded_tensors": 338,
+    "checkpoint_files": [
+      "model.safetensors"
+    ],
+    "tied_lm_head_from_embeddings": true
+  },
+  "cache_stats": {
+    "total_blocks": 32,
+    "free_blocks": 27,
+    "allocated_blocks": 5,
+    "reserved_tokens": 54,
+    "allocated_slots": 80,
+    "unused_tail_slots": 26,
+    "internal_fragmentation": 0.325,
+    "active_requests": 4,
+    "num_layers": 28,
+    "num_blocks": 32,
+    "block_size": 16,
+    "bytes_per_block": 458752,
+    "physical_pool_bytes": 14680064,
+    "dtype": "bfloat16",
+    "device": "cuda:0",
+    "completed_kv_tokens": 50,
+    "pending_appends": 0
+  },
+  "results": [
+    {
+      "prompt": "The capital of France is",
+      "prompt_tokens": 5,
+      "prefill_max_abs_logit_error": 1.8125,
+      "prefill_mean_abs_logit_error": 0.19497910141944885,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " Paris. The capital of France is also",
+      "status": "pass"
+    },
+    {
+      "prompt": "Write one word for the color of grass:",
+      "prompt_tokens": 9,
+      "prefill_max_abs_logit_error": 2.0625,
+      "prefill_mean_abs_logit_error": 0.19255033135414124,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " green. The word for the color of",
+      "status": "pass"
+    },
+    {
+      "prompt": "Two plus two equals",
+      "prompt_tokens": 4,
+      "prefill_max_abs_logit_error": 1.25,
+      "prefill_mean_abs_logit_error": 0.16739718616008759,
+      "greedy_tokens_equal": false,
+      "first_divergence": {
+        "generation_step": 1,
+        "paged_token": 13,
+        "reference_token": 11,
+        "paged_top_two_margin": 0.125,
+        "reference_top_two_margin": 0.0
+      },
+      "generated_text": " four. This is a fact that we",
+      "status": "fail"
+    },
+    {
+      "prompt": "A friendly greeting is",
+      "prompt_tokens": 4,
+      "prefill_max_abs_logit_error": 0.359375,
+      "prefill_mean_abs_logit_error": 0.056307725608348846,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " a great way to start a conversation.",
+      "status": "pass"
+    }
+  ]
+}

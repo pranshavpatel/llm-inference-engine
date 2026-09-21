@@ -28,7 +28,17 @@ BF16 is the selected deployment dtype because this GPU reports native support, a
 
 The preferred optimized backend remains FlashInfer `0.6.18.post1`, but its published wheels require Linux. The current host is native Windows without WSL or Docker. Building the architecture around an unexercised FlashInfer API would therefore violate the compatibility gate.
 
-The Phase 0 fallback is a standalone PyTorch SDPA smoke test that scatters contiguous KV tensors into noncontiguous physical pages, gathers them through a page table, and checks prefill and decode outputs against the original tensors. Page sizes 1, 16, 32, and 64 passed in FP16 and BF16 for the Qwen2.5-1.5B attention geometry. This establishes layout feasibility only: the fallback is not wired into the model, is not optimized, and has no performance claim.
+The Phase 0 fallback is a standalone PyTorch SDPA smoke test that scatters contiguous KV tensors into noncontiguous physical pages, gathers them through a page table, and checks prefill and decode outputs against the original tensors. Page sizes 1, 16, 32, and 64 passed in FP16 and BF16 for the Qwen2.5-1.5B attention geometry. It remains a feasibility record and has no performance claim.
+
+## Physical paged KV
+
+The physical layout is `[layer, physical_page, offset, kv_head, head_dim]`, with separate preallocated key and value tensors. Sequence-facing tensors use `[kv_head, token, head_dim]`. Page-table scatter and gather validate page ownership ranges, device, dtype, shape, and capacity before mutation. Advanced-indexed writes use indexed assignment because `.copy_()` on a PyTorch advanced-indexing result would modify a temporary tensor.
+
+`PagedKVCacheManager` composes the physical pool with `BlockManager`. Allocation reserves slots but begins with zero completed KV tokens. An append creates a plan with fixed start/end positions; every layer must write exactly that range before commit advances the completed-token counter. Failure aborts the plan without exposing partial pages through a committed length. Released pages are zeroed before ownership returns to the allocator.
+
+Generic `PagedBatchMetadata` contains block tables, committed sequence lengths, and query lengths. Block tables may be longer than the committed sequence requires because the allocator can reserve future decode capacity. Backends may read only the committed sequence length.
+
+`ReferencePagedAttention` is the slow correctness oracle. It gathers each sequence, repeats KV heads for GQA, applies an offset-aware causal mask, evaluates softmax in FP32, and returns padded static-batch output. `PagedQwen2Runner` performs Qwen2 projection and RoPE, writes each layer through append plans, and supports variable-length static prefill and incremental decode. It is not a scheduler and does not dynamically admit work during a step.
 
 ## Page ownership
 
@@ -42,10 +52,12 @@ Admission leaves `ceil(num_blocks * watermark)` free pages; growth may consume a
 
 ## Accounting and arrival plans
 
-Reserved slots track space promised for KV writes. They do not imply that a model has performed those writes. Tail fragmentation uses reserved tokens and excludes wholly free pages. Physical tensor allocation and completed-token accounting remain Phase 2 work.
+Reserved slots track space promised for KV writes. Completed KV tokens advance only after every layer finishes an append transaction. Tail fragmentation uses reserved tokens and excludes wholly free pages. Pool counters report physical bytes, bytes per block, completed tokens, active blocks, and pending append count; they are accounting values, not performance measurements.
 
 The trace builder uses an isolated seeded random generator. Arrival offsets are cumulative exponential draws starting after time zero. The checksum covers canonical JSON of the payload excluding the checksum itself. The trace is synthetic and contains lengths, not prompt text or token IDs.
 
 ## Deferred work
 
-Physical GPU KV pages, a reusable paged-attention interface, an optimized Linux backend, static or continuous batching, scheduling, serving, and benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. The next gate is agreement among contiguous attention, a gather-based paged oracle, and FlashInfer on the exact target geometry before connecting scheduling or serving.
+An optimized Linux backend, continuous batching, scheduling, serving, and benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. The remaining Phase 2 gate is agreement among contiguous attention, the gather-based paged oracle, and FlashInfer on the exact target geometry before connecting scheduling or serving.
+
+Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

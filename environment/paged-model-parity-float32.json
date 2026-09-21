@@ -1,0 +1,77 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "dtype": "float32",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "torch": "2.13.0+cu130",
+  "block_size": 16,
+  "attention_backend": "pytorch-gather-reference",
+  "weight_coverage": {
+    "loaded_tensors": 338,
+    "checkpoint_files": [
+      "model.safetensors"
+    ],
+    "tied_lm_head_from_embeddings": true
+  },
+  "cache_stats": {
+    "total_blocks": 32,
+    "free_blocks": 27,
+    "allocated_blocks": 5,
+    "reserved_tokens": 54,
+    "allocated_slots": 80,
+    "unused_tail_slots": 26,
+    "internal_fragmentation": 0.325,
+    "active_requests": 4,
+    "num_layers": 28,
+    "num_blocks": 32,
+    "block_size": 16,
+    "bytes_per_block": 917504,
+    "physical_pool_bytes": 29360128,
+    "dtype": "float32",
+    "device": "cuda:0",
+    "completed_kv_tokens": 50,
+    "pending_appends": 0
+  },
+  "results": [
+    {
+      "prompt": "The capital of France is",
+      "prompt_tokens": 5,
+      "prefill_max_abs_logit_error": 8.45193862915039e-05,
+      "prefill_mean_abs_logit_error": 5.885150130779948e-06,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " Paris. The capital of France is also",
+      "status": "pass"
+    },
+    {
+      "prompt": "Write one word for the color of grass:",
+      "prompt_tokens": 9,
+      "prefill_max_abs_logit_error": 0.00011348724365234375,
+      "prefill_mean_abs_logit_error": 1.074112606147537e-05,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " green. The word for the color of",
+      "status": "pass"
+    },
+    {
+      "prompt": "Two plus two equals",
+      "prompt_tokens": 4,
+      "prefill_max_abs_logit_error": 0.0001329183578491211,
+      "prefill_mean_abs_logit_error": 1.3605588719656225e-05,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " four, but what if you have three",
+      "status": "pass"
+    },
+    {
+      "prompt": "A friendly greeting is",
+      "prompt_tokens": 4,
+      "prefill_max_abs_logit_error": 8.0108642578125e-05,
+      "prefill_mean_abs_logit_error": 8.48984836920863e-06,
+      "greedy_tokens_equal": true,
+      "first_divergence": null,
+      "generated_text": " a great way to start a conversation.",
+      "status": "pass"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # LLM inference engine: implementation and portfolio plan
 
-Status: Phase 0 feasibility and Phase 1 contiguous-cache reference implemented on September 21, 2026. Physical paging, scheduling, serving, and performance measurement remain future work; no performance results exist.
+Status: Phase 0 and Phase 1 are implemented. Phase 2 now has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; the optimized Linux backend gate remains open. Scheduling, serving, and performance measurement remain future work, and no performance results exist.
 
 ## 1. Outcome and assumptions
 
