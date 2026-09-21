@@ -1,0 +1,5 @@
+# GitHub-hosted CPU runners. The local version excludes CUDA wheels while the
+# remaining test dependencies continue to resolve from the default PyPI index.
+--extra-index-url https://download.pytorch.org/whl/cpu
+-r test.txt
+torch==2.13.0+cpu
