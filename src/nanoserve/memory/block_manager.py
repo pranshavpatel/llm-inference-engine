@@ -69,6 +69,10 @@ class BlockManager:
     def block_table(self, request_id: str) -> tuple[int, ...]:
         return tuple(self._tables[request_id])
 
+    def reserved_tokens(self, request_id: str) -> int:
+        """Return the total KV slots promised to a request."""
+        return self._slots[request_id]
+
     def slot(self, request_id: str, position: int) -> tuple[int, int]:
         if isinstance(position, bool) or not isinstance(position, int):
             raise ValueError("position must be an integer")

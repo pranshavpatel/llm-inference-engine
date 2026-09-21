@@ -160,14 +160,9 @@ class Qwen2Attention(nn.Module):
         self.o_proj = nn.Linear(self.num_heads * self.head_dim, config.hidden_size, bias=False)
         self.rotary_emb = RotaryEmbedding(self.head_dim, config.rope_theta)
 
-    def forward(
-        self,
-        hidden_states: Tensor,
-        position_ids: Tensor,
-        attention_mask: Optional[Tensor] = None,
-        past_key_value: Optional[LayerKV] = None,
-        use_cache: bool = False,
-    ) -> tuple[Tensor, Optional[LayerKV]]:
+    def project_qkv(
+        self, hidden_states: Tensor, position_ids: Tensor
+    ) -> tuple[Tensor, Tensor, Tensor]:
         batch, query_length, _ = hidden_states.shape
         query = self.q_proj(hidden_states).view(batch, query_length, self.num_heads, self.head_dim).transpose(1, 2)
         key = self.k_proj(hidden_states).view(
@@ -177,6 +172,18 @@ class Qwen2Attention(nn.Module):
             batch, query_length, self.num_key_value_heads, self.head_dim
         ).transpose(1, 2)
         query, key = self.rotary_emb(query, key, position_ids)
+        return query, key, value
+
+    def forward(
+        self,
+        hidden_states: Tensor,
+        position_ids: Tensor,
+        attention_mask: Optional[Tensor] = None,
+        past_key_value: Optional[LayerKV] = None,
+        use_cache: bool = False,
+    ) -> tuple[Tensor, Optional[LayerKV]]:
+        batch, query_length, _ = hidden_states.shape
+        query, key, value = self.project_qkv(hidden_states, position_ids)
 
         past_length = 0
         if past_key_value is not None:
