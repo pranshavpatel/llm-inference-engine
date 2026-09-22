@@ -55,7 +55,7 @@ The implemented API subset is:
 
 - `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, greedy `temperature=0`, and optional boolean `ignore_eos` for fixed-output experiments.
 - JSON completions with exact prompt/completion token accounting, or SSE chunks terminated by `data: [DONE]`.
-- `GET /health`, `GET /ready`, and JSON `GET /metrics`.
+- `GET /health`, `GET /ready`, and JSON `GET /metrics`. The worker metrics include a cumulative `generated_tokens` counter: one increment per emitted model token, excluding recomputed history and terminal events without a token. Take differences between boundary samples for an internal output-token count; the counter alone does not define a benchmark measurement window.
 - `400` for unsupported inputs, `429` for bounded-queue overload, `503` when the worker is unavailable, and disconnect cancellation for streaming responses.
 
 Run a local contract demo backed by a deterministic, randomly initialized tiny Qwen2 model:
