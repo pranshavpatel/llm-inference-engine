@@ -34,8 +34,16 @@ step (zero-based step 3), HF chose token 714, ` but`, with logit 20.375; its
 runner-up logit was 19.625, a 0.75 margin. vLLM's ` what` was absent from HF's
 top five (the fifth logit was 18.875). Thus this divergence is **not** an HF
 near-tie at the shared prefix. The earlier near-tie on the other GPU cannot
-explain it. The cause is still unknown; inspect vLLM's candidates on the same
-prefix before attributing it to any kernel or configuration difference.
+explain it. The saved vLLM top-ten probe (`vllm-logprob-probe-r000000.json`)
+verified the vLLM replay checksum and reproduced its text as a single request.
+At step 3, vLLM chose ` what` with a 0.875 log-probability margin over ` if`;
+HF's ` but` was absent from vLLM's top ten, at least 2.25 log-probability units
+below vLLM's winner. These are margins *within* each engine; HF raw logits and
+vLLM normalized log-probabilities must not be compared as absolute values.
+The discrepancy does not require two simultaneous requests, but its cause is
+still unknown. The probe response itself does not record the current server's
+revision and launch flags; retain those separately before drawing conclusions
+about a specific vLLM backend.
 
 The runs were **not** a performance comparison: there were only two requests,
 no warmup or bounded measurement interval, and the resource configurations
@@ -91,20 +99,10 @@ not reset them to make the command work.
 The file contains only top-five logits per generation step, not the full model
 output tensor.
 
-## Next diagnostic: vLLM's candidates at the shared prefix
+## vLLM candidate probe already completed
 
-On the same VM, check for local changes and pull the latest Phase 5 branch
-first:
-
-```bash
-cd ~/llm-inference-engine
-git status --short
-git pull --ff-only
-```
-
-Then start vLLM with **exactly** the pilot flags in `../PHASE5_VM_PILOT.md`,
-leaving nanoserve stopped. The server must use the same pinned model and
-tokenizer revision. Once it is ready, in a second terminal:
+The probe was run against a vLLM 0.30.0 server after the Phase 5 branch was
+updated. The request used was:
 
 ```bash
 cd ~/llm-inference-engine
@@ -117,10 +115,46 @@ PYTHONPATH=src python scripts/phase5_vllm_logprob_probe.py \
   --output phase5-vm-pilot/vllm-logprob-probe-r000000.json
 ```
 
-If tracked local changes prevent pulling, preserve them; do not reset them.
 The script makes one non-streaming greedy request with ten top-token logprobs
 and otherwise the replay's prompt, output limit, and ignore-EOS policy. It
 saves the full response and reports whether its output matches the earlier
-two-request vLLM replay. Send back the JSON even if that flag is false or the
-server returns an error. A single request may not reproduce a batching-related
-effect, so a different output is diagnostic rather than a resolved cause.
+two-request vLLM replay. The returned file matched.
+
+## Next diagnostic: vLLM eager-mode ablation
+
+This is a correctness-only ablation, **not** a scored performance run. Stop the
+current vLLM server and wait for it to exit; leave nanoserve stopped. On the
+same L40S, restart vLLM with the exact pilot command in
+`../PHASE5_VM_PILOT.md`, adding `--enforce-eager` and saving to a new log file:
+
+```bash
+cd ~/llm-inference-engine
+source .venv-vllm/bin/activate
+VLLM_USE_FLASHINFER_SAMPLER=0 vllm serve Qwen/Qwen2.5-1.5B-Instruct \
+  --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 \
+  --tokenizer-revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 \
+  --generation-config vllm --dtype bfloat16 \
+  --max-model-len 64 --gpu-memory-utilization 0.3 \
+  --enforce-eager --host 127.0.0.1 --port 8000 \
+  2>&1 | tee phase5-vm-pilot/vllm-eager-server.log
+```
+
+In a second terminal after readiness:
+
+```bash
+cd ~/llm-inference-engine
+source .venv-vllm/bin/activate
+PYTHONPATH=src python scripts/phase5_vllm_logprob_probe.py \
+  --trace phase5-vm-pilot/fixed-trace.json \
+  --vllm-replay phase5-vm-pilot/vllm-fixed.json \
+  --request-id r000000 \
+  --endpoint http://127.0.0.1:8000/v1/completions \
+  --output phase5-vm-pilot/vllm-eager-logprob-probe-r000000.json
+```
+
+Return both the JSON and the new server log, including startup configuration.
+If eager vLLM still favors ` what`, compilation/CUDA graphs are not necessary
+for the discrepancy. If it instead favors ` but`, the changed execution mode
+is implicated, but further checks must separate compilation from CUDA graphs.
+[vLLM 0.30 documents](https://docs.vllm.ai/en/v0.30.0/cli/serve/) that
+`--enforce-eager` disables both.

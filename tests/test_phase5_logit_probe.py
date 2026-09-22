@@ -62,6 +62,30 @@ class Phase5LogitProbeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "checksummed trace"):
             prepare_probe(trace, replay, "r000000")
 
+    def test_saved_vllm_probe_reproduces_replay_and_excludes_hf_choice(self):
+        root = self.pilot_root()
+        trace = json.loads((root / "fixed-trace.json").read_text(encoding="utf-8"))
+        replay_bytes = (root / "vllm-fixed.json").read_bytes()
+        replay = json.loads(replay_bytes)
+        probe = json.loads((root / "vllm-logprob-probe-r000000.json").read_text(encoding="utf-8"))
+        self.assertEqual(probe["trace_sha256"], trace["sha256"])
+        self.assertEqual(probe["vllm_replay_file_sha256"], hashlib.sha256(replay_bytes).hexdigest())
+        self.assertEqual(probe["http_status"], 200)
+        self.assertTrue(probe["matches_vllm_replay"])
+        response = probe["response"]
+        self.assertEqual(response["model"], trace["model"])
+        self.assertEqual(response["usage"]["completion_tokens"], 8)
+        choice = response["choices"][0]
+        self.assertEqual(choice["text"], replay["records"][0]["output_text"])
+        self.assertEqual(choice["finish_reason"], "length")
+        logprobs = choice["logprobs"]
+        self.assertEqual(logprobs["tokens"][:4], [" four", ",", " but", " what"])
+        fourth = logprobs["top_logprobs"][3]
+        self.assertEqual(max(fourth, key=fourth.get), " what")
+        self.assertAlmostEqual(fourth[" what"] - fourth[" if"], 0.875, places=6)
+        self.assertNotIn(" but", fourth)
+        self.assertGreaterEqual(fourth[" what"] - min(fourth.values()), 2.25)
+
 
 if __name__ == "__main__":
     unittest.main()
