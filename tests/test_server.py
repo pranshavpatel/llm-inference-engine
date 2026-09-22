@@ -231,7 +231,7 @@ class ServerTests(unittest.TestCase):
         payload = json.loads(response.read())
         connection.close()
         self.assertEqual(response.status, 400)
-        self.assertIn("valid JSON", payload["error"]["message"])
+        self.assertEqual(payload["error"]["type"], "invalid_request_error")
 
     def test_stream_disconnect_requests_cancellation(self):
         release = threading.Event()

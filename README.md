@@ -167,4 +167,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The remaining Phase 4 gate is to run the saved trace against vLLM on a supported host and verify complete records for all three engines. Controlled performance claims still require a comparable, isolated target GPU environment.
+The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU environment.
