@@ -28,10 +28,12 @@ class StubWorker:
         self.overloaded = False
         self.cancelled = []
         self.counter = 0
+        self.last_eos_token_id = None
 
     def submit(self, prompt_token_ids, max_new_tokens, *, eos_token_id=None, request_id=None):
         if self.overloaded:
             raise WorkerQueueFull("test capacity reached")
+        self.last_eos_token_id = eos_token_id
         self.counter += 1
         handle = RequestHandle(
             request_id or f"cmpl-test-{self.counter}",
@@ -176,6 +178,24 @@ class ServerTests(unittest.TestCase):
 
     def test_eos_maps_to_openai_stop_reason(self):
         self.assertEqual(CompletionService.finish_reason(FinishReason.EOS), "stop")
+
+    def test_ignore_eos_is_boolean_and_disables_early_stop(self):
+        class EosCodec(CharacterCodec):
+            eos_token_id = ord("A")
+
+        self.server.service.codec = EosCodec()
+        payload = {"model": "test-model", "prompt": "x", "max_tokens": 3}
+        status, _, _ = self.request("POST", "/v1/completions", payload)
+        self.assertEqual(status, 200)
+        self.assertEqual(self.worker.last_eos_token_id, ord("A"))
+
+        status, _, body = self.request("POST", "/v1/completions", {**payload, "ignore_eos": True})
+        self.assertEqual(status, 200)
+        self.assertIsNone(self.worker.last_eos_token_id)
+        self.assertEqual(json.loads(body)["usage"]["completion_tokens"], 3)
+
+        status, _, _ = self.request("POST", "/v1/completions", {**payload, "ignore_eos": 1})
+        self.assertEqual(status, 400)
 
     def test_stream_waits_for_complete_multibyte_character(self):
         self.server.service.codec = Utf8Codec()

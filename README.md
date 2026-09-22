@@ -53,7 +53,7 @@ Phase 4 now includes a dependency-free HTTP correctness path. `InferenceWorker` 
 
 The implemented API subset is:
 
-- `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, and greedy `temperature=0`.
+- `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, greedy `temperature=0`, and optional boolean `ignore_eos` for fixed-output experiments.
 - JSON completions with exact prompt/completion token accounting, or SSE chunks terminated by `data: [DONE]`.
 - `GET /health`, `GET /ready`, and JSON `GET /metrics`.
 - `400` for unsupported inputs, `429` for bounded-queue overload, `503` when the worker is unavailable, and disconnect cancellation for streaming responses.
@@ -101,11 +101,11 @@ The committed two-request debug trace was replayed against the pinned Hugging Fa
 
 ## Phase 5 experiment groundwork
 
-`plan-sweep` writes reproducible, independently seeded Poisson arrival traces for fixed offered-load intervals. Each trace is saved once and can be replayed unchanged against all engines. The current protocol uses normal EOS behavior, so `max_tokens` is a ceiling, not a guaranteed fixed output length. Use a new output directory for each plan:
+`plan-sweep` writes reproducible, independently seeded Poisson arrival traces for fixed offered-load intervals. Each trace is saved once and can be replayed unchanged against all engines. Use `--ignore-eos` for the fixed-output benchmark policy: EOS token IDs still count toward `max_tokens`, and a completed HTTP replay is marked failed unless usage reports exactly that many generated tokens with a `length` finish. Without the flag, normal EOS behavior remains available for correctness checks. vLLM 0.30 supports the `ignore_eos` completion parameter as a [server extension](https://docs.vllm.ai/en/v0.30.0/serving/online_serving/openai_compatible_server/). Use a new output directory for each plan:
 
 ```powershell
 $env:PYTHONPATH = "src"
-.\.venv\Scripts\python.exe -m nanoserve plan-sweep --rates 1,2,4 --repetitions 3 --duration-s 30 --seed 42 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --output-dir phase5-pilot-plan
+.\.venv\Scripts\python.exe -m nanoserve plan-sweep --rates 1,2,4 --repetitions 3 --duration-s 30 --seed 42 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --ignore-eos --output-dir phase5-pilot-plan
 ```
 
 `analyze-replay` validates a saved record against its checksummed trace, then exports a manifest, per-request CSV, timestamped chunk-event JSONL, and aggregate JSON. For a small format check using the committed Phase 4 records:
@@ -120,7 +120,7 @@ For a fixed-window trace, HTTP replay can now stop after an explicit drain inter
 .\.venv\Scripts\python.exe -m nanoserve replay --trace phase5-pilot-plan/trace-rate-00-rep-00.json --engine nanoserve --endpoint http://127.0.0.1:8000/v1/completions --bounded-drain-s 10 --max-workers 32 --output phase5-pilot-nanoserve.json
 ```
 
-The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; scored same-GPU sweeps, fixed-length output policy, profiles, and plots remain to be completed before any comparative performance claim.
+The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; fixed-output behavior still needs validation against the installed vLLM server, and scored same-GPU sweeps, profiles, and plots remain before any comparative performance claim.
 
 ## Physical paged reference
 
@@ -176,7 +176,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `92` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `99` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 

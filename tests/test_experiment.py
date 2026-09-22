@@ -136,6 +136,18 @@ class ExperimentTests(unittest.TestCase):
                 )
             self.assertFalse(output.exists())
 
+    def test_sweep_plan_fixed_output_policy_reaches_each_trace(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "fixed"
+            manifest = write_sweep_plan(
+                output, rates=[10], repetitions=1, duration_s=1, base_seed=1,
+                model="m", revision="r", prompts=["p"], max_tokens=4,
+                ignore_eos=True,
+            )
+            trace = json.loads((output / manifest["traces"][0]["file"]).read_text(encoding="utf-8"))
+            self.assertIn("require exactly", manifest["output_policy"])
+            self.assertTrue(all(request["ignore_eos"] for request in trace["requests"]))
+
 
 if __name__ == "__main__":
     unittest.main()

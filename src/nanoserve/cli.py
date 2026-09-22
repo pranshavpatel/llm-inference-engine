@@ -294,6 +294,7 @@ def main(argv=None) -> int:
     requests.add_argument("--revision", required=True)
     requests.add_argument("--prompt", action="append", dest="prompts", required=True)
     requests.add_argument("--max-tokens", type=int, default=16)
+    requests.add_argument("--ignore-eos", action="store_true", help="Require max-tokens generated tokens")
     requests.add_argument("--output", type=Path, required=True)
     replay = sub.add_parser("replay", help="Replay a saved completion trace")
     replay.add_argument("--trace", type=Path, required=True)
@@ -319,6 +320,7 @@ def main(argv=None) -> int:
     sweep.add_argument("--revision", required=True)
     sweep.add_argument("--prompt", action="append", dest="prompts", required=True)
     sweep.add_argument("--max-tokens", type=int, default=64)
+    sweep.add_argument("--ignore-eos", action="store_true", help="Require max-tokens generated tokens")
     sweep.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
@@ -346,6 +348,7 @@ def main(argv=None) -> int:
                 revision=args.revision,
                 prompts=args.prompts,
                 max_tokens=args.max_tokens,
+                ignore_eos=args.ignore_eos,
             )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -366,6 +369,7 @@ def main(argv=None) -> int:
                 revision=args.revision,
                 prompts=args.prompts,
                 max_tokens=args.max_tokens,
+                ignore_eos=args.ignore_eos,
             )
         else:
             from .replay import (

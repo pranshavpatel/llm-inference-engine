@@ -34,6 +34,7 @@ def make_completion_trace(
     revision: str,
     prompts: list[str],
     max_tokens: int,
+    ignore_eos: bool = False,
 ) -> dict:
     """Create a saved text workload with arrival offsets fixed before replay."""
     if not model or not revision:
@@ -42,6 +43,8 @@ def make_completion_trace(
         raise ValueError("prompts must contain nonempty strings")
     if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
         raise ValueError("max_tokens must be a positive integer")
+    if not isinstance(ignore_eos, bool):
+        raise ValueError("ignore_eos must be a boolean")
     plan = make_trace(count, rate, seed, prompt_tokens=1, output_tokens=max_tokens)
     rng = random.Random(seed)
     payload = {
@@ -57,6 +60,7 @@ def make_completion_trace(
                 "arrival_offset_s": item["arrival_offset_s"],
                 "prompt": rng.choice(prompts),
                 "max_tokens": max_tokens,
+                **({"ignore_eos": True} if ignore_eos else {}),
             }
             for item in plan["requests"]
         ],
@@ -73,6 +77,7 @@ def make_duration_completion_trace(
     revision: str,
     prompts: list[str],
     max_tokens: int,
+    ignore_eos: bool = False,
 ) -> dict:
     """Save every Poisson arrival in a fixed offered-load interval.
 
@@ -89,6 +94,8 @@ def make_duration_completion_trace(
         raise ValueError("model, revision, and prompts must be nonempty")
     if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
         raise ValueError("max_tokens must be a positive integer")
+    if not isinstance(ignore_eos, bool):
+        raise ValueError("ignore_eos must be a boolean")
     arrival_rng = random.Random(seed)
     prompt_rng = random.Random(seed)
     arrival = 0.0
@@ -102,6 +109,7 @@ def make_duration_completion_trace(
             "arrival_offset_s": arrival,
             "prompt": prompt_rng.choice(prompts),
             "max_tokens": max_tokens,
+            **({"ignore_eos": True} if ignore_eos else {}),
         })
     if not requests:
         raise ValueError("seeded interval has no arrivals; increase rate or duration_s")
@@ -148,6 +156,7 @@ def validate_completion_trace(trace: dict) -> None:
         offset = request.get("arrival_offset_s")
         prompt = request.get("prompt")
         max_tokens = request.get("max_tokens")
+        ignore_eos = request.get("ignore_eos", False)
         if not isinstance(request_id, str) or not request_id or request_id in seen:
             raise ValueError("trace request IDs must be unique nonempty strings")
         if (
@@ -163,6 +172,8 @@ def validate_completion_trace(trace: dict) -> None:
             raise ValueError("trace prompts must be nonempty strings")
         if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
             raise ValueError("trace max_tokens must be positive integers")
+        if not isinstance(ignore_eos, bool):
+            raise ValueError("trace ignore_eos must be a boolean")
         seen.add(request_id)
         previous = offset
     payload = {key: value for key, value in trace.items() if key != "sha256"}
@@ -244,16 +255,17 @@ class HTTPCompletionsAdapter:
             self._url.port,
             timeout=remaining_timeout(),
         )
-        body = json.dumps(
-            {
-                "model": self.model,
-                "prompt": request["prompt"],
-                "max_tokens": request["max_tokens"],
-                "temperature": 0,
-                "stream": True,
-                "stream_options": {"include_usage": True},
-            }
-        )
+        payload = {
+            "model": self.model,
+            "prompt": request["prompt"],
+            "max_tokens": request["max_tokens"],
+            "temperature": 0,
+            "stream": True,
+            "stream_options": {"include_usage": True},
+        }
+        if request.get("ignore_eos", False):
+            payload["ignore_eos"] = True
+        body = json.dumps(payload)
         sent = None
         active_socket = None
         try:
@@ -315,7 +327,7 @@ class HTTPCompletionsAdapter:
                     )
             if not done or finish_reason is None:
                 raise RuntimeError("completion stream ended without [DONE] and finish reason")
-            return {
+            record = {
                 "request_id": request["request_id"],
                 "status": "completed",
                 "actual_send_offset_s": sent,
@@ -327,12 +339,28 @@ class HTTPCompletionsAdapter:
                 "usage": usage,
                 "chunks": chunks,
             }
+            if request.get("ignore_eos", False):
+                observed = usage.get("completion_tokens") if isinstance(usage, dict) else None
+                if observed != request["max_tokens"] or finish_reason != "length":
+                    record["status"] = "failed"
+                    record["error"] = (
+                        "fixed-output policy mismatch: expected "
+                        f"{request['max_tokens']} tokens and length finish, "
+                        f"got {observed} tokens and {finish_reason!r}"
+                    )
+            return record
         except Exception as error:
+            at = time.monotonic()
+            drain_timeout = (
+                deadline_monotonic is not None
+                and isinstance(error, TimeoutError)
+                and at >= deadline_monotonic - 0.01
+            )
             return {
                 "request_id": request["request_id"],
-                "status": "failed",
+                "status": "timed_out" if drain_timeout else "failed",
                 "actual_send_offset_s": sent,
-                "completed_offset_s": time.monotonic() - trace_start,
+                "completed_offset_s": at - trace_start,
                 "error": f"{type(error).__name__}: {error}",
             }
         finally:
@@ -385,7 +413,7 @@ class HuggingFaceAdapter:
             for step in range(request["max_tokens"]):
                 token = int(output.logits[0, -1].argmax())
                 generated.append(token)
-                if token == eos:
+                if token == eos and not request.get("ignore_eos", False):
                     finish_reason = "stop"
                 decoded = self.tokenizer.decode(
                     generated,
@@ -394,7 +422,7 @@ class HuggingFaceAdapter:
                 )
                 if not decoded.startswith(emitted_text):
                     raise RuntimeError("tokenizer output changed text already emitted")
-                stable = decoded if finish_reason == "stop" or step + 1 == request["max_tokens"] else decoded.split("\ufffd", 1)[0]
+                stable = decoded if finish_reason == "stop" or step + 1 == request["max_tokens"] else decoded.rstrip("\ufffd")
                 piece = stable[len(emitted_text) :]
                 emitted_text = stable
                 at = time.monotonic() - trace_start

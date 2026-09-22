@@ -224,6 +224,7 @@ def write_sweep_plan(
     revision: str,
     prompts: list[str],
     max_tokens: int,
+    ignore_eos: bool = False,
 ) -> dict:
     """Write paired, independently seeded fixed-window arrival traces."""
     if not rates or any(isinstance(rate, bool) or not isinstance(rate, (int, float)) or not math.isfinite(rate) or rate <= 0 for rate in rates):
@@ -240,6 +241,7 @@ def write_sweep_plan(
             trace = make_duration_completion_trace(
                 duration_s=duration_s, rate=rate, seed=base_seed + repetition,
                 model=model, revision=revision, prompts=prompts, max_tokens=max_tokens,
+                ignore_eos=ignore_eos,
             )
             planned.append((f"trace-rate-{rate_index:02d}-rep-{repetition:02d}.json", trace, rate_index, repetition))
     output_dir.mkdir(parents=True, exist_ok=False)
@@ -266,7 +268,10 @@ def write_sweep_plan(
         "duration_s": float(duration_s),
         "base_seed": base_seed,
         "max_tokens": max_tokens,
-        "output_policy": "normal EOS; max_tokens is a ceiling, not a fixed output length",
+        "output_policy": (
+            "ignore EOS; require exactly max_tokens generated tokens"
+            if ignore_eos else "normal EOS; max_tokens is a ceiling, not a fixed output length"
+        ),
         "status": "arrival plan only; not a scored benchmark run",
         "traces": traces,
     }

@@ -41,6 +41,9 @@ class CompletionService:
         max_tokens = payload.get("max_tokens", 16)
         if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
             raise ValueError("max_tokens must be a positive integer")
+        ignore_eos = payload.get("ignore_eos", False)
+        if not isinstance(ignore_eos, bool):
+            raise ValueError("ignore_eos must be a boolean")
         stream = payload.get("stream", False)
         if not isinstance(stream, bool):
             raise ValueError("stream must be a boolean")
@@ -64,6 +67,7 @@ class CompletionService:
             "model",
             "prompt",
             "max_tokens",
+            "ignore_eos",
             "stream",
             "n",
             "temperature",
@@ -78,7 +82,7 @@ class CompletionService:
         handle = self.worker.submit(
             prompt_ids,
             max_tokens,
-            eos_token_id=self.codec.eos_token_id,
+            eos_token_id=None if ignore_eos else self.codec.eos_token_id,
         )
         return handle, stream, include_usage
 
