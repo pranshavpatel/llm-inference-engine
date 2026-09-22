@@ -132,12 +132,12 @@ class ExperimentTests(unittest.TestCase):
                 self.assertEqual(aggregate["cohort"]["completed"], 2)
                 self.assertEqual(aggregate["full_run_completed_output_tokens"], 4)
 
-    def test_committed_phase5_vm_pilot_validates_fixed_output_but_has_one_text_divergence(self):
+    def test_committed_phase5_vm_pilot_matches_hf_and_nanoserve_but_not_vllm(self):
         root = Path(__file__).resolve().parents[1] / "environment" / "phase5-vm-pilot"
         trace = json.loads((root / "fixed-trace.json").read_text(encoding="utf-8"))
         validate_completion_trace(trace)
         outputs = {}
-        for engine in ("nanoserve", "vllm"):
+        for engine in ("hf", "nanoserve", "vllm"):
             replay = json.loads((root / f"{engine}-fixed.json").read_text(encoding="utf-8"))
             aggregate, rows, _ = analyze_replay(trace, replay)
             self.assertEqual(aggregate["cohort"]["completed"], 2)
@@ -145,7 +145,8 @@ class ExperimentTests(unittest.TestCase):
             self.assertEqual(aggregate["cohort"]["missing_usage"], 0)
             self.assertTrue(all(row["completion_tokens"] == 8 and row["finish_reason"] == "length" for row in rows))
             outputs[engine] = [record["output_text"] for record in replay["records"]]
-        self.assertNotEqual(outputs["nanoserve"][0], outputs["vllm"][0])
+        self.assertEqual(outputs["hf"], outputs["nanoserve"])
+        self.assertNotEqual(outputs["hf"][0], outputs["vllm"][0])
         self.assertEqual(outputs["nanoserve"][1], outputs["vllm"][1])
 
     def test_sweep_plan_is_fixed_window_reproducible_and_paired(self):
