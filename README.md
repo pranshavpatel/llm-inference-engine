@@ -99,6 +99,23 @@ On a separate supported vLLM host, run its OpenAI-compatible completions server 
 
 The committed two-request debug trace was replayed against the pinned Hugging Face checkpoint, nanoserve, and vLLM 0.30.0. All three completed 2/2 requests with matching text (` four,` and ` Paris.`), `length` finish reasons, two completion tokens each, matching prompt-token usage, and no missing usage. The vLLM run used an Ubuntu 24 NVIDIA L40S VM with `VLLM_USE_FLASHINFER_SAMPLER=0` because the VM lacked `nvcc`; its launch pinned both model and tokenizer revisions to the trace's commit. See `environment/phase4-vllm-smoke.json` and `environment/README.md` for the saved evidence and environment details. These short smoke records are functional evidence only; the Windows and Linux runs used different GPUs and are not benchmark results.
 
+## Phase 5 experiment groundwork
+
+`plan-sweep` writes reproducible, independently seeded Poisson arrival traces for fixed offered-load intervals. Each trace is saved once and can be replayed unchanged against all engines. The current protocol uses normal EOS behavior, so `max_tokens` is a ceiling, not a guaranteed fixed output length. Use a new output directory for each plan:
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m nanoserve plan-sweep --rates 1,2,4 --repetitions 3 --duration-s 30 --seed 42 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --output-dir phase5-pilot-plan
+```
+
+`analyze-replay` validates a saved record against its checksummed trace, then exports a manifest, per-request CSV, timestamped chunk-event JSONL, and aggregate JSON. For a small format check using the committed Phase 4 records:
+
+```powershell
+.\.venv\Scripts\python.exe -m nanoserve analyze-replay --trace environment/phase4-debug-trace.json --replay environment/phase4-vllm-smoke.json --output-dir phase4-vllm-analysis
+```
+
+The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Failures and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; scored same-GPU sweeps, bounded drain, fixed-length output policy, repetitions, profiles, and plots remain to be completed before any comparative performance claim.
+
 ## Physical paged reference
 
 `PagedKVCache` preallocates K/V tensors with layout `[layer, physical_page, offset, kv_head, head_dim]`. `PagedKVCacheManager` connects those tensors to `BlockManager`, tracks completed KV tokens separately from reserved slots, clears released pages, and commits an append only after every transformer layer has written the same token range.
@@ -153,7 +170,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The full non-GPU suite passes `77` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `89` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 

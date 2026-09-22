@@ -305,6 +305,20 @@ def main(argv=None) -> int:
     replay.add_argument("--timeout-s", type=float, default=60)
     replay.add_argument("--max-workers", type=int, default=32)
     replay.add_argument("--output", type=Path, required=True)
+    analysis = sub.add_parser("analyze-replay", help="Export honest full-cohort metrics from one saved replay")
+    analysis.add_argument("--trace", type=Path, required=True)
+    analysis.add_argument("--replay", type=Path, required=True)
+    analysis.add_argument("--output-dir", type=Path, required=True)
+    sweep = sub.add_parser("plan-sweep", help="Save fixed-window Poisson traces for paired pilot runs")
+    sweep.add_argument("--rates", required=True, help="Comma-separated target requests per second")
+    sweep.add_argument("--repetitions", type=int, default=3)
+    sweep.add_argument("--duration-s", type=float, required=True)
+    sweep.add_argument("--seed", type=int, default=0)
+    sweep.add_argument("--model", required=True)
+    sweep.add_argument("--revision", required=True)
+    sweep.add_argument("--prompt", action="append", dest="prompts", required=True)
+    sweep.add_argument("--max-tokens", type=int, default=64)
+    sweep.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "doctor":
@@ -334,6 +348,24 @@ def main(argv=None) -> int:
             )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        elif args.command == "analyze-replay":
+            from .experiment import write_analysis
+
+            report = write_analysis(args.trace, args.replay, args.output_dir)
+        elif args.command == "plan-sweep":
+            from .experiment import write_sweep_plan
+
+            report = write_sweep_plan(
+                args.output_dir,
+                rates=[float(item.strip()) for item in args.rates.split(",")],
+                repetitions=args.repetitions,
+                duration_s=args.duration_s,
+                base_seed=args.seed,
+                model=args.model,
+                revision=args.revision,
+                prompts=args.prompts,
+                max_tokens=args.max_tokens,
+            )
         else:
             from .replay import (
                 HTTPCompletionsAdapter,
