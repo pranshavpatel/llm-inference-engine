@@ -1,0 +1,16 @@
+{"request_id": "r000000", "chunk_index": 0, "at_offset_s": 0.041950224003812764, "text": " four", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 1, "at_offset_s": 0.04381015300168656, "text": ",", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 2, "at_offset_s": 0.048232074004772585, "text": " but", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 3, "at_offset_s": 0.05332379200262949, "text": " what", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 4, "at_offset_s": 0.05848895000235643, "text": " if", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 5, "at_offset_s": 0.06354669500433374, "text": " you", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 6, "at_offset_s": 0.0686826410019421, "text": " have", "finish_reason": null}
+{"request_id": "r000000", "chunk_index": 7, "at_offset_s": 0.07422620100260247, "text": " three", "finish_reason": "length"}
+{"request_id": "r000001", "chunk_index": 0, "at_offset_s": 0.04388780200679321, "text": " Paris", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 1, "at_offset_s": 0.04828861300484277, "text": ".", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 2, "at_offset_s": 0.05337884800246684, "text": " The", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 3, "at_offset_s": 0.05854651600384386, "text": " capital", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 4, "at_offset_s": 0.06358198000089033, "text": " of", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 5, "at_offset_s": 0.06871586100169225, "text": " France", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 6, "at_offset_s": 0.07431234900286654, "text": " is", "finish_reason": null}
+{"request_id": "r000001", "chunk_index": 7, "at_offset_s": 0.07887391100666719, "text": " also", "finish_reason": "length"}
