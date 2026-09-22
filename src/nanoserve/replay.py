@@ -81,8 +81,8 @@ def make_duration_completion_trace(
 ) -> dict:
     """Save every Poisson arrival in a fixed offered-load interval.
 
-    This plans arrivals only. Existing replay still drains all requests and
-    therefore does not implement a bounded-drain scored benchmark.
+    This plans arrivals only. Scored replays must opt into bounded drain
+    and retain unfinished requests in their result records.
     """
     if isinstance(duration_s, bool) or not isinstance(duration_s, (int, float)) or not math.isfinite(duration_s) or duration_s <= 0:
         raise ValueError("duration_s must be finite and positive")

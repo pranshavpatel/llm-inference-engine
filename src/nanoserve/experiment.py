@@ -104,6 +104,9 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
             else:
                 tokens = usage["completion_tokens"]
                 output_tokens += tokens
+            if request.get("ignore_eos", False):
+                if record.get("finish_reason") != "length" or (tokens is not None and tokens != request["max_tokens"]):
+                    raise ValueError("completed fixed-output record contradicts trace token policy")
         else:
             error = str(record.get("error", "unknown"))
             if status == "timed_out":
@@ -350,17 +353,41 @@ def write_sweep_report(plan_path: Path, replay_dirs: dict[str, Path], output_dir
     entries = plan.get("traces")
     if not isinstance(entries, list) or not entries:
         raise ValueError("sweep plan must list traces")
+    rates = plan.get("rates_rps")
+    repetitions = plan.get("repetitions")
+    if (not isinstance(rates, list) or not rates or
+            any(isinstance(rate, bool) or not isinstance(rate, (int, float)) or not math.isfinite(rate) or rate <= 0 for rate in rates) or
+            isinstance(repetitions, bool) or not isinstance(repetitions, int) or repetitions <= 0 or
+            len(entries) != len(rates) * repetitions):
+        raise ValueError("sweep plan rates, repetitions, and trace count disagree")
+    seen_pairs: set[tuple[int, int]] = set()
     rows = []
     for entry in entries:
         if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
             raise ValueError("invalid sweep trace entry")
         if Path(entry["file"]).name != entry["file"]:
             raise ValueError("sweep trace file must be a simple filename")
+        rate_index = entry.get("rate_index")
+        repetition = entry.get("repetition")
+        if (isinstance(rate_index, bool) or not isinstance(rate_index, int) or not 0 <= rate_index < len(rates) or
+                isinstance(repetition, bool) or not isinstance(repetition, int) or not 0 <= repetition < repetitions or
+                (rate_index, repetition) in seen_pairs):
+            raise ValueError("sweep trace rate/repetition pair is invalid or duplicated")
+        seen_pairs.add((rate_index, repetition))
         trace_path = plan_path.parent / entry["file"]
         trace = json.loads(trace_path.read_text(encoding="utf-8"))
         validate_completion_trace(trace)
         if trace["sha256"] != entry.get("trace_sha256"):
             raise ValueError("sweep plan trace checksum mismatch")
+        if (trace["model"] != plan.get("model") or trace["revision"] != plan.get("revision") or
+                trace.get("seed") != entry.get("seed") or
+                trace.get("rate_rps") != rates[rate_index] or
+                trace.get("rate_rps") != entry.get("target_rate_rps") or
+                trace.get("offered_interval_s") != plan.get("duration_s") or
+                trace.get("offered_interval_s") != entry.get("offered_interval_s") or
+                len(trace["requests"]) != entry.get("requests") or
+                any(request["max_tokens"] != plan.get("max_tokens") for request in trace["requests"])):
+            raise ValueError("sweep plan metadata disagrees with trace")
         for engine, directory in replay_dirs.items():
             replay_path = directory / entry["file"]
             replay_bytes = replay_path.read_bytes()

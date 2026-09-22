@@ -76,6 +76,22 @@ class ExperimentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "first content"):
             analyze_replay(trace, replay)
 
+    def test_saved_fixed_output_records_must_match_token_policy(self):
+        trace, replay = self.make_pair()
+        fixed_trace = make_completion_trace(
+            count=2, rate=10, seed=4, model="test-model", revision="revision",
+            prompts=["prompt"], max_tokens=2, ignore_eos=True,
+        )
+        replay["trace_sha256"] = fixed_trace["sha256"]
+        analyze_replay(fixed_trace, replay)
+        replay["records"][0]["usage"]["completion_tokens"] = 1
+        with self.assertRaisesRegex(ValueError, "fixed-output"):
+            analyze_replay(fixed_trace, replay)
+        replay["records"][0]["usage"]["completion_tokens"] = 2
+        replay["records"][0]["finish_reason"] = "stop"
+        with self.assertRaisesRegex(ValueError, "fixed-output"):
+            analyze_replay(fixed_trace, replay)
+
     def test_export_writes_manifest_csv_events_and_aggregate(self):
         trace, replay = self.make_pair()
         with tempfile.TemporaryDirectory() as directory:
@@ -197,6 +213,17 @@ class ExperimentTests(unittest.TestCase):
             self.assertIn("<svg", (output_dir / "failure-vs-rate.svg").read_text(encoding="utf-8"))
             with self.assertRaises(FileExistsError):
                 write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, output_dir)
+            corrupted = json.loads((plan_dir / "sweep-plan.json").read_text(encoding="utf-8"))
+            corrupted["traces"][-1] = corrupted["traces"][0]
+            (plan_dir / "sweep-plan.json").write_text(json.dumps(corrupted), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "duplicated"):
+                write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, root / "invalid-report")
+            corrupted = plan.copy()
+            corrupted["traces"] = [entry.copy() for entry in plan["traces"]]
+            corrupted["traces"][0]["target_rate_rps"] = 99
+            (plan_dir / "sweep-plan.json").write_text(json.dumps(corrupted), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "metadata disagrees"):
+                write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, root / "invalid-report")
 
 
 if __name__ == "__main__":
