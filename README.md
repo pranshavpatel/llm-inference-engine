@@ -124,6 +124,14 @@ The aggregate reports full-run completed output tokens per second, client time-t
 
 For the first Ubuntu L40S same-GPU policy check, follow [the Phase 5 VM pilot runbook](environment/PHASE5_VM_PILOT.md). It runs vLLM and nanoserve sequentially, saves both full replay files, and records the environment and server startup configuration.
 
+After a larger paired pilot, save each engine's replay files under its own directory using the trace filenames from `sweep-plan.json` (for example `phase5-runs/nanoserve/trace-rate-00-rep-00.json`). The report command validates every trace/replay pairing and regenerates run-level CSV, per-rate CSV, and two labeled SVG diagnostics:
+
+```powershell
+.\.venv\Scripts\python.exe -m nanoserve report-sweep --plan phase5-pilot-plan/sweep-plan.json --replays nanoserve=phase5-runs/nanoserve --replays vllm=phase5-runs/vllm --output-dir phase5-pilot-report
+```
+
+The report displays the median and range of **per-run** p99 TTFT values; it does not pool requests and relabel that value as a pooled p99. Hollow plot points denote at least one failed repetition. Zero observed failures alone does not establish stable throughput or a sustainable frontier.
+
 ## Physical paged reference
 
 `PagedKVCache` preallocates K/V tensors with layout `[layer, physical_page, offset, kv_head, head_dim]`. `PagedKVCacheManager` connects those tensors to `BlockManager`, tracks completed KV tokens separately from reserved slots, clears released pages, and commits an append only after every transformer layer has written the same token range.
@@ -178,7 +186,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `99` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `100` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 

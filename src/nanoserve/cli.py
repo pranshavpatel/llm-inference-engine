@@ -311,6 +311,10 @@ def main(argv=None) -> int:
     analysis.add_argument("--trace", type=Path, required=True)
     analysis.add_argument("--replay", type=Path, required=True)
     analysis.add_argument("--output-dir", type=Path, required=True)
+    sweep_report = sub.add_parser("report-sweep", help="Regenerate paired pilot CSV and SVG diagnostics")
+    sweep_report.add_argument("--plan", type=Path, required=True, help="Path to sweep-plan.json")
+    sweep_report.add_argument("--replays", action="append", required=True, metavar="ENGINE=DIR")
+    sweep_report.add_argument("--output-dir", type=Path, required=True)
     sweep = sub.add_parser("plan-sweep", help="Save fixed-window Poisson traces for paired pilot runs")
     sweep.add_argument("--rates", required=True, help="Comma-separated target requests per second")
     sweep.add_argument("--repetitions", type=int, default=3)
@@ -356,6 +360,19 @@ def main(argv=None) -> int:
             from .experiment import write_analysis
 
             report = write_analysis(args.trace, args.replay, args.output_dir)
+        elif args.command == "report-sweep":
+            from .experiment import write_sweep_report
+
+            replay_dirs = {}
+            for item in args.replays:
+                if "=" not in item:
+                    raise ValueError("--replays must use ENGINE=DIR")
+                name, directory = item.split("=", 1)
+                if not name or not directory or name in replay_dirs:
+                    raise ValueError("--replays engine names must be unique and nonempty")
+                replay_dirs[name] = Path(directory)
+            report = write_sweep_report(args.plan, replay_dirs, args.output_dir)
+            report = {key: value for key, value in report.items() if key not in ("runs", "by_rate")}
         elif args.command == "plan-sweep":
             from .experiment import write_sweep_plan
 

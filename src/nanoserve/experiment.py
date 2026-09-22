@@ -6,7 +6,9 @@ import csv
 import hashlib
 import json
 import math
+import statistics
 from collections import Counter
+from html import escape
 from pathlib import Path
 
 from nanoserve.replay import make_duration_completion_trace, validate_completion_trace
@@ -277,3 +279,190 @@ def write_sweep_plan(
     }
     (output_dir / "sweep-plan.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
+
+
+def _line_plot_svg(
+    series: list[tuple[str, list[tuple[float, float, str, bool]]]],
+    *,
+    x_label: str,
+    y_label: str,
+    title: str,
+) -> str:
+    """Dependency-free diagnostic SVG; hollow points indicate run failures."""
+    width, height = 760, 470
+    left, right, top, bottom = 88, 30, 45, 72
+    inner_width, inner_height = width - left - right, height - top - bottom
+    all_points = [point for _, points in series for point in points]
+    xs = [point[0] for point in all_points]
+    ys = [point[1] for point in all_points]
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(0.0, min(ys)), max(ys)
+    if x_min == x_max:
+        x_min = max(0.0, x_min - 1)
+        x_max += 1
+    if y_min == y_max:
+        y_max += 1
+    colors = ("#2367b4", "#d35b30", "#328651", "#8456a2", "#a88921")
+
+    def x_position(value: float) -> float:
+        return left + inner_width * (value - x_min) / (x_max - x_min)
+
+    def y_position(value: float) -> float:
+        return top + inner_height * (1 - (value - y_min) / (y_max - y_min))
+
+    pieces = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">',
+        '<rect width="100%" height="100%" fill="white"/>',
+        f'<text x="{width / 2}" y="25" text-anchor="middle" font-size="17">{escape(title)}</text>',
+        f'<path d="M {left} {top} V {top + inner_height} H {left + inner_width}" fill="none" stroke="#333"/>',
+        f'<text x="{left + inner_width / 2}" y="{height - 18}" text-anchor="middle" font-size="13">{escape(x_label)}</text>',
+        f'<text x="20" y="{top + inner_height / 2}" text-anchor="middle" font-size="13" transform="rotate(-90 20 {top + inner_height / 2})">{escape(y_label)}</text>',
+    ]
+    for index in range(5):
+        x_value = x_min + index * (x_max - x_min) / 4
+        y_value = y_min + index * (y_max - y_min) / 4
+        xp, yp = x_position(x_value), y_position(y_value)
+        pieces.append(f'<text x="{xp:.1f}" y="{top + inner_height + 18}" text-anchor="middle" font-size="11">{x_value:.2g}</text>')
+        pieces.append(f'<text x="{left - 8}" y="{yp + 4:.1f}" text-anchor="end" font-size="11">{y_value:.2g}</text>')
+    for index, (name, points) in enumerate(series):
+        color = colors[index % len(colors)]
+        pieces.append(f'<text x="{left + index * 155}" y="{height - 45}" fill="{color}" font-size="12">{escape(name)}</text>')
+        if len(points) > 1:
+            coordinates = " ".join(f"{x_position(x):.1f},{y_position(y):.1f}" for x, y, _, _ in points)
+            pieces.append(f'<polyline points="{coordinates}" fill="none" stroke="{color}" stroke-width="2"/>')
+        for x, y, label, has_failures in points:
+            xp, yp = x_position(x), y_position(y)
+            fill = "white" if has_failures else color
+            pieces.append(f'<circle cx="{xp:.1f}" cy="{yp:.1f}" r="5" fill="{fill}" stroke="{color}" stroke-width="2"/>')
+            pieces.append(f'<text x="{xp + 7:.1f}" y="{yp - 7:.1f}" font-size="10">{escape(label)}</text>')
+    pieces.append('</svg>')
+    return "\n".join(pieces) + "\n"
+
+
+def write_sweep_report(plan_path: Path, replay_dirs: dict[str, Path], output_dir: Path) -> dict:
+    """Regenerate paired pilot diagnostics from complete saved replay files."""
+    if not replay_dirs or any(not name or not isinstance(directory, Path) for name, directory in replay_dirs.items()):
+        raise ValueError("replay_dirs must map engine names to directories")
+    plan_bytes = plan_path.read_bytes()
+    plan = json.loads(plan_bytes)
+    if plan.get("schema_version") != 1 or plan.get("kind") != "phase5-sweep-plan":
+        raise ValueError("unsupported sweep plan")
+    entries = plan.get("traces")
+    if not isinstance(entries, list) or not entries:
+        raise ValueError("sweep plan must list traces")
+    rows = []
+    for entry in entries:
+        if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
+            raise ValueError("invalid sweep trace entry")
+        if Path(entry["file"]).name != entry["file"]:
+            raise ValueError("sweep trace file must be a simple filename")
+        trace_path = plan_path.parent / entry["file"]
+        trace = json.loads(trace_path.read_text(encoding="utf-8"))
+        validate_completion_trace(trace)
+        if trace["sha256"] != entry.get("trace_sha256"):
+            raise ValueError("sweep plan trace checksum mismatch")
+        for engine, directory in replay_dirs.items():
+            replay_path = directory / entry["file"]
+            replay_bytes = replay_path.read_bytes()
+            replay = json.loads(replay_bytes)
+            aggregate, _, _ = analyze_replay(trace, replay)
+            expected_adapter = {
+                "nanoserve": "nanoserve-http",
+                "vllm": "vllm-http",
+                "hf": "huggingface-eager",
+            }.get(engine)
+            if expected_adapter is not None and replay["adapter"] != expected_adapter:
+                raise ValueError(f"{engine} replay has adapter {replay['adapter']!r}")
+            cohort = aggregate["cohort"]
+            rows.append({
+                "engine": engine,
+                "adapter": replay["adapter"],
+                "rate_index": entry["rate_index"],
+                "repetition": entry["repetition"],
+                "target_rate_rps": entry["target_rate_rps"],
+                "trace_sha256": trace["sha256"],
+                "replay_file_sha256": hashlib.sha256(replay_bytes).hexdigest(),
+                "requests": cohort["requests"],
+                "completed": cohort["completed"],
+                "failed": cohort["failed"],
+                "timed_out": cohort["timed_out"],
+                "not_sent": cohort["not_sent"],
+                "missing_usage": cohort["missing_usage"],
+                "p99_client_ttft_s": aggregate["client_ttft"]["p99_s"],
+                "ttft_samples": aggregate["client_ttft"]["count"],
+                "p99_send_lag_s": aggregate["send_lag"]["p99_s"],
+                "full_run_completed_output_tokens_per_s": aggregate["full_run_completed_output_tokens_per_s"],
+                "failure_fraction": cohort["failed"] / cohort["requests"],
+            })
+
+    grouped = []
+    for engine in replay_dirs:
+        for rate_index in sorted({row["rate_index"] for row in rows}):
+            members = [row for row in rows if row["engine"] == engine and row["rate_index"] == rate_index]
+            if len(members) != plan.get("repetitions"):
+                raise ValueError("sweep plan repetition count disagrees with runs")
+            p99_values = [row["p99_client_ttft_s"] for row in members if row["p99_client_ttft_s"] is not None]
+            throughput_values = [row["full_run_completed_output_tokens_per_s"] for row in members if row["full_run_completed_output_tokens_per_s"] is not None]
+            grouped.append({
+                "engine": engine,
+                "rate_index": rate_index,
+                "target_rate_rps": members[0]["target_rate_rps"],
+                "repetitions": len(members),
+                "median_of_run_p99_client_ttft_s": statistics.median(p99_values) if p99_values else None,
+                "min_run_p99_client_ttft_s": min(p99_values) if p99_values else None,
+                "max_run_p99_client_ttft_s": max(p99_values) if p99_values else None,
+                "median_full_run_completed_output_tokens_per_s": statistics.median(throughput_values) if throughput_values else None,
+                "median_failure_fraction": statistics.median(row["failure_fraction"] for row in members),
+                "runs_with_failures": sum(row["failed"] > 0 for row in members),
+            })
+    report = {
+        "schema_version": 1,
+        "kind": "phase5-pilot-sweep-report",
+        "plan_sha256": hashlib.sha256(plan_bytes).hexdigest(),
+        "engines": list(replay_dirs),
+        "runs": rows,
+        "by_rate": grouped,
+        "limitations": [
+            "Pilot diagnostics only: zero observed failures does not prove a stable queue or sustainable throughput.",
+            "The plotted p99 value is the median of per-run p99 values, not a pooled percentile.",
+            "Full-run output-token throughput includes startup and drain; it is not steady-state window throughput.",
+            "No TPOT SLO goodput or sustainable frontier is inferred from HTTP chunks.",
+        ],
+    }
+    output_dir.mkdir(parents=True, exist_ok=False)
+    (output_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    with (output_dir / "runs.csv").open("w", newline="", encoding="utf-8") as output:
+        writer = csv.DictWriter(output, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    with (output_dir / "by-rate.csv").open("w", newline="", encoding="utf-8") as output:
+        writer = csv.DictWriter(output, fieldnames=list(grouped[0]))
+        writer.writeheader()
+        writer.writerows(grouped)
+    latency_series = []
+    failure_series = []
+    for engine in replay_dirs:
+        members = [item for item in grouped if item["engine"] == engine]
+        latency_series.append((engine, [
+            (item["median_full_run_completed_output_tokens_per_s"], item["median_of_run_p99_client_ttft_s"], f"{item['target_rate_rps']:g} rps", item["runs_with_failures"] > 0)
+            for item in members
+            if item["median_full_run_completed_output_tokens_per_s"] is not None and item["median_of_run_p99_client_ttft_s"] is not None
+        ]))
+        failure_series.append((engine, [
+            (item["target_rate_rps"], item["median_failure_fraction"], f"{item['target_rate_rps']:g} rps", item["runs_with_failures"] > 0)
+            for item in members
+        ]))
+    if any(points for _, points in latency_series):
+        (output_dir / "throughput-vs-ttft.svg").write_text(_line_plot_svg(
+            [(name, points) for name, points in latency_series if points],
+            x_label="Full-run completed output tokens/s (includes drain)",
+            y_label="Median of run p99 client TTFT (s)",
+            title="Pilot diagnostic: throughput versus TTFT",
+        ), encoding="utf-8")
+    (output_dir / "failure-vs-rate.svg").write_text(_line_plot_svg(
+        failure_series,
+        x_label="Target offered requests/s",
+        y_label="Median failure fraction",
+        title="Pilot diagnostic: failures versus offered rate",
+    ), encoding="utf-8")
+    return report
