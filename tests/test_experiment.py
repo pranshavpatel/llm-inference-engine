@@ -52,6 +52,18 @@ class ExperimentTests(unittest.TestCase):
         self.assertNotIn("tpot", aggregate)
         self.assertNotIn("goodput", aggregate)
 
+    def test_server_reported_token_timing_is_optional_and_never_inferred_from_chunks(self):
+        trace, replay = self.make_pair()
+        replay["records"][0]["server_metrics"] = {"generation_time_ms": 40.0, "mean_itl_ms": 40.0}
+        aggregate, rows, _ = analyze_replay(trace, replay)
+        self.assertEqual(aggregate["server_reported_tpot"]["count"], 1)
+        self.assertEqual(aggregate["server_reported_tpot"]["p99_s"], 0.04)
+        self.assertEqual(rows[0]["server_tpot_s"], 0.04)
+        self.assertIsNone(rows[1]["server_tpot_s"])
+        replay["records"][0]["server_metrics"]["mean_itl_ms"] = -1
+        with self.assertRaisesRegex(ValueError, "mean_itl_ms"):
+            analyze_replay(trace, replay)
+
     def test_failure_and_missing_usage_remain_visible(self):
         trace, replay = self.make_pair()
         replay["records"][0]["usage"] = None
@@ -204,6 +216,7 @@ class ExperimentTests(unittest.TestCase):
                             "completed_offset_s": sent + 0.02,
                             "finish_reason": "length",
                             "usage": {"prompt_tokens": 1, "completion_tokens": 2, "total_tokens": 3},
+                            "server_metrics": {"generation_time_ms": 10.0, "mean_itl_ms": 10.0},
                             "chunks": [
                                 {"at_offset_s": sent + 0.01, "text": "a", "finish_reason": None},
                                 {"at_offset_s": sent + 0.02, "text": "b", "finish_reason": "length"},
@@ -222,6 +235,7 @@ class ExperimentTests(unittest.TestCase):
             self.assertEqual(len(report["runs"]), 8)
             self.assertEqual(len(report["by_rate"]), 4)
             self.assertEqual(report["by_rate"][0]["repetitions"], 2)
+            self.assertEqual(report["by_rate"][0]["median_of_run_p99_server_tpot_s"], 0.01)
             self.assertIn("median of per-run p99", " ".join(report["limitations"]))
             with (output_dir / "runs.csv").open(newline="", encoding="utf-8") as source:
                 self.assertEqual(len(list(csv.DictReader(source))), 8)

@@ -174,6 +174,8 @@ class ServerTests(unittest.TestCase):
         self.assertIn('"text":"A"', text)
         self.assertIn('"finish_reason":"length"', text)
         self.assertIn('"completion_tokens":2', text)
+        items = [json.loads(line[6:]) for line in text.splitlines() if line.startswith("data: {")]
+        self.assertEqual(items[-1]["metrics"], {"generation_time_ms": 1000.0, "mean_itl_ms": 1000.0})
         self.assertTrue(text.endswith("data: [DONE]\n\n"))
 
     def test_eos_maps_to_openai_stop_reason(self):

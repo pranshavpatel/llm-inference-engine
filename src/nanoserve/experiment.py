@@ -62,6 +62,7 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
     completed_latencies: list[float] = []
     send_lags: list[float] = []
     inter_content_gaps: list[float] = []
+    server_tpots: list[float] = []
     errors: Counter[str] = Counter()
     output_tokens = 0
     missing_usage = 0
@@ -121,6 +122,16 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
                 errors["timeout"] += 1
             else:
                 errors["other"] += 1
+        server_metrics = record.get("server_metrics")
+        if server_metrics is not None and not isinstance(server_metrics, dict):
+            raise ValueError("server_metrics must be an object when present")
+        server_tpot = None
+        if server_metrics is not None:
+            _time(server_metrics.get("generation_time_ms"), "generation_time_ms", optional=True)
+            mean_itl_ms = _time(server_metrics.get("mean_itl_ms"), "mean_itl_ms", optional=True)
+            if status == "completed" and tokens is not None and tokens > 1 and mean_itl_ms is not None:
+                server_tpot = mean_itl_ms / 1000
+                server_tpots.append(server_tpot)
         chunks = record.get("chunks", [])
         if not isinstance(chunks, list):
             raise ValueError("record chunks must be a list")
@@ -147,6 +158,7 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
             "ttft_s": ttft,
             "end_to_end_s": latency,
             "completion_tokens": tokens,
+            "server_tpot_s": server_tpot,
             "finish_reason": record.get("finish_reason"),
             "error": record.get("error"),
         })
@@ -177,10 +189,12 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
         "completed_end_to_end": _percentiles(completed_latencies),
         "send_lag": _percentiles(send_lags),
         "inter_content_chunk_gap": _percentiles(inter_content_gaps),
+        "server_reported_tpot": _percentiles(server_tpots),
         "limitations": [
             "Full-run cohort metrics include startup and drain; they are not steady-state throughput.",
             "HTTP chunks are not model tokens; inter-content-chunk gaps are not ITL or TPOT.",
-            "Token-level TPOT SLO goodput and within-window output-token throughput are unavailable from this replay schema.",
+            "Server-reported TPOT is available only when the server supplies per-request token metrics; missing samples are not inferred from HTTP chunks.",
+            "TPOT SLO goodput and within-window output-token throughput are not computed by this diagnostic replay analysis.",
             "A completed request with missing usage makes output-token throughput unavailable.",
         ],
     }
@@ -417,6 +431,8 @@ def write_sweep_report(plan_path: Path, replay_dirs: dict[str, Path], output_dir
                 "missing_usage": cohort["missing_usage"],
                 "p99_client_ttft_s": aggregate["client_ttft"]["p99_s"],
                 "ttft_samples": aggregate["client_ttft"]["count"],
+                "p99_server_tpot_s": aggregate["server_reported_tpot"]["p99_s"],
+                "server_tpot_samples": aggregate["server_reported_tpot"]["count"],
                 "p99_send_lag_s": aggregate["send_lag"]["p99_s"],
                 "full_run_completed_output_tokens_per_s": aggregate["full_run_completed_output_tokens_per_s"],
                 "failure_fraction": cohort["failed"] / cohort["requests"],
@@ -429,6 +445,7 @@ def write_sweep_report(plan_path: Path, replay_dirs: dict[str, Path], output_dir
             if len(members) != plan.get("repetitions"):
                 raise ValueError("sweep plan repetition count disagrees with runs")
             p99_values = [row["p99_client_ttft_s"] for row in members if row["p99_client_ttft_s"] is not None]
+            tpot_values = [row["p99_server_tpot_s"] for row in members if row["p99_server_tpot_s"] is not None]
             throughput_values = [row["full_run_completed_output_tokens_per_s"] for row in members if row["full_run_completed_output_tokens_per_s"] is not None]
             grouped.append({
                 "engine": engine,
@@ -438,6 +455,9 @@ def write_sweep_report(plan_path: Path, replay_dirs: dict[str, Path], output_dir
                 "median_of_run_p99_client_ttft_s": statistics.median(p99_values) if p99_values else None,
                 "min_run_p99_client_ttft_s": min(p99_values) if p99_values else None,
                 "max_run_p99_client_ttft_s": max(p99_values) if p99_values else None,
+                "median_of_run_p99_server_tpot_s": statistics.median(tpot_values) if tpot_values else None,
+                "min_run_p99_server_tpot_s": min(tpot_values) if tpot_values else None,
+                "max_run_p99_server_tpot_s": max(tpot_values) if tpot_values else None,
                 "median_full_run_completed_output_tokens_per_s": statistics.median(throughput_values) if throughput_values else None,
                 "median_failure_fraction": statistics.median(row["failure_fraction"] for row in members),
                 "runs_with_failures": sum(row["failed"] > 0 for row in members),
@@ -453,7 +473,7 @@ def write_sweep_report(plan_path: Path, replay_dirs: dict[str, Path], output_dir
             "Pilot diagnostics only: zero observed failures does not prove a stable queue or sustainable throughput.",
             "The plotted p99 value is the median of per-run p99 values, not a pooled percentile.",
             "Full-run output-token throughput includes startup and drain; it is not steady-state window throughput.",
-            "No TPOT SLO goodput or sustainable frontier is inferred from HTTP chunks.",
+            "Server TPOT is shown only when per-request metrics were supplied; no SLO goodput or sustainable frontier is inferred from HTTP chunks.",
         ],
     }
     output_dir.mkdir(parents=True, exist_ok=False)

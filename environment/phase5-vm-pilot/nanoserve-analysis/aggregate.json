@@ -42,10 +42,17 @@
     "p90_s": 0.04181219699967187,
     "p99_s": 0.08020390199817484
   },
+  "server_reported_tpot": {
+    "count": 0,
+    "p50_s": null,
+    "p90_s": null,
+    "p99_s": null
+  },
   "limitations": [
     "Full-run cohort metrics include startup and drain; they are not steady-state throughput.",
     "HTTP chunks are not model tokens; inter-content-chunk gaps are not ITL or TPOT.",
-    "Token-level TPOT SLO goodput and within-window output-token throughput are unavailable from this replay schema.",
+    "Server-reported TPOT is available only when the server supplies per-request token metrics; missing samples are not inferred from HTTP chunks.",
+    "TPOT SLO goodput and within-window output-token throughput are not computed by this diagnostic replay analysis.",
     "A completed request with missing usage makes output-token throughput unavailable."
   ]
 }

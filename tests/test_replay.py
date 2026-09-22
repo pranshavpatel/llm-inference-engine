@@ -213,7 +213,8 @@ class ReplayTests(unittest.TestCase):
                 events = [
                     {"id": "remote-1", "choices": [{"text": "hello", "finish_reason": None}]},
                     {"id": "remote-1", "choices": [{"text": " world", "finish_reason": "length"}]},
-                    {"id": "remote-1", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 3, "total_tokens": 4}},
+                    {"id": "remote-1", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 3, "total_tokens": 4},
+                     "metrics": {"generation_time_ms": 24.0, "mean_itl_ms": 12.0}},
                 ]
                 body = "".join(f"data: {json.dumps(event)}\n\n" for event in events)
                 body += "data: [DONE]\n\n"
@@ -243,6 +244,7 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(record["output_text"], "hello world")
         self.assertEqual(len(record["chunks"]), 2)
         self.assertEqual(record["usage"]["completion_tokens"], 3)
+        self.assertEqual(record["server_metrics"]["mean_itl_ms"], 12.0)
         self.assertEqual(result["summary"]["missing_usage"], 0)
         self.assertTrue(captured[0]["stream_options"]["include_usage"])
 

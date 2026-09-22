@@ -293,6 +293,7 @@ class HTTPCompletionsAdapter:
             first_content = None
             finish_reason = None
             usage = None
+            server_metrics = None
             server_request_id = None
             done = False
             while True:
@@ -313,6 +314,8 @@ class HTTPCompletionsAdapter:
                 server_request_id = item.get("id", server_request_id)
                 if item.get("usage") is not None:
                     usage = item["usage"]
+                if item.get("metrics") is not None:
+                    server_metrics = item["metrics"]
                 for choice in item.get("choices", ()):
                     piece = choice.get("text") or ""
                     at = time.monotonic() - trace_start
@@ -337,6 +340,7 @@ class HTTPCompletionsAdapter:
                 "output_text": "".join(text_parts),
                 "finish_reason": finish_reason,
                 "usage": usage,
+                **({"server_metrics": server_metrics} if server_metrics is not None else {}),
                 "chunks": chunks,
             }
             if request.get("ignore_eos", False):

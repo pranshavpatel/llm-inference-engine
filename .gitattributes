@@ -1,1 +1,4 @@
-environment/phase5-vm-pilot/** -text
+# Preserve byte-for-byte VM source artifacts; generated analysis stays normalized text.
+environment/phase5-vm-pilot/*.json -text
+environment/phase5-vm-pilot/*.log -text
+environment/phase5-vm-pilot/*.txt -text
