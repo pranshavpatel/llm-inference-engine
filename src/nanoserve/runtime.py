@@ -57,8 +57,10 @@ def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
     if device.type == "cuda":
         if not torch.cuda.is_available():
             raise ValueError("CUDA is unavailable")
-        if dtype == torch.bfloat16 and not torch.cuda.is_bf16_supported():
-            raise ValueError("this CUDA device does not support bfloat16")
+        if dtype == torch.bfloat16:
+            with torch.cuda.device(device):
+                if not torch.cuda.is_bf16_supported():
+                    raise ValueError("this CUDA device does not support bfloat16")
     elif device.type == "cpu" and dtype != torch.float32:
         raise ValueError("CPU serving requires float32")
     elif device.type not in ("cuda", "cpu"):
@@ -85,7 +87,8 @@ def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
     num_blocks = (config.kv_pool_mib * 1024**2) // bytes_per_block
     if num_blocks < 1:
         raise ValueError("KV pool budget cannot hold one physical page")
-    minimum_pages = (config.max_context_tokens + config.block_size - 1) // config.block_size
+    # The terminal sampled token is returned, not appended to physical KV.
+    minimum_pages = max(1, (config.max_context_tokens - 1 + config.block_size - 1) // config.block_size)
     if num_blocks - math.ceil(num_blocks * config.watermark) < minimum_pages:
         raise ValueError("KV pool cannot admit a maximum-context request")
 

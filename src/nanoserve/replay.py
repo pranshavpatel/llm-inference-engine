@@ -48,7 +48,7 @@ def make_completion_trace(
         "model": model,
         "revision": revision,
         "seed": seed,
-        "rate_rps": rate,
+        "rate_rps": float(rate),
         "requests": [
             {
                 "request_id": item["request_id"],
@@ -254,7 +254,6 @@ class HuggingFaceAdapter:
 
     def run(self, request: dict, trace_start: float) -> dict:
         torch = self._torch
-        sent = time.monotonic() - trace_start
         token_ids = self.tokenizer.encode(request["prompt"], add_special_tokens=False)
         if not token_ids:
             raise ValueError("prompt encoded to zero tokens")
@@ -266,6 +265,7 @@ class HuggingFaceAdapter:
         eos = self.tokenizer.eos_token_id
         with self._lock, torch.inference_mode():
             inputs = torch.tensor([token_ids], dtype=torch.long, device=self.device)
+            sent = time.monotonic() - trace_start
             output = self.model(inputs, use_cache=True)
             cache = output.past_key_values
             for step in range(request["max_tokens"]):

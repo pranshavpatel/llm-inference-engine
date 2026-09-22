@@ -370,7 +370,7 @@ def main(argv=None) -> int:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
             report = {key: value for key, value in report.items() if key != "records"}
-    except (ValueError, KeyError, OSError) as exc:
+    except (ValueError, KeyError, OSError, ImportError) as exc:
         parser.error(str(exc))
     print(json.dumps(report, indent=2))
     return 0

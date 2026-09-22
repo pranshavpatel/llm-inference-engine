@@ -2,6 +2,7 @@ import http.client
 import json
 import tempfile
 import threading
+import time
 import unittest
 from dataclasses import asdict
 from pathlib import Path
@@ -88,7 +89,11 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(result["usage"]["prompt_tokens"], 1)
             self.assertLessEqual(result["usage"]["completion_tokens"], 2)
             self.assertIn(result["choices"][0]["finish_reason"], ("stop", "length"))
-            self.assertEqual(runtime.worker.stats()["cache"]["active_requests"], 0)
+            deadline = time.monotonic() + 2
+            while runtime.worker.stats()["cache"]["active_requests"] != 0:
+                if time.monotonic() >= deadline:
+                    self.fail("worker did not publish the released KV pages")
+                time.sleep(0.01)
             self.assertEqual(runtime.checkpoint_files, ("model.safetensors",))
         finally:
             server.shutdown()

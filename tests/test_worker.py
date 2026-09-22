@@ -1,3 +1,4 @@
+import queue
 import threading
 import time
 import unittest
@@ -8,7 +9,7 @@ from nanoserve.engine import Engine
 from nanoserve.memory import BlockManager, KVCacheSpec, PagedKVCache, PagedKVCacheManager
 from nanoserve.scheduler import Scheduler, SchedulerConfig
 from nanoserve.types import FinishReason, OutputEvent, RequestState
-from nanoserve.worker import InferenceWorker, WorkerClosed, WorkerQueueFull
+from nanoserve.worker import InferenceWorker, RequestHandle, WorkerClosed, WorkerQueueFull, _Submit
 
 
 def make_manager():
@@ -201,6 +202,65 @@ class WorkerTests(unittest.TestCase):
             self.assertTrue(handle.next_event(timeout=2).finished)
         self.assertEqual(worker.stats()["worker"]["rejected"], 1)
         worker.stop()
+
+    def test_continuously_refilled_ingress_does_not_starve_engine_steps(self):
+        class StatsOnlyScheduler:
+            def stats(self):
+                return {"states": {}}
+
+        class SelfFeedingEngine:
+            def __init__(self):
+                self.scheduler = StatsOnlyScheduler()
+                self.worker = None
+                self.admitted = 0
+                self.active = []
+                self.first_step_after = None
+
+            def add_request(self, request_id, prompt, max_tokens, *, eos_token_id=None):
+                self.admitted += 1
+                self.active.append(request_id)
+                if self.admitted < 12:
+                    next_id = f"queued-{self.admitted}"
+                    handle = RequestHandle(next_id, 1, 1, time.time())
+                    self.worker._commands.put_nowait(
+                        _Submit(next_id, (1,), 1, None, handle, queue.Queue(maxsize=1))
+                    )
+
+            def step(self):
+                if self.first_step_after is None:
+                    self.first_step_after = self.admitted
+                active, self.active = self.active, []
+                return tuple(OutputEvent(request_id, 1, True, FinishReason.LENGTH) for request_id in active)
+
+            def abort(self, request_id):
+                return OutputEvent(request_id, None, True, FinishReason.CANCELLED)
+
+        engine = SelfFeedingEngine()
+        worker = InferenceWorker(engine, command_capacity=3)
+        engine.worker = worker
+        with worker:
+            handle = worker.submit([1], 1, request_id="first")
+            self.assertTrue(handle.next_event(timeout=2).finished)
+        self.assertLessEqual(engine.first_step_after, 3)
+
+    def test_stop_timeout_includes_wait_for_worker_reply(self):
+        manager = make_manager()
+        entered = threading.Event()
+        release = threading.Event()
+        runner = RecordingRunner(manager, entered=entered, release=release)
+        worker = InferenceWorker(Engine(make_scheduler(manager), runner))
+        worker.start()
+        worker.submit([1], 8, request_id="slow")
+        self.assertTrue(entered.wait(2))
+        try:
+            started = time.monotonic()
+            with self.assertRaises(TimeoutError):
+                worker.stop(timeout=0.05)
+            self.assertLess(time.monotonic() - started, 0.5)
+        finally:
+            release.set()
+            worker._thread.join(2)
+        self.assertFalse(worker.is_running)
 
 
 if __name__ == "__main__":

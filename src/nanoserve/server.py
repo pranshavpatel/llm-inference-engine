@@ -194,7 +194,7 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
             raise ValueError("request body size is invalid")
         try:
             return json.loads(self.rfile.read(length))
-        except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        except (json.JSONDecodeError, UnicodeDecodeError, RecursionError) as error:
             raise ValueError("request body must be valid JSON") from error
 
     def do_POST(self) -> None:
@@ -251,7 +251,7 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
                         raise RuntimeError("tokenizer output changed text already streamed")
                     # A byte-level tokenizer may show the Unicode replacement
                     # character until later tokens finish a multibyte codepoint.
-                    stable = decoded if event.finished else decoded.split("\ufffd", 1)[0]
+                    stable = decoded if event.finished else decoded.rstrip("\ufffd")
                     text = stable[len(emitted_text) :]
                     emitted_text = stable
                     chunk = self.service.event_payload(handle, event, text=text)

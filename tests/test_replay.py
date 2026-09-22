@@ -3,6 +3,7 @@ import threading
 import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 from nanoserve.replay import (
     HTTPCompletionsAdapter,
@@ -31,6 +32,20 @@ class ReplayTests(unittest.TestCase):
         first["requests"][0]["prompt"] = "changed"
         with self.assertRaisesRegex(ValueError, "checksum"):
             validate_completion_trace(first)
+
+    def test_saved_trace_reproduces_with_equivalent_rate_types(self):
+        saved_path = Path(__file__).resolve().parents[1] / "environment" / "phase4-debug-trace.json"
+        saved = json.loads(saved_path.read_text(encoding="utf-8"))
+        arguments = dict(
+            count=2,
+            seed=7,
+            model=saved["model"],
+            revision=saved["revision"],
+            prompts=["The capital of France is", "Two plus two equals"],
+            max_tokens=2,
+        )
+        self.assertEqual(saved, make_completion_trace(rate=100, **arguments))
+        self.assertEqual(saved, make_completion_trace(rate=100.0, **arguments))
 
     def test_replay_retains_every_completion_and_failure_in_trace_order(self):
         class FakeAdapter:

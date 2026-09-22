@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import math
 import queue
 import threading
 import time
@@ -164,7 +165,7 @@ class InferenceWorker:
             )
             self._thread.start()
 
-    def _put_command(self, command, *, admission: bool) -> None:
+    def _put_command(self, command, *, admission: bool, deadline: float | None = None) -> None:
         if not self.is_running:
             raise WorkerClosed("inference worker is not running")
         if admission:
@@ -176,17 +177,23 @@ class InferenceWorker:
                 raise WorkerQueueFull("worker command queue is full") from error
             return
         while self.is_running:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise TimeoutError("timed out waiting for worker command capacity")
             try:
-                self._commands.put(command, timeout=0.1)
+                wait = 0.1 if deadline is None else min(0.1, deadline - time.monotonic())
+                self._commands.put(command, timeout=max(0, wait))
                 return
             except queue.Full:
                 continue
         raise WorkerClosed("inference worker stopped before accepting the command")
 
-    def _wait_reply(self, reply: queue.Queue):
+    def _wait_reply(self, reply: queue.Queue, *, deadline: float | None = None):
         while True:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise TimeoutError("timed out waiting for inference worker reply")
             try:
-                result = reply.get(timeout=0.1)
+                wait = 0.1 if deadline is None else min(0.1, deadline - time.monotonic())
+                result = reply.get(timeout=max(0, wait))
             except queue.Empty:
                 if not self.is_running:
                     raise WorkerClosed("inference worker stopped before replying")
@@ -232,14 +239,17 @@ class InferenceWorker:
             return result
 
     def stop(self, timeout: float = 5) -> None:
+        if not math.isfinite(timeout) or timeout < 0:
+            raise ValueError("timeout must be finite and nonnegative")
         if not self.is_running:
             return
+        deadline = time.monotonic() + timeout
         reply: queue.Queue = queue.Queue(maxsize=1)
-        self._put_command(_Stop(reply), admission=False)
-        self._wait_reply(reply)
+        self._put_command(_Stop(reply), admission=False, deadline=deadline)
+        self._wait_reply(reply, deadline=deadline)
         thread = self._thread
         if thread is not None:
-            thread.join(timeout)
+            thread.join(max(0, deadline - time.monotonic()))
             if thread.is_alive():
                 raise TimeoutError("inference worker did not stop")
 
@@ -345,20 +355,26 @@ class InferenceWorker:
                 except queue.Empty:
                     command = None
 
+                processed = 0
                 if isinstance(command, _Submit):
                     self._submit(command)
+                    processed = 1
                 elif isinstance(command, _Cancel):
                     self._cancel(command)
+                    processed = 1
                 elif isinstance(command, _Stop):
                     self._cancel_all()
                     command.reply.put(True)
                     stopping = True
+                    processed = 1
 
-                while not stopping:
+                # Bound ingress work so a continuously refilled queue cannot starve decode.
+                while not stopping and processed < self.command_capacity:
                     try:
                         command = self._commands.get_nowait()
                     except queue.Empty:
                         break
+                    processed += 1
                     if isinstance(command, _Submit):
                         self._submit(command)
                     elif isinstance(command, _Cancel):

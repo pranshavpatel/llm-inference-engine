@@ -2,6 +2,7 @@ import http.client
 import json
 import socket
 import struct
+import sys
 import threading
 import time
 import unittest
@@ -57,6 +58,36 @@ class StubWorker:
 
     def stats(self):
         return {"worker": {"running": self.is_running, "submitted": self.counter}}
+
+
+class Utf8Codec:
+    eos_token_id = None
+
+    def encode(self, text):
+        return tuple(text.encode("utf-8"))
+
+    def decode_tokens(self, token_ids):
+        return bytes(token_ids).decode("utf-8", errors="replace")
+
+
+class TokenSequenceWorker(StubWorker):
+    def __init__(self, tokens):
+        super().__init__()
+        self.tokens = tokens
+
+    def submit(self, prompt_token_ids, max_new_tokens, *, eos_token_id=None, request_id=None):
+        handle = RequestHandle("cmpl-utf8", len(prompt_token_ids), max_new_tokens, 1_700_000_000)
+        for index, token_id in enumerate(self.tokens):
+            finished = index == len(self.tokens) - 1
+            handle._events.put(
+                OutputEvent(
+                    handle.request_id,
+                    token_id,
+                    finished,
+                    FinishReason.LENGTH if finished else None,
+                )
+            )
+        return handle
 
 
 class ServerTests(unittest.TestCase):
@@ -147,11 +178,8 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(CompletionService.finish_reason(FinishReason.EOS), "stop")
 
     def test_stream_waits_for_complete_multibyte_character(self):
-        class SplitUnicodeCodec(CharacterCodec):
-            def decode_tokens(self, token_ids):
-                return "\ufffd" if len(token_ids) == 1 else "é"
-
-        self.server.service.codec = SplitUnicodeCodec()
+        self.server.service.codec = Utf8Codec()
+        self.server.service.worker = TokenSequenceWorker("é".encode("utf-8"))
         status, _, body = self.request(
             "POST",
             "/v1/completions",
@@ -172,6 +200,38 @@ class ServerTests(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["choices"][0]["text"], "é")
+
+    def test_stream_emits_text_after_completed_replacement_character(self):
+        self.server.service.codec = Utf8Codec()
+        self.server.service.worker = TokenSequenceWorker("\ufffdab".encode("utf-8"))
+        status, _, body = self.request(
+            "POST",
+            "/v1/completions",
+            {"model": "test-model", "prompt": "x", "max_tokens": 5, "stream": True},
+        )
+        chunks = [
+            json.loads(line.removeprefix("data: "))
+            for line in body.decode().splitlines()
+            if line.startswith("data: {")
+        ]
+        self.assertEqual(status, 200)
+        self.assertEqual(chunks[-2]["choices"][0]["text"], "\ufffda")
+        self.assertEqual(chunks[-1]["choices"][0]["text"], "b")
+
+    def test_deeply_nested_json_returns_bad_request(self):
+        connection = http.client.HTTPConnection(self.host, self.port, timeout=2)
+        body = b"[" * 1100 + b"0" + b"]" * 1100
+        connection.request(
+            "POST",
+            "/v1/completions",
+            body=body,
+            headers={"Content-Type": "application/json"},
+        )
+        response = connection.getresponse()
+        payload = json.loads(response.read())
+        connection.close()
+        self.assertEqual(response.status, 400)
+        self.assertIn("valid JSON", payload["error"]["message"])
 
     def test_stream_disconnect_requests_cancellation(self):
         release = threading.Event()
@@ -231,7 +291,7 @@ class ServerTests(unittest.TestCase):
         connection.setsockopt(
             socket.SOL_SOCKET,
             socket.SO_LINGER,
-            struct.pack("hh", 1, 0),
+            struct.pack("hh" if sys.platform == "win32" else "ii", 1, 0),
         )
         connection.close()
         release.set()
