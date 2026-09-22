@@ -114,7 +114,13 @@ $env:PYTHONPATH = "src"
 .\.venv\Scripts\python.exe -m nanoserve analyze-replay --trace environment/phase4-debug-trace.json --replay environment/phase4-vllm-smoke.json --output-dir phase4-vllm-analysis
 ```
 
-The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Failures and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; scored same-GPU sweeps, bounded drain, fixed-length output policy, repetitions, profiles, and plots remain to be completed before any comparative performance claim.
+For a fixed-window trace, HTTP replay can now stop after an explicit drain interval. Work still in flight becomes `timed_out`; work queued behind the client worker limit becomes `not_sent`. The command interrupts active sockets and refuses to save a report if its client threads cannot stop. For example, with nanoserve already serving the matching checkpoint:
+
+```powershell
+.\.venv\Scripts\python.exe -m nanoserve replay --trace phase5-pilot-plan/trace-rate-00-rep-00.json --engine nanoserve --endpoint http://127.0.0.1:8000/v1/completions --bounded-drain-s 10 --max-workers 32 --output phase5-pilot-nanoserve.json
+```
+
+The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; scored same-GPU sweeps, fixed-length output policy, profiles, and plots remain to be completed before any comparative performance claim.
 
 ## Physical paged reference
 
@@ -170,7 +176,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `89` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `92` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 

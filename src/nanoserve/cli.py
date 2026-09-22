@@ -304,6 +304,7 @@ def main(argv=None) -> int:
     replay.add_argument("--dtype", choices=("float32", "bfloat16"), default="bfloat16")
     replay.add_argument("--timeout-s", type=float, default=60)
     replay.add_argument("--max-workers", type=int, default=32)
+    replay.add_argument("--bounded-drain-s", type=float, help="Stop a fixed-window HTTP trace after this drain interval")
     replay.add_argument("--output", type=Path, required=True)
     analysis = sub.add_parser("analyze-replay", help="Export honest full-cohort metrics from one saved replay")
     analysis.add_argument("--trace", type=Path, required=True)
@@ -386,6 +387,8 @@ def main(argv=None) -> int:
                     name=f"{args.engine}-http",
                 )
             else:
+                if args.bounded_drain_s is not None:
+                    raise ValueError("--bounded-drain-s is supported only for HTTP engines")
                 if args.model_dir is None:
                     raise ValueError("--model-dir is required for Hugging Face replay")
                 if (
@@ -396,9 +399,17 @@ def main(argv=None) -> int:
                 adapter = HuggingFaceAdapter(
                     args.model_dir, device=args.device, dtype=args.dtype
                 )
-            report = replay_completion_trace(
-                workload, adapter, max_workers=args.max_workers
-            )
+            if args.bounded_drain_s is None:
+                report = replay_completion_trace(
+                    workload, adapter, max_workers=args.max_workers
+                )
+            else:
+                from .replay import replay_bounded_http_trace
+
+                report = replay_bounded_http_trace(
+                    workload, adapter, drain_s=args.bounded_drain_s,
+                    max_workers=args.max_workers,
+                )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
             report = {key: value for key, value in report.items() if key != "records"}

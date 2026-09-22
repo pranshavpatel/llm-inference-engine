@@ -64,12 +64,14 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
     output_tokens = 0
     missing_usage = 0
     completed = 0
+    timed_out = 0
+    not_sent = 0
     for request, record in zip(trace["requests"], records):
         if not isinstance(record, dict) or record.get("request_id") != request["request_id"]:
             raise ValueError("replay records must match trace IDs and order")
         status = record.get("status")
-        if status not in ("completed", "failed"):
-            raise ValueError("replay record status must be completed or failed")
+        if status not in ("completed", "failed", "timed_out", "not_sent"):
+            raise ValueError("unsupported replay record status")
         intended = _time(request["arrival_offset_s"], "intended arrival")
         sent = _time(record.get("actual_send_offset_s"), "actual send", optional=True)
         first = _time(record.get("first_content_offset_s"), "first content", optional=True)
@@ -102,7 +104,13 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
                 output_tokens += tokens
         else:
             error = str(record.get("error", "unknown"))
-            if "HTTP 429" in error:
+            if status == "timed_out":
+                timed_out += 1
+                errors["drain_timeout"] += 1
+            elif status == "not_sent":
+                not_sent += 1
+                errors["not_sent"] += 1
+            elif "HTTP 429" in error:
                 errors["http_429"] += 1
             elif "Timeout" in error or "timed out" in error:
                 errors["timeout"] += 1
@@ -142,6 +150,8 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
         ("requests", len(records)), ("completed", completed), ("failed", len(records) - completed), ("missing_usage", missing_usage)
     )):
         raise ValueError("replay summary disagrees with records")
+    if summary.get("timed_out", timed_out) != timed_out or summary.get("not_sent", not_sent) != not_sent:
+        raise ValueError("replay timeout summary disagrees with records")
     aggregate = {
         "schema_version": 1,
         "kind": "completion-replay-analysis",
@@ -149,9 +159,12 @@ def analyze_replay(trace: dict, replay: dict) -> tuple[dict, list[dict], list[di
         "adapter": replay["adapter"],
         "cohort": {
             "requests": len(records), "completed": completed, "failed": len(records) - completed,
+            "timed_out": timed_out, "not_sent": not_sent,
             "missing_usage": missing_usage, "failure_types": dict(errors),
         },
         "target_offered_rate_rps": trace.get("rate_rps"),
+        "offered_interval_s": replay.get("offered_interval_s"),
+        "drain_deadline_offset_s": replay.get("drain_deadline_offset_s"),
         "full_run_elapsed_s": elapsed,
         "full_run_completed_output_tokens": output_tokens if missing_usage == 0 else None,
         "full_run_completed_output_tokens_per_s": output_tokens / elapsed if missing_usage == 0 else None,

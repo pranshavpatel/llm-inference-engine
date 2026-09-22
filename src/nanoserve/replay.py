@@ -6,13 +6,15 @@ import hashlib
 import http.client
 import json
 import math
+import queue
 import random
+import socket
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Protocol
+from typing import Callable, Protocol
 from urllib.parse import urlsplit
 
 from nanoserve.bench import make_trace
@@ -199,8 +201,39 @@ class HTTPCompletionsAdapter:
         self.model = model
         self.timeout_s = timeout_s
         self._url = parsed
+        self._active_sockets: set[socket.socket] = set()
+        self._active_lock = threading.Lock()
 
-    def run(self, request: dict, trace_start: float) -> dict:
+    def abort_active(self) -> None:
+        """Interrupt in-flight HTTP reads after a bounded replay deadline."""
+        with self._active_lock:
+            sockets = tuple(self._active_sockets)
+        for active in sockets:
+            try:
+                active.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+            try:
+                active.close()
+            except OSError:
+                pass
+
+    def run(
+        self,
+        request: dict,
+        trace_start: float,
+        *,
+        deadline_monotonic: float | None = None,
+        on_sent: Callable[[float], None] | None = None,
+    ) -> dict:
+        def remaining_timeout() -> float:
+            if deadline_monotonic is None:
+                return self.timeout_s
+            remaining = deadline_monotonic - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("bounded replay drain deadline exceeded")
+            return min(self.timeout_s, remaining)
+
         connection_type = (
             http.client.HTTPSConnection
             if self._url.scheme == "https"
@@ -209,7 +242,7 @@ class HTTPCompletionsAdapter:
         connection = connection_type(
             self._url.hostname,
             self._url.port,
-            timeout=self.timeout_s,
+            timeout=remaining_timeout(),
         )
         body = json.dumps(
             {
@@ -221,14 +254,24 @@ class HTTPCompletionsAdapter:
                 "stream_options": {"include_usage": True},
             }
         )
-        sent = time.monotonic() - trace_start
+        sent = None
+        active_socket = None
         try:
+            connection.connect()
+            active_socket = connection.sock
+            with self._active_lock:
+                self._active_sockets.add(active_socket)
+            active_socket.settimeout(remaining_timeout())
+            sent = time.monotonic() - trace_start
+            if on_sent is not None:
+                on_sent(sent)
             connection.request(
                 "POST",
                 "/v1/completions",
                 body=body,
                 headers={"Content-Type": "application/json"},
             )
+            active_socket.settimeout(remaining_timeout())
             response = connection.getresponse()
             if response.status != 200:
                 detail = response.read(2048).decode("utf-8", errors="replace")
@@ -240,7 +283,11 @@ class HTTPCompletionsAdapter:
             usage = None
             server_request_id = None
             done = False
-            for raw_line in response:
+            while True:
+                active_socket.settimeout(remaining_timeout())
+                raw_line = response.readline()
+                if not raw_line:
+                    break
                 line = raw_line.decode("utf-8", errors="replace").strip()
                 if not line.startswith("data: "):
                     continue
@@ -289,6 +336,9 @@ class HTTPCompletionsAdapter:
                 "error": f"{type(error).__name__}: {error}",
             }
         finally:
+            if active_socket is not None:
+                with self._active_lock:
+                    self._active_sockets.discard(active_socket)
             connection.close()
 
 
@@ -434,6 +484,144 @@ def replay_completion_trace(
                 record["status"] == "completed" and record.get("usage") is None
                 for record in records
             ),
+        },
+        "records": records,
+    }
+
+
+def replay_bounded_http_trace(
+    trace: dict,
+    adapter: HTTPCompletionsAdapter,
+    *,
+    drain_s: float,
+    max_workers: int = 32,
+) -> dict:
+    """Offer a fixed-window trace and retain queued/in-flight work at cutoff.
+
+    This mode is HTTP-only. Active sockets are interrupted at the drain
+    deadline; it refuses to return a report if worker threads do not stop.
+    """
+    validate_completion_trace(trace)
+    offered_s = trace.get("offered_interval_s")
+    if offered_s is None:
+        raise ValueError("bounded replay requires a fixed offered_interval_s trace")
+    if not isinstance(adapter, HTTPCompletionsAdapter):
+        raise ValueError("bounded replay requires an HTTP completions adapter")
+    if isinstance(drain_s, bool) or not isinstance(drain_s, (int, float)) or not math.isfinite(drain_s) or drain_s < 0:
+        raise ValueError("drain_s must be finite and nonnegative")
+    if isinstance(max_workers, bool) or not isinstance(max_workers, int) or max_workers <= 0:
+        raise ValueError("max_workers must be a positive integer")
+
+    started_at = datetime.now(timezone.utc).isoformat()
+    start = time.monotonic()
+    deadline = start + offered_s + drain_s
+    pending: queue.Queue[dict] = queue.Queue()
+    stopped = threading.Event()
+    lock = threading.Lock()
+    started: dict[str, float] = {}
+    sent_offsets: dict[str, float] = {}
+    results: dict[str, dict] = {}
+
+    def consume() -> None:
+        while not stopped.is_set():
+            try:
+                request = pending.get(timeout=0.02)
+            except queue.Empty:
+                continue
+            if stopped.is_set() or time.monotonic() >= deadline:
+                return
+            request_id = request["request_id"]
+            with lock:
+                started[request_id] = time.monotonic() - start
+            def record_send(offset: float) -> None:
+                with lock:
+                    sent_offsets[request_id] = offset
+
+            try:
+                result = adapter.run(
+                    request, start, deadline_monotonic=deadline, on_sent=record_send
+                )
+            except Exception as error:
+                result = {
+                    "request_id": request_id,
+                    "status": "failed",
+                    "completed_offset_s": time.monotonic() - start,
+                    "error": f"{type(error).__name__}: {error}",
+                }
+            with lock:
+                if time.monotonic() <= deadline:
+                    results[request_id] = result
+
+    threads = [
+        threading.Thread(target=consume, name=f"bounded-replay-{index}", daemon=True)
+        for index in range(min(max_workers, len(trace["requests"])))
+    ]
+    for thread in threads:
+        thread.start()
+    try:
+        for request in trace["requests"]:
+            delay = start + request["arrival_offset_s"] - time.monotonic()
+            if delay > 0:
+                time.sleep(delay)
+            pending.put_nowait(request)
+        while time.monotonic() < deadline:
+            with lock:
+                finished = len(results) == len(trace["requests"])
+            if finished and time.monotonic() >= start + offered_s:
+                break
+            time.sleep(min(0.02, max(0, deadline - time.monotonic())))
+    finally:
+        stopped.set()
+        adapter.abort_active()
+        shutdown_deadline = time.monotonic() + 2.0
+        for thread in threads:
+            thread.join(max(0, shutdown_deadline - time.monotonic()))
+    if any(thread.is_alive() for thread in threads):
+        raise RuntimeError("bounded replay could not stop all HTTP workers")
+
+    cutoff_offset = offered_s + drain_s
+    records = []
+    for request in trace["requests"]:
+        request_id = request["request_id"]
+        with lock:
+            record = results.get(request_id)
+            dispatch = started.get(request_id)
+            sent = sent_offsets.get(request_id)
+        if record is None:
+            status = "timed_out" if dispatch is not None else "not_sent"
+            record = {
+                "request_id": request_id,
+                "status": status,
+                "dispatch_offset_s": dispatch,
+                "actual_send_offset_s": sent,
+                "completed_offset_s": cutoff_offset,
+                "error": "drain deadline exceeded" if dispatch is not None else "worker capacity exhausted before drain deadline",
+            }
+        record["intended_arrival_offset_s"] = request["arrival_offset_s"]
+        if record.get("actual_send_offset_s") is not None:
+            record["send_lag_s"] = record["actual_send_offset_s"] - request["arrival_offset_s"]
+        records.append(record)
+    completed = sum(record["status"] == "completed" for record in records)
+    return {
+        "schema_version": 1,
+        "kind": "completion-replay",
+        "mode": "fixed-window-bounded-drain",
+        "trace_sha256": trace["sha256"],
+        "model": trace["model"],
+        "revision": trace["revision"],
+        "adapter": adapter.name,
+        "started_at_utc": started_at,
+        "offered_interval_s": offered_s,
+        "drain_s": drain_s,
+        "drain_deadline_offset_s": cutoff_offset,
+        "elapsed_s": time.monotonic() - start,
+        "summary": {
+            "requests": len(records),
+            "completed": completed,
+            "failed": len(records) - completed,
+            "timed_out": sum(record["status"] == "timed_out" for record in records),
+            "not_sent": sum(record["status"] == "not_sent" for record in records),
+            "missing_usage": sum(record["status"] == "completed" and record.get("usage") is None for record in records),
         },
         "records": records,
     }

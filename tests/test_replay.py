@@ -8,9 +8,12 @@ from pathlib import Path
 from nanoserve.replay import (
     HTTPCompletionsAdapter,
     make_completion_trace,
+    make_duration_completion_trace,
+    replay_bounded_http_trace,
     replay_completion_trace,
     validate_completion_trace,
 )
+from nanoserve.experiment import analyze_replay
 
 
 class ReplayTests(unittest.TestCase):
@@ -143,6 +146,90 @@ class ReplayTests(unittest.TestCase):
         self.assertIn("HTTP 429", record["error"])
         self.assertIn("actual_send_offset_s", record)
         self.assertIn("send_lag_s", record)
+
+    def test_bounded_replay_completes_fast_fixed_window_requests(self):
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                return
+
+            def do_POST(self):
+                self.rfile.read(int(self.headers["Content-Length"]))
+                events = [
+                    {"id": "remote", "choices": [{"text": " ok", "finish_reason": "length"}]},
+                    {"id": "remote", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}},
+                ]
+                body = "".join(f"data: {json.dumps(event)}\n\n" for event in events) + "data: [DONE]\n\n"
+                encoded = body.encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        trace = make_duration_completion_trace(
+            duration_s=0.05, rate=100, seed=7, model="test-model",
+            revision="revision", prompts=["p"], max_tokens=1,
+        )
+        try:
+            host, port = server.server_address
+            adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
+            replay = replay_bounded_http_trace(trace, adapter, drain_s=1, max_workers=4)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(2)
+        self.assertEqual(replay["summary"]["completed"], len(trace["requests"]))
+        self.assertEqual(replay["summary"]["timed_out"], 0)
+        self.assertEqual(replay["summary"]["not_sent"], 0)
+        aggregate, _, _ = analyze_replay(trace, replay)
+        self.assertEqual(aggregate["cohort"]["completed"], len(trace["requests"]))
+
+    def test_bounded_replay_retains_inflight_and_queued_at_cutoff(self):
+        release = threading.Event()
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                return
+
+            def do_POST(self):
+                self.rfile.read(int(self.headers["Content-Length"]))
+                release.wait(2)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        trace = make_duration_completion_trace(
+            duration_s=0.2, rate=100, seed=7, model="test-model",
+            revision="revision", prompts=["p"], max_tokens=1,
+        )
+        self.assertGreater(len(trace["requests"]), 1)
+        try:
+            host, port = server.server_address
+            adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
+            started = time.monotonic()
+            replay = replay_bounded_http_trace(trace, adapter, drain_s=0.1, max_workers=1)
+            self.assertLess(time.monotonic() - started, 1.5)
+        finally:
+            release.set()
+            server.shutdown()
+            server.server_close()
+            thread.join(2)
+        self.assertEqual(replay["summary"]["completed"], 0)
+        self.assertEqual(replay["summary"]["timed_out"], 1)
+        self.assertEqual(replay["summary"]["not_sent"], len(trace["requests"]) - 1)
+        self.assertEqual([record["request_id"] for record in replay["records"]], [request["request_id"] for request in trace["requests"]])
+        aggregate, _, _ = analyze_replay(trace, replay)
+        self.assertEqual(aggregate["cohort"]["failure_types"]["drain_timeout"], 1)
+
+    def test_bounded_replay_requires_fixed_window(self):
+        adapter = HTTPCompletionsAdapter("http://127.0.0.1:8000/v1/completions", "test-model")
+        with self.assertRaisesRegex(ValueError, "offered_interval"):
+            replay_bounded_http_trace(self.make_trace(), adapter, drain_s=1)
 
 
 if __name__ == "__main__":
