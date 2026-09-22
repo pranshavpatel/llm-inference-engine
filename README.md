@@ -122,6 +122,8 @@ For a fixed-window trace, HTTP replay can now stop after an explicit drain inter
 
 The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; fixed-output behavior still needs validation against the installed vLLM server, and scored same-GPU sweeps, profiles, and plots remain before any comparative performance claim.
 
+For the first Ubuntu L40S same-GPU policy check, follow [the Phase 5 VM pilot runbook](environment/PHASE5_VM_PILOT.md). It runs vLLM and nanoserve sequentially, saves both full replay files, and records the environment and server startup configuration.
+
 ## Physical paged reference
 
 `PagedKVCache` preallocates K/V tensors with layout `[layer, physical_page, offset, kv_head, head_dim]`. `PagedKVCacheManager` connects those tensors to `BlockManager`, tracks completed KV tokens separately from reserved slots, clears released pages, and commits an append only after every transformer layer has written the same token range.
