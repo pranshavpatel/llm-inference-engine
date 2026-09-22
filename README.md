@@ -84,6 +84,21 @@ $snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa79
 
 The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
 
+## Saved trace replay
+
+`trace-requests` writes a checksummed workload with fixed arrival offsets and prompt text. `replay` sends those requests at their scheduled times and retains one record per request, including failures, actual send lag, first content, completion, exact usage when the endpoint supplies it, and timestamped content chunks. HTTP chunks are not assumed to equal model tokens.
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m nanoserve trace-requests --count 20 --rate 2 --seed 7 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --output trace.json
+.\.venv\Scripts\python.exe -m nanoserve replay --trace trace.json --engine nanoserve --endpoint http://127.0.0.1:8000/v1/completions --output nanoserve-run.json
+.\.venv\Scripts\python.exe -m nanoserve replay --trace trace.json --engine hf --model-dir $snapshot --output hf-run.json
+```
+
+On a separate supported vLLM host, run its OpenAI-compatible completions server with the same pinned model, then use `--engine vllm --endpoint http://HOST:PORT/v1/completions`. The HTTP adapter requests a final usage chunk through `stream_options.include_usage`, which [vLLM's completion protocol supports](https://docs.vllm.ai/en/stable/api/vllm/entrypoints/openai/completion/protocol/). Check the saved `missing_usage` count before using token metrics. The trace revision is checked against a Hugging Face snapshot directory name when available; a remote HTTP server's loaded revision still must be verified in its launch configuration. The local Hugging Face adapter serializes greedy requests on one loaded model; it is an initial functional baseline, not a tuned static-batch comparison.
+
+The committed two-request debug trace was replayed against both the pinned Hugging Face checkpoint and nanoserve. Both completed 2/2 requests with matching text (` four,` and ` Paris.`), two completion tokens each, and no missing usage. These short smoke records are functional evidence only; their latency values were collected on a shared Windows display GPU and are not benchmark results. vLLM replay has not been run on this host.
+
 ## Physical paged reference
 
 `PagedKVCache` preallocates K/V tensors with layout `[layer, physical_page, offset, kv_head, head_dim]`. `PagedKVCacheManager` connects those tensors to `BlockManager`, tracks completed KV tokens separately from reserved slots, clears released pages, and commits an append only after every transformer layer has written the same token range.
@@ -138,7 +153,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, and startup from a saved tiny checkpoint. The full non-GPU suite passes `73` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The full non-GPU suite passes `77` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 
@@ -152,4 +167,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The next Phase 4 increment is identical saved-trace adapters for nanoserve, Hugging Face, and vLLM; controlled performance claims still require the target Linux GPU environment.
+The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The remaining Phase 4 gate is to run the saved trace against vLLM on a supported host and verify complete records for all three engines. Controlled performance claims still require a comparable, isolated target GPU environment.

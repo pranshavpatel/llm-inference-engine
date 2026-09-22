@@ -130,15 +130,17 @@ class ServerTests(unittest.TestCase):
                 "max_tokens": 2,
                 "stream": True,
                 "temperature": 0,
+                "stream_options": {"include_usage": True},
             },
         )
         text = body.decode()
 
         self.assertEqual(status, 200)
         self.assertEqual(content_type, "text/event-stream")
-        self.assertEqual(text.count("data: {"), 2)
+        self.assertEqual(text.count("data: {"), 3)
         self.assertIn('"text":"A"', text)
         self.assertIn('"finish_reason":"length"', text)
+        self.assertIn('"completion_tokens":2', text)
         self.assertTrue(text.endswith("data: [DONE]\n\n"))
 
     def test_eos_maps_to_openai_stop_reason(self):
@@ -260,6 +262,14 @@ class ServerTests(unittest.TestCase):
             "POST",
             "/v1/completions",
             {"model": "test-model", "prompt": "x", "temperature": 0.5},
+        )
+        self.assertEqual(status, 400)
+        self.assertIn("greedy", json.loads(body)["error"]["message"])
+
+        status, _, body = self.request(
+            "POST",
+            "/v1/completions",
+            {"model": "test-model", "prompt": "x", "temperature": False},
         )
         self.assertEqual(status, 400)
         self.assertIn("greedy", json.loads(body)["error"]["message"])

@@ -76,6 +76,12 @@ The standard-library HTTP server intentionally implements a narrow completions c
 
 The HTTP server decodes the entire generated token prefix at each output event. This matters for byte-level tokenizers, where individual token pieces can be invalid UTF-8. Streaming withholds an incomplete replacement character until later tokens complete it; non-streaming decodes the full output once. EOS is excluded from decoded text and maps to the `stop` finish reason.
 
+## Open-loop trace replay
+
+Completion traces contain prompt text, maximum output tokens, intended arrival offsets, model ID, revision, and a checksum. The replay client schedules submissions against one monotonic start time, independent of request completion. The request record keeps intended and actual submission times, first nonempty content, completion, finish reason, stream chunks, output text, usage when returned, and failures. Chunk count is not treated as token count. A final usage-only SSE record is requested from HTTP endpoints through `stream_options.include_usage`; nanoserve emits it after terminal success.
+
+The HTTP adapter targets either nanoserve or a vLLM OpenAI-compatible completions endpoint. The local Hugging Face adapter loads the same saved checkpoint and serializes greedy requests with a cached model forward. Its queueing and batch formation differ from continuous nanoserve scheduling and must be disclosed in any performance comparison. The two-request debug trace validates record completeness and matching short outputs between nanoserve and Hugging Face, but does not establish a throughput or latency result.
+
 ## Accounting and arrival plans
 
 Reserved slots track space promised for KV writes. Completed KV tokens advance only after every layer finishes an append transaction. Tail fragmentation uses reserved tokens and excludes wholly free pages. Pool counters report physical bytes, bytes per block, completed tokens, active blocks, and pending append count; they are accounting values, not performance measurements.
@@ -84,6 +90,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-An optimized Linux backend, chat completions, comparable saved-trace adapters, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler and HTTP correctness path.
+An optimized Linux backend, chat completions, an actual vLLM trace replay, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler and HTTP correctness path.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

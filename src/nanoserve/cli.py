@@ -286,6 +286,25 @@ def main(argv=None) -> int:
     trace.add_argument("--seed", type=int, default=0)
     trace.add_argument("--prompt-tokens", type=int, default=128)
     trace.add_argument("--output-tokens", type=int, default=64)
+    requests = sub.add_parser("trace-requests", help="Save a checksummed completion workload")
+    requests.add_argument("--count", type=int, default=20)
+    requests.add_argument("--rate", type=float, default=2.0)
+    requests.add_argument("--seed", type=int, default=0)
+    requests.add_argument("--model", required=True)
+    requests.add_argument("--revision", required=True)
+    requests.add_argument("--prompt", action="append", dest="prompts", required=True)
+    requests.add_argument("--max-tokens", type=int, default=16)
+    requests.add_argument("--output", type=Path, required=True)
+    replay = sub.add_parser("replay", help="Replay a saved completion trace")
+    replay.add_argument("--trace", type=Path, required=True)
+    replay.add_argument("--engine", choices=("nanoserve", "vllm", "hf"), required=True)
+    replay.add_argument("--endpoint")
+    replay.add_argument("--model-dir", type=Path)
+    replay.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    replay.add_argument("--dtype", choices=("float32", "bfloat16"), default="bfloat16")
+    replay.add_argument("--timeout-s", type=float, default=60)
+    replay.add_argument("--max-workers", type=int, default=32)
+    replay.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "doctor":
@@ -299,8 +318,58 @@ def main(argv=None) -> int:
         elif args.command == "memory":
             geometry = ModelGeometry.from_config(json.loads(args.config.read_text()))
             report = geometry.capacity(args.pool_mib * 1024**2, args.block_size, args.dtype_bytes)
-        else:
+        elif args.command == "trace":
             report = make_trace(args.count, args.rate, args.seed, args.prompt_tokens, args.output_tokens)
+        elif args.command == "trace-requests":
+            from .replay import make_completion_trace
+
+            report = make_completion_trace(
+                count=args.count,
+                rate=args.rate,
+                seed=args.seed,
+                model=args.model,
+                revision=args.revision,
+                prompts=args.prompts,
+                max_tokens=args.max_tokens,
+            )
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        else:
+            from .replay import (
+                HTTPCompletionsAdapter,
+                HuggingFaceAdapter,
+                replay_completion_trace,
+                validate_completion_trace,
+            )
+
+            workload = json.loads(args.trace.read_text(encoding="utf-8"))
+            validate_completion_trace(workload)
+            if args.engine in ("nanoserve", "vllm"):
+                if not args.endpoint:
+                    raise ValueError("--endpoint is required for HTTP replay")
+                adapter = HTTPCompletionsAdapter(
+                    args.endpoint,
+                    workload["model"],
+                    timeout_s=args.timeout_s,
+                    name=f"{args.engine}-http",
+                )
+            else:
+                if args.model_dir is None:
+                    raise ValueError("--model-dir is required for Hugging Face replay")
+                if (
+                    args.model_dir.parent.name == "snapshots"
+                    and args.model_dir.name != workload["revision"]
+                ):
+                    raise ValueError("checkpoint snapshot does not match trace revision")
+                adapter = HuggingFaceAdapter(
+                    args.model_dir, device=args.device, dtype=args.dtype
+                )
+            report = replay_completion_trace(
+                workload, adapter, max_workers=args.max_workers
+            )
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+            report = {key: value for key, value in report.items() if key != "records"}
     except (ValueError, KeyError, OSError) as exc:
         parser.error(str(exc))
     print(json.dumps(report, indent=2))

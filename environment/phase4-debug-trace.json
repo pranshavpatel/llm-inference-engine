@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "completion-request-trace",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 7,
+  "rate_rps": 100.0,
+  "requests": [
+    {
+      "request_id": "r000000",
+      "arrival_offset_s": 0.003913148442348043,
+      "prompt": "Two plus two equals",
+      "max_tokens": 2
+    },
+    {
+      "request_id": "r000001",
+      "arrival_offset_s": 0.005548333012402824,
+      "prompt": "The capital of France is",
+      "max_tokens": 2
+    }
+  ],
+  "sha256": "b283b40c9a433735f3a6e5134011c34192cae14708c60e6ec1746875f06e59d1"
+}

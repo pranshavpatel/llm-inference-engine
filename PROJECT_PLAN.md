@@ -1,6 +1,6 @@
 # LLM inference engine: implementation and portfolio plan
 
-Status: Phases 0, 1, and the Phase 3 scheduler correctness milestone are implemented. Phase 2 has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; its optimized Linux backend gate remains open because this native-Windows host cannot run FlashInfer. Phase 4 now has a single-owner worker, bounded ingress, cancellation/error propagation, a narrow `/v1/completions` JSON/SSE server, health/readiness, metrics, a tiny-model CLI smoke path, and local production-checkpoint startup. Comparison adapters and controlled performance measurement remain future work, and no performance results exist.
+Status: Phases 0, 1, and the Phase 3 scheduler correctness milestone are implemented. Phase 2 has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; its optimized Linux backend gate remains open because this native-Windows host cannot run FlashInfer. Phase 4 now has a single-owner worker, bounded ingress, cancellation/error propagation, a narrow `/v1/completions` JSON/SSE server, health/readiness, metrics, local production-checkpoint startup, and checksummed open-loop trace replay adapters for nanoserve, Hugging Face, and vLLM-compatible HTTP. The saved debug trace passed nanoserve and Hugging Face; actual vLLM replay and controlled performance measurement remain future work, and no performance results exist.
 
 ## 1. Outcome and assumptions
 

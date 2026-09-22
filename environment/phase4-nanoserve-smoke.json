@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "kind": "completion-replay",
+  "trace_sha256": "b283b40c9a433735f3a6e5134011c34192cae14708c60e6ec1746875f06e59d1",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "adapter": "nanoserve-http",
+  "started_at_utc": "2026-09-22T19:41:28.896103+00:00",
+  "elapsed_s": 0.6879999999982829,
+  "summary": {
+    "requests": 2,
+    "completed": 2,
+    "failed": 0,
+    "missing_usage": 0
+  },
+  "records": [
+    {
+      "request_id": "r000000",
+      "status": "completed",
+      "actual_send_offset_s": 0.0,
+      "first_content_offset_s": 0.5,
+      "completed_offset_s": 0.6409999999996217,
+      "server_request_id": "cmpl-0cc63efd3f24417386ee0ad715aa1b2c",
+      "output_text": " four,",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 2,
+        "total_tokens": 6
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.5,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.6409999999996217,
+          "text": ",",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.003913148442348043,
+      "send_lag_s": -0.003913148442348043
+    },
+    {
+      "request_id": "r000001",
+      "status": "completed",
+      "actual_send_offset_s": 0.01599999999962165,
+      "first_content_offset_s": 0.6409999999996217,
+      "completed_offset_s": 0.6879999999982829,
+      "server_request_id": "cmpl-9f3b4b4008794f6f80529b2888365b2f",
+      "output_text": " Paris.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 2,
+        "total_tokens": 7
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.6409999999996217,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.6879999999982829,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.005548333012402824,
+      "send_lag_s": 0.010451666987218826
+    }
+  ]
+}

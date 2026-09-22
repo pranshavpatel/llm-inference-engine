@@ -44,10 +44,22 @@ class CompletionService:
         stream = payload.get("stream", False)
         if not isinstance(stream, bool):
             raise ValueError("stream must be a boolean")
-        if payload.get("n", 1) != 1:
+        n = payload.get("n", 1)
+        if isinstance(n, bool) or not isinstance(n, int) or n != 1:
             raise ValueError("only n=1 is supported")
-        if payload.get("temperature", 0) not in (0, 0.0):
+        temperature = payload.get("temperature", 0)
+        if (
+            isinstance(temperature, bool)
+            or not isinstance(temperature, (int, float))
+            or temperature != 0
+        ):
             raise ValueError("only greedy temperature=0 is supported")
+        stream_options = payload.get("stream_options", {})
+        if not isinstance(stream_options, dict) or set(stream_options) - {"include_usage"}:
+            raise ValueError("stream_options only supports include_usage")
+        include_usage = stream_options.get("include_usage", False)
+        if not isinstance(include_usage, bool) or (include_usage and not stream):
+            raise ValueError("include_usage requires stream=true and a boolean value")
         unsupported = set(payload) - {
             "model",
             "prompt",
@@ -55,6 +67,7 @@ class CompletionService:
             "stream",
             "n",
             "temperature",
+            "stream_options",
         }
         if unsupported:
             names = ", ".join(sorted(unsupported))
@@ -67,7 +80,7 @@ class CompletionService:
             max_tokens,
             eos_token_id=self.codec.eos_token_id,
         )
-        return handle, stream
+        return handle, stream, include_usage
 
     def event_payload(self, handle, event: OutputEvent, *, text: str) -> dict:
         finish_reason = self.finish_reason(event.finish_reason)
@@ -190,7 +203,7 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
             return
         try:
             payload = self._read_payload()
-            handle, stream = self.service.submit(payload)
+            handle, stream, include_usage = self.service.submit(payload)
         except ValueError as error:
             self._write_json(HTTPStatus.BAD_REQUEST, _error(str(error)))
             return
@@ -224,9 +237,11 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
         self.close_connection = True
         token_ids: list[int] = []
         emitted_text = ""
+        errored = False
         try:
             for event in handle.iter_events():
                 if event.error:
+                    errored = True
                     chunk = _error(event.error, "engine_error")
                 else:
                     if event.token_id is not None:
@@ -241,6 +256,22 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
                     emitted_text = stable
                     chunk = self.service.event_payload(handle, event, text=text)
                 data = f"data: {json.dumps(chunk, separators=(',', ':'))}\n\n"
+                self.wfile.write(data.encode("utf-8"))
+                self.wfile.flush()
+            if include_usage and not errored:
+                usage_chunk = {
+                    "id": handle.request_id,
+                    "object": "text_completion.chunk",
+                    "created": int(handle.created_at),
+                    "model": self.service.model,
+                    "choices": [],
+                    "usage": {
+                        "prompt_tokens": handle.prompt_tokens,
+                        "completion_tokens": len(token_ids),
+                        "total_tokens": handle.prompt_tokens + len(token_ids),
+                    },
+                }
+                data = f"data: {json.dumps(usage_chunk, separators=(',', ':'))}\n\n"
                 self.wfile.write(data.encode("utf-8"))
                 self.wfile.flush()
             self.wfile.write(b"data: [DONE]\n\n")
