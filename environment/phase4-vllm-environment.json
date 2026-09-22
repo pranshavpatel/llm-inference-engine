@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "kind": "replay-environment",
+  "replay_file": "phase4-vllm-smoke.json",
+  "source": "user-provided terminal output from the Ubuntu GPU VM",
+  "operating_system": "Ubuntu 24",
+  "gpu": "NVIDIA L40S",
+  "driver_version": "580.159.03",
+  "reported_cuda_version": "13.0",
+  "vllm_version": "0.30.0",
+  "nvcc_available": false,
+  "environment_variables": {
+    "VLLM_USE_FLASHINFER_SAMPLER": "0"
+  },
+  "serve_command": [
+    "vllm", "serve", "Qwen/Qwen2.5-1.5B-Instruct",
+    "--revision", "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "--tokenizer-revision", "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "--dtype", "bfloat16",
+    "--max-model-len", "64",
+    "--gpu-memory-utilization", "0.3",
+    "--host", "127.0.0.1",
+    "--port", "8000"
+  ],
+  "replay_endpoint": "http://127.0.0.1:8000/v1/completions",
+  "notes": "Correctness smoke only; not a controlled performance comparison."
+}

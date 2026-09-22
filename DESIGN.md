@@ -62,6 +62,26 @@ The scheduler uses a plan/execute/commit boundary. Only one plan may be in fligh
 
 Preemption reconstruction runs the complete prompt plus already generated history at positions starting from zero. Its sampled result is the next new output; historical tokens are never re-emitted. Counters distinguish preemption count from recomputed KV tokens. Request snapshots and output events expose monotonic timestamps for queue, first-schedule, emission, and completion measurement.
 
+## Worker and HTTP ownership
+
+`InferenceWorker` runs the synchronous engine on one dedicated background thread. HTTP threads never access scheduler, allocator, model, or GPU state directly. Submissions and cancellation use a bounded command queue; each accepted request owns an event queue consumed by exactly one response path. The scheduler remains the second admission bound for waiting requests.
+
+A cancellation received during model execution cannot interrupt that tensor operation. It is processed immediately after the step commits, so a token may have been produced internally before cancellation becomes terminal. The request event stream then receives one cancellation event and its pages are released. Stopping the worker applies the same cleanup to every active handle.
+
+Runner exceptions already transition selected scheduler requests to `FAILED`. The worker inspects those snapshots, forwards terminal error events to the corresponding consumers, and continues serving unaffected queued requests. An exception that does not produce any failed scheduler state is treated as a fatal worker invariant failure.
+
+The standard-library HTTP server intentionally implements a narrow completions contract. Non-streaming handlers collect request-local events; streaming handlers translate each event into one SSE record and cancel on a broken connection. EOS maps to the OpenAI-style `stop` finish reason while length remains `length`. Health is process liveness, readiness requires a running inference worker, and metrics expose scheduler, cache, and worker counters as JSON rather than claiming Prometheus compatibility.
+
+`serve-demo` uses a seeded random tiny model and a byte codec so transport tests require no checkpoint download. It is not a language-quality or performance demonstration. `serve` constructs the same worker/service objects from a local Qwen2 config, tokenizer, and coverage-checked safetensors checkpoint. It chooses the physical page count from the configured KV byte budget and rejects a pool that cannot admit a maximum-context request. Startup opens HTTP ingress only after model and KV allocation succeed.
+
+The HTTP server decodes the entire generated token prefix at each output event. This matters for byte-level tokenizers, where individual token pieces can be invalid UTF-8. Streaming withholds an incomplete replacement character until later tokens complete it; non-streaming decodes the full output once. EOS is excluded from decoded text and maps to the `stop` finish reason.
+
+## Open-loop trace replay
+
+Completion traces contain prompt text, maximum output tokens, intended arrival offsets, model ID, revision, and a checksum. The replay client schedules submissions against one monotonic start time, independent of request completion. The request record keeps intended and actual submission times, first nonempty content, completion, finish reason, stream chunks, output text, usage when returned, and failures. Chunk count is not treated as token count. A final usage-only SSE record is requested from HTTP endpoints through `stream_options.include_usage`; nanoserve emits it after terminal success.
+
+The HTTP adapter targets either nanoserve or a vLLM OpenAI-compatible completions endpoint. The local Hugging Face adapter loads the same saved checkpoint and serializes greedy requests with a cached model forward. Its queueing and batch formation differ from continuous nanoserve scheduling and must be disclosed in any performance comparison. The two-request debug trace validates record completeness and matching short outputs between nanoserve and Hugging Face, but does not establish a throughput or latency result.
+
 ## Accounting and arrival plans
 
 Reserved slots track space promised for KV writes. Completed KV tokens advance only after every layer finishes an append transaction. Tail fragmentation uses reserved tokens and excludes wholly free pages. Pool counters report physical bytes, bytes per block, completed tokens, active blocks, and pending append count; they are accounting values, not performance measurements.
@@ -70,6 +90,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-An optimized Linux backend, asynchronous serving, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler correctness path.
+An optimized Linux backend, chat completions, an actual vLLM trace replay, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler and HTTP correctness path.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

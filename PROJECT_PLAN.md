@@ -1,6 +1,6 @@
 # LLM inference engine: implementation and portfolio plan
 
-Status: Phases 0, 1, and the Phase 3 scheduler correctness milestone are implemented. Phase 2 has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; its optimized Linux backend gate remains open because this native-Windows host cannot run FlashInfer. The scheduler now provides continuous FCFS admission, decode-first reservation, recompute preemption, cancellation, bounded queues, timing events, and finite-workload tests. Serving and controlled performance measurement remain future work, and no performance results exist.
+Status: Phases 0 and 1 are implemented. The Phase 3 scheduler correctness milestone includes continuous FCFS admission, decode-first reservation, recompute preemption, cancellation, bounded queues, timing events, and finite-workload tests. Phase 2 has physical paged KV storage, transactional allocator integration, variable-length static batches, and a gather-based attention oracle; its optimized Linux backend gate remains open. Phase 4 has a single-owner worker, bounded ingress, cancellation/error propagation, a narrow `/v1/completions` JSON/SSE server, health/readiness, metrics, local production-checkpoint startup, and checksummed open-loop trace replay. The saved two-request debug trace passed nanoserve, Hugging Face, and vLLM with matching outputs and usage. Controlled same-GPU performance measurement remains future work; these short smoke runs are not benchmarks.
 
 ## 1. Outcome and assumptions
 
@@ -247,7 +247,7 @@ results/                    # manifests, compact raw results, figures
 .github/workflows/          # CPU checks; GPU checks when hardware exists
 ```
 
-Proposed commands to implement, not commands available yet: `nanoserve doctor`, `nanoserve generate`, `nanoserve serve`, and a single benchmark reproduction entrypoint. Document expected runtime, downloads, hardware, and output locations. Keep model weights and large profiler binaries outside Git; provide checksums and retrieval instructions for released artifacts.
+Proposed commands still to implement: `nanoserve generate` and a single benchmark reproduction entrypoint. `nanoserve doctor` and `nanoserve serve` are available. Document expected runtime, downloads, hardware, and output locations. Keep model weights and large profiler binaries outside Git; provide checksums and retrieval instructions for released artifacts.
 
 ## 10. Budget and operational plan
 

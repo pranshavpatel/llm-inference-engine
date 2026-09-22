@@ -2,7 +2,7 @@
 
 `nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel, HTTP serving, and controlled performance benchmarks are not implemented, and there are no performance claims.
+This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel and controlled performance benchmarks are not implemented, and there are no performance claims.
 
 ## Reproducible setup
 
@@ -46,6 +46,58 @@ $env:PYTHONPATH = "src"
 ```
 
 The JSON report includes output tokens, steps, preemptions, recomputed tokens, and final page release. Its elapsed time is diagnostic only and is explicitly not a performance claim.
+
+## Completion serving
+
+Phase 4 now includes a dependency-free HTTP correctness path. `InferenceWorker` is the only owner of the synchronous engine: request threads communicate through a bounded command queue and receive token events through per-request queues. Cancellation waits for an already-running model step and then releases request state before the next step.
+
+The implemented API subset is:
+
+- `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, and greedy `temperature=0`.
+- JSON completions with exact prompt/completion token accounting, or SSE chunks terminated by `data: [DONE]`.
+- `GET /health`, `GET /ready`, and JSON `GET /metrics`.
+- `400` for unsupported inputs, `429` for bounded-queue overload, `503` when the worker is unavailable, and disconnect cancellation for streaming responses.
+
+Run a local contract demo backed by a deterministic, randomly initialized tiny Qwen2 model:
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m nanoserve serve-demo --host 127.0.0.1 --port 8000
+```
+
+From another shell:
+
+```powershell
+$body = @{ model = "nanoserve-tiny-random"; prompt = "hello"; max_tokens = 4; stream = $false } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/v1/completions -ContentType application/json -Body $body
+```
+
+The demo model and byte codec test transport and lifecycle behavior only; their text is not meaningful.
+
+To serve a locally available Qwen2 safetensors checkpoint with its tokenizer, use the `serve` command. It loads only local files, checks tensor coverage, and derives physical page count from the KV budget:
+
+```powershell
+$env:PYTHONPATH = "src"
+$snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
+.\.venv\Scripts\python.exe -m nanoserve serve --model-dir $snapshot --model-name Qwen/Qwen2.5-1.5B-Instruct --device cuda --dtype bfloat16 --kv-pool-mib 128 --max-context-tokens 64
+```
+
+The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
+
+## Saved trace replay
+
+`trace-requests` writes a checksummed workload with fixed arrival offsets and prompt text. `replay` sends those requests at their scheduled times and retains one record per request, including failures, actual send lag, first content, completion, exact usage when the endpoint supplies it, and timestamped content chunks. HTTP chunks are not assumed to equal model tokens.
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m nanoserve trace-requests --count 20 --rate 2 --seed 7 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --output trace.json
+.\.venv\Scripts\python.exe -m nanoserve replay --trace trace.json --engine nanoserve --endpoint http://127.0.0.1:8000/v1/completions --output nanoserve-run.json
+.\.venv\Scripts\python.exe -m nanoserve replay --trace trace.json --engine hf --model-dir $snapshot --output hf-run.json
+```
+
+On a separate supported vLLM host, run its OpenAI-compatible completions server with the same pinned model, then use `--engine vllm --endpoint http://HOST:PORT/v1/completions`. The HTTP adapter requests a final usage chunk through `stream_options.include_usage`, which [vLLM's completion protocol supports](https://docs.vllm.ai/en/stable/api/vllm/entrypoints/openai/completion/protocol/). Check the saved `missing_usage` count before using token metrics. The trace revision is checked against a Hugging Face snapshot directory name when available; a remote HTTP server's loaded revision still must be verified in its launch configuration. The local Hugging Face adapter serializes greedy requests on one loaded model; it is an initial functional baseline, not a tuned static-batch comparison.
+
+The committed two-request debug trace was replayed against the pinned Hugging Face checkpoint, nanoserve, and vLLM 0.30.0. All three completed 2/2 requests with matching text (` four,` and ` Paris.`), `length` finish reasons, two completion tokens each, matching prompt-token usage, and no missing usage. The vLLM run used an Ubuntu 24 NVIDIA L40S VM with `VLLM_USE_FLASHINFER_SAMPLER=0` because the VM lacked `nvcc`; its launch pinned both model and tokenizer revisions to the trace's commit. See `environment/phase4-vllm-smoke.json` and `environment/README.md` for the saved evidence and environment details. These short smoke records are functional evidence only; the Windows and Linux runs used different GPUs and are not benchmark results.
 
 ## Physical paged reference
 
@@ -100,7 +152,8 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The physical page pool and reference backend passed all eight CUDA page-size/dtype combinations. CPU coverage includes fragmented page tables, B−1/B/B+1 boundaries, variable-length static batches, transactional failures, clearing, and repeated mixed-length reuse.
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
-- The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration. The full non-GPU suite passes `57` tests; `9` GPU tests remain opt-in.
+- The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The full non-GPU suite passes `77` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 
@@ -114,4 +167,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The next product milestone is Phase 4 serving: a single-owner worker, bounded request ingress, completion streaming, disconnect cancellation, health/readiness, and shared-trace adapters.
+The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU environment.
