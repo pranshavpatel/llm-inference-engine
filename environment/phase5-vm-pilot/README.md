@@ -28,6 +28,15 @@ The earlier Windows BF16 Hugging Face comparison generated ` four, but but`
 (`../model-parity-bfloat16.json`), matching the L40S nanoserve prefix, but
 different hardware and execution paths make that indirect evidence only.
 
+The saved L40S HF eager top-five probe (`hf-logit-probe-r000000.json`) verified
+the HF replay output and its file checksum. At the first divergent generation
+step (zero-based step 3), HF chose token 714, ` but`, with logit 20.375; its
+runner-up logit was 19.625, a 0.75 margin. vLLM's ` what` was absent from HF's
+top five (the fifth logit was 18.875). Thus this divergence is **not** an HF
+near-tie at the shared prefix. The earlier near-tie on the other GPU cannot
+explain it. The cause is still unknown; inspect vLLM's candidates on the same
+prefix before attributing it to any kernel or configuration difference.
+
 The runs were **not** a performance comparison: there were only two requests,
 no warmup or bounded measurement interval, and the resource configurations
 were not matched. The vLLM log reports 8.81 GiB of KV cache, prefix caching,
@@ -58,13 +67,9 @@ python -c 'import torch, transformers; print("torch", torch.__version__, "transf
   | tee phase5-vm-pilot/hf-env.txt
 ```
 
-The remaining numerical check is the top-token logit margin at the shared
-prefix where vLLM and HF/nanoserve diverged. A close margin would support a
-precision-sensitive greedy tie; a wide margin would require deeper vLLM
-configuration or implementation investigation.
-
-After pulling the updated Phase 5 branch on the VM, with both servers stopped,
-run the local-only BF16 eager probe against the same pinned snapshot:
+The HF top-token check is complete. For reproducibility, it was run after
+pulling the Phase 5 branch, with both servers stopped, against the same pinned
+snapshot:
 
 ```bash
 cd ~/llm-inference-engine
@@ -83,6 +88,39 @@ PYTHONPATH=src python scripts/phase5_logit_probe.py \
 If `git status` shows tracked local changes, preserve them before pulling; do
 not reset them to make the command work.
 
-Send back the JSON even if the command reports that its generated text does
-not match the saved HF replay. The file contains only top-five logits per
-generation step, not the full model output tensor.
+The file contains only top-five logits per generation step, not the full model
+output tensor.
+
+## Next diagnostic: vLLM's candidates at the shared prefix
+
+On the same VM, check for local changes and pull the latest Phase 5 branch
+first:
+
+```bash
+cd ~/llm-inference-engine
+git status --short
+git pull --ff-only
+```
+
+Then start vLLM with **exactly** the pilot flags in `../PHASE5_VM_PILOT.md`,
+leaving nanoserve stopped. The server must use the same pinned model and
+tokenizer revision. Once it is ready, in a second terminal:
+
+```bash
+cd ~/llm-inference-engine
+source .venv-vllm/bin/activate
+PYTHONPATH=src python scripts/phase5_vllm_logprob_probe.py \
+  --trace phase5-vm-pilot/fixed-trace.json \
+  --vllm-replay phase5-vm-pilot/vllm-fixed.json \
+  --request-id r000000 \
+  --endpoint http://127.0.0.1:8000/v1/completions \
+  --output phase5-vm-pilot/vllm-logprob-probe-r000000.json
+```
+
+If tracked local changes prevent pulling, preserve them; do not reset them.
+The script makes one non-streaming greedy request with ten top-token logprobs
+and otherwise the replay's prompt, output limit, and ignore-EOS policy. It
+saves the full response and reports whether its output matches the earlier
+two-request vLLM replay. Send back the JSON even if that flag is false or the
+server returns an error. A single request may not reproduce a batching-related
+effect, so a different output is diagnostic rather than a resolved cause.
