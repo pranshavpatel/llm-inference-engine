@@ -124,6 +124,8 @@ The aggregate reports full-run completed output tokens per second, client time-t
 
 For the first Ubuntu L40S same-GPU policy check, follow [the Phase 5 VM pilot runbook](environment/PHASE5_VM_PILOT.md). It runs vLLM and nanoserve sequentially, saves both full replay files, and records the environment and server startup configuration.
 
+The first [paired L40S load pilot](environment/phase5-vm-sweep/README.md) replayed nine matching traces per engine at 0.5, 1, and 2 requests/s. Both engines completed all 348 requests with 16 output tokens, no missing usage, and under 1.8 ms maximum per-run p99 send lag. KV capacity was 4,672 token slots on each. nanoserve's median-of-run p99 client TTFT rose from 111 to 173 ms; vLLM's stayed near 17 ms. Neither engine saturated at these offered rates, so matching delivered output rates are not evidence of equal capacity. Higher-rate runs are next.
+
 After a larger paired pilot, save each engine's replay files under its own directory using the trace filenames from `sweep-plan.json` (for example `phase5-runs/nanoserve/trace-rate-00-rep-00.json`). The report command validates every trace/replay pairing and regenerates run-level CSV, per-rate CSV, and two labeled SVG diagnostics:
 
 ```powershell

@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "kind": "completion-request-trace",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42,
+  "rate_rps": 2.0,
+  "offered_interval_s": 30.0,
+  "arrival_process": "poisson",
+  "requests": [
+    {
+      "request_id": "r000000",
+      "arrival_offset_s": 0.5100301436374005,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000001",
+      "arrival_offset_s": 0.5226945631587699,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000002",
+      "arrival_offset_s": 0.6835065951962527,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000003",
+      "arrival_offset_s": 0.8097996880313094,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000004",
+      "arrival_offset_s": 1.4765960244353509,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000005",
+      "arrival_offset_s": 2.0411825288346472,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000006",
+      "arrival_offset_s": 3.1548265786103373,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000007",
+      "arrival_offset_s": 3.20030278091362,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000008",
+      "arrival_offset_s": 3.4743258606118657,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000009",
+      "arrival_offset_s": 3.489450949215545,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000010",
+      "arrival_offset_s": 3.612809297195457,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000011",
+      "arrival_offset_s": 3.964767061128534,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000012",
+      "arrival_offset_s": 3.9782142629686876,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000013",
+      "arrival_offset_s": 4.089060097550528,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000014",
+      "arrival_offset_s": 4.613806098161814,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000015",
+      "arrival_offset_s": 5.007470725283015,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000016",
+      "arrival_offset_s": 5.131983934766426,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000017",
+      "arrival_offset_s": 5.576888287917307,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000018",
+      "arrival_offset_s": 6.405757335028856,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000019",
+      "arrival_offset_s": 6.409017319305989,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000020",
+      "arrival_offset_s": 7.2285002503512645,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000021",
+      "arrival_offset_s": 7.827395220838007,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000022",
+      "arrival_offset_s": 8.035342764087297,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000023",
+      "arrival_offset_s": 8.119835898130932,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000024",
+      "arrival_offset_s": 9.695597222350084,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000025",
+      "arrival_offset_s": 9.900781687290626,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000026",
+      "arrival_offset_s": 9.949448012960605,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000027",
+      "arrival_offset_s": 10.000307355458421,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000028",
+      "arrival_offset_s": 10.940584226274991,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000029",
+      "arrival_offset_s": 11.403408959752998,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000030",
+      "arrival_offset_s": 12.226273929455626,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000031",
+      "arrival_offset_s": 12.88044414467876,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000032",
+      "arrival_offset_s": 13.264625356693845,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000033",
+      "arrival_offset_s": 15.072732949538855,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000034",
+      "arrival_offset_s": 15.310570290963348,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000035",
+      "arrival_offset_s": 15.71209666370659,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000036",
+      "arrival_offset_s": 16.59632715599934,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000037",
+      "arrival_offset_s": 17.078175258562762,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000038",
+      "arrival_offset_s": 18.067365226234468,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000039",
+      "arrival_offset_s": 18.49797319690889,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000040",
+      "arrival_offset_s": 19.107637983032806,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000041",
+      "arrival_offset_s": 19.13109175316125,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000042",
+      "arrival_offset_s": 19.260411238334832,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000043",
+      "arrival_offset_s": 19.431225566924674,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000044",
+      "arrival_offset_s": 19.472803328154168,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000045",
+      "arrival_offset_s": 19.605301266350168,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000046",
+      "arrival_offset_s": 19.658538183605906,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000047",
+      "arrival_offset_s": 19.821384973590053,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000048",
+      "arrival_offset_s": 20.326252411357295,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000049",
+      "arrival_offset_s": 20.553185426317352,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000050",
+      "arrival_offset_s": 20.784346801443576,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000051",
+      "arrival_offset_s": 20.901896059670445,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000052",
+      "arrival_offset_s": 21.05718572024044,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000053",
+      "arrival_offset_s": 22.436762116913204,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000054",
+      "arrival_offset_s": 22.958874434266143,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000055",
+      "arrival_offset_s": 23.428565848264277,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000056",
+      "arrival_offset_s": 23.522417040943836,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000057",
+      "arrival_offset_s": 24.175469269300027,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000058",
+      "arrival_offset_s": 24.264675369703998,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000059",
+      "arrival_offset_s": 24.503254303051172,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000060",
+      "arrival_offset_s": 26.782557487272204,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000061",
+      "arrival_offset_s": 27.293382777502323,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000062",
+      "arrival_offset_s": 27.700418812586054,
+      "prompt": "The capital of France is",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000063",
+      "arrival_offset_s": 28.277398207253746,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000064",
+      "arrival_offset_s": 29.2026815745775,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    },
+    {
+      "request_id": "r000065",
+      "arrival_offset_s": 29.95073599069967,
+      "prompt": "Two plus two equals",
+      "max_tokens": 16,
+      "ignore_eos": true
+    }
+  ],
+  "sha256": "9669c7c1d5b763f7fb41c9046be94c267d3463c96ec595db5648503067e21893"
+}

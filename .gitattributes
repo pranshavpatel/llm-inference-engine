@@ -2,3 +2,11 @@
 environment/phase5-vm-pilot/*.json -text
 environment/phase5-vm-pilot/*.log -text
 environment/phase5-vm-pilot/*.txt -text
+
+# Preserve checksummed VM sweep traces and replays byte-for-byte.
+environment/phase5-vm-sweep/*.json -text
+environment/phase5-vm-sweep/*.log -text
+environment/phase5-vm-sweep/plan/* -text
+environment/phase5-vm-sweep/vllm/* -text
+environment/phase5-vm-sweep/nanoserve/* -text
+environment/phase5-vm-sweep/report/* -text

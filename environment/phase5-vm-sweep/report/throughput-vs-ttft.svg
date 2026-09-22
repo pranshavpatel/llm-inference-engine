@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" role="img" aria-label="Pilot diagnostic: throughput versus TTFT">
+<rect width="100%" height="100%" fill="white"/>
+<text x="380.0" y="25" text-anchor="middle" font-size="17">Pilot diagnostic: throughput versus TTFT</text>
+<path d="M 88 45 V 398 H 730" fill="none" stroke="#333"/>
+<text x="409.0" y="452" text-anchor="middle" font-size="13">Full-run completed output tokens/s (includes drain)</text>
+<text x="20" y="221.5" text-anchor="middle" font-size="13" transform="rotate(-90 20 221.5)">Median of run p99 client TTFT (s)</text>
+<text x="88.0" y="416" text-anchor="middle" font-size="11">9.1</text>
+<text x="80" y="402.0" text-anchor="end" font-size="11">0</text>
+<text x="248.5" y="416" text-anchor="middle" font-size="11">16</text>
+<text x="80" y="313.8" text-anchor="end" font-size="11">0.043</text>
+<text x="409.0" y="416" text-anchor="middle" font-size="11">22</text>
+<text x="80" y="225.5" text-anchor="end" font-size="11">0.086</text>
+<text x="569.5" y="416" text-anchor="middle" font-size="11">29</text>
+<text x="80" y="137.2" text-anchor="end" font-size="11">0.13</text>
+<text x="730.0" y="416" text-anchor="middle" font-size="11">35</text>
+<text x="80" y="49.0" text-anchor="end" font-size="11">0.17</text>
+<text x="88" y="425" fill="#2367b4" font-size="12">nanoserve</text>
+<polyline points="88.0,171.2 298.5,151.4 719.7,45.0" fill="none" stroke="#2367b4" stroke-width="2"/>
+<circle cx="88.0" cy="171.2" r="5" fill="#2367b4" stroke="#2367b4" stroke-width="2"/>
+<text x="95.0" y="164.2" font-size="10">0.5 rps</text>
+<circle cx="298.5" cy="151.4" r="5" fill="#2367b4" stroke="#2367b4" stroke-width="2"/>
+<text x="305.5" y="144.4" font-size="10">1 rps</text>
+<circle cx="719.7" cy="45.0" r="5" fill="#2367b4" stroke="#2367b4" stroke-width="2"/>
+<text x="726.7" y="38.0" font-size="10">2 rps</text>
+<text x="243" y="425" fill="#d35b30" font-size="12">vllm</text>
+<polyline points="88.0,362.9 298.5,361.4 730.0,363.6" fill="none" stroke="#d35b30" stroke-width="2"/>
+<circle cx="88.0" cy="362.9" r="5" fill="#d35b30" stroke="#d35b30" stroke-width="2"/>
+<text x="95.0" y="355.9" font-size="10">0.5 rps</text>
+<circle cx="298.5" cy="361.4" r="5" fill="#d35b30" stroke="#d35b30" stroke-width="2"/>
+<text x="305.5" y="354.4" font-size="10">1 rps</text>
+<circle cx="730.0" cy="363.6" r="5" fill="#d35b30" stroke="#d35b30" stroke-width="2"/>
+<text x="737.0" y="356.6" font-size="10">2 rps</text>
+</svg>

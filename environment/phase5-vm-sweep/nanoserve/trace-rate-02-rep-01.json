@@ -1,0 +1,6204 @@
+{
+  "schema_version": 1,
+  "kind": "completion-replay",
+  "mode": "fixed-window-bounded-drain",
+  "trace_sha256": "7996a6f9f43e1039dda551345acfe5d15f5cc77cc0d238a8ea4e08cf018323f1",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "adapter": "nanoserve-http",
+  "started_at_utc": "2026-09-22T23:26:26.603991+00:00",
+  "offered_interval_s": 30.0,
+  "drain_s": 20.0,
+  "drain_deadline_offset_s": 50.0,
+  "elapsed_s": 30.43295868900168,
+  "summary": {
+    "requests": 60,
+    "completed": 60,
+    "failed": 0,
+    "timed_out": 0,
+    "not_sent": 0,
+    "missing_usage": 0
+  },
+  "records": [
+    {
+      "request_id": "r000000",
+      "status": "completed",
+      "actual_send_offset_s": 0.021057571000710595,
+      "first_content_offset_s": 0.05254723600228317,
+      "completed_offset_s": 0.48271587600174826,
+      "server_request_id": "cmpl-52504a3218254f888e1b87d00d2924ae",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 430.2208130029612,
+        "mean_itl_ms": 28.68138753353075
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.05254723600228317,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.08131525399949169,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.10999494499992579,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.13868316599837271,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.16729601800034288,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.19593128799897386,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.22464423799829092,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.253257164004026,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.2818041499995161,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.31049490599980345,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.33925039400492096,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.3678807250034879,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.3965745910027181,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.4251863690005848,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.45386341200355673,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.4826868930031196,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.019657315237125036,
+      "send_lag_s": 0.001400255763585559
+    },
+    {
+      "request_id": "r000001",
+      "status": "completed",
+      "actual_send_offset_s": 0.6156351340032415,
+      "first_content_offset_s": 0.6456445200019516,
+      "completed_offset_s": 1.3206831740026246,
+      "server_request_id": "cmpl-c1b6f8facd6944e39e73c6f021bb449c",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 675.0149910003529,
+        "mean_itl_ms": 45.000999400023524
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.6456445200019516,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.6741424950014334,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.7033256069989875,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.7607849970008829,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.8012500059994636,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.8417646669986425,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.8823178750026273,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.9226563940028427,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.9631366800022079,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0039452030032407,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0450122480033315,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1146718230011174,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1658967710027355,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.2174331479982357,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.2689508289986406,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.3206484370020917,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.6153901919231247,
+      "send_lag_s": 0.00024494208011682783
+    },
+    {
+      "request_id": "r000002",
+      "status": "completed",
+      "actual_send_offset_s": 0.6933267929998692,
+      "first_content_offset_s": 0.7607585020014085,
+      "completed_offset_s": 1.4430103929989855,
+      "server_request_id": "cmpl-1187ee14a10b461a92c2d859f9ac0460",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 682.2688489992288,
+        "mean_itl_ms": 45.48458993328192
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.7607585020014085,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.801352267000766,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.8418579440040048,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.8823989439988509,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.9226938589999918,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.9632165319999331,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0043431000012788,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0451888809984666,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.114793439002824,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1660231679998105,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.2175539240051876,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.2690794840018498,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.3209516100032488,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.3614495869987877,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.4021440610013087,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.442981375999807,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.6930936386704278,
+      "send_lag_s": 0.00023315432944137626
+    },
+    {
+      "request_id": "r000003",
+      "status": "completed",
+      "actual_send_offset_s": 1.0037663920011255,
+      "first_content_offset_s": 1.1146327480018954,
+      "completed_offset_s": 1.7250893840027857,
+      "server_request_id": "cmpl-2f23c8d62adf4775a1ff01d654d9ef96",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 610.3656029954436,
+        "mean_itl_ms": 40.69104019969624
+      },
+      "chunks": [
+        {
+          "at_offset_s": 1.1146327480018954,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.165963865998492,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.217495062002854,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.2690050110031734,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.320802228001412,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.3615409720005118,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.4023262160044396,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.4431273890004377,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.4715408320043935,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.5000545910006622,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.528548447000503,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.5571425130037824,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.586526020000747,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.6438545519995387,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.6843704109996906,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.7249781850041472,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 1.0035369035530675,
+      "send_lag_s": 0.00022948844805803503
+    },
+    {
+      "request_id": "r000004",
+      "status": "completed",
+      "actual_send_offset_s": 1.5605745810025837,
+      "first_content_offset_s": 1.6437954069988336,
+      "completed_offset_s": 2.094904719000624,
+      "server_request_id": "cmpl-9a938e17401d4722a9eba09e8309b08d",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 451.19135999993887,
+        "mean_itl_ms": 30.079423999995925
+      },
+      "chunks": [
+        {
+          "at_offset_s": 1.6437954069988336,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.6844194439981948,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.7250192170031369,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.753431574004935,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.7817487040010747,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.8102063400001498,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.8387038790024235,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.8671209910025937,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.8956387340003857,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.9240023140009725,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.9525710919988342,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.9808780340026715,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.009321039004135,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.0379898800019873,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.066449425998144,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.094881842000177,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 1.5603695592606104,
+      "send_lag_s": 0.00020502174197334355
+    },
+    {
+      "request_id": "r000005",
+      "status": "completed",
+      "actual_send_offset_s": 2.3479855699988548,
+      "first_content_offset_s": 2.3778340499993647,
+      "completed_offset_s": 2.883163594000507,
+      "server_request_id": "cmpl-99dd1473fcb7432fa5f9be49840b037e",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 505.309305000992,
+        "mean_itl_ms": 33.687287000066135
+      },
+      "chunks": [
+        {
+          "at_offset_s": 2.3778340499993647,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.406249043000571,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.434807716999785,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.4633274389998405,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.491926547998446,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.5204241600004025,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.5489256030050456,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.577422975002264,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6059983000013744,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6344910510015325,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6637145510030678,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.7209542089985916,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.7613802129999385,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.801841760003299,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.8423987350033713,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.883141810001689,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 2.3477701146547063,
+      "send_lag_s": 0.000215455344148463
+    },
+    {
+      "request_id": "r000006",
+      "status": "completed",
+      "actual_send_offset_s": 2.649760865002463,
+      "first_content_offset_s": 2.7209160150014213,
+      "completed_offset_s": 3.4129761299991515,
+      "server_request_id": "cmpl-f03b13c856f24b50bf3b14b024ba89ef",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 691.9388349997462,
+        "mean_itl_ms": 46.12925566664975
+      },
+      "chunks": [
+        {
+          "at_offset_s": 2.7209160150014213,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.7614624480047496,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.80191608700261,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.842474614000821,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.8832445480002207,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.9115324880040134,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.93996793700353,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.968356074001349,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.9976466430016444,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.0562648310005898,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.1258407380009885,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.176924660001532,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.2280873749987222,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.279213152003649,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.331791399003123,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.41294306400232,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 2.6495963522076247,
+      "send_lag_s": 0.00016451279483842285
+    },
+    {
+      "request_id": "r000007",
+      "status": "completed",
+      "actual_send_offset_s": 2.994658995005011,
+      "first_content_offset_s": 3.056219393001811,
+      "completed_offset_s": 3.9625869570008945,
+      "server_request_id": "cmpl-c35c5654bc3b43818bf3c2e55ab02d3f",
+      "output_text": " four, but but what if you have three plus three? What if you have",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 906.3883730050293,
+        "mean_itl_ms": 60.42589153366862
+      },
+      "chunks": [
+        {
+          "at_offset_s": 3.056219393001811,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.125976487004664,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.1770579160001944,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.2281466080021346,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.2793285150037264,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.331838611004059,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.413294529003906,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.4651063600031193,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.5175533779984107,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.5697242110036314,
+          "text": " plus",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.6502270530036185,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7124602110052365,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7749424900030135,
+          "text": " What",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.83756773800269,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.899986500000523,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.9625608770002145,
+          "text": " have",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 2.99444515061633,
+      "send_lag_s": 0.0002138443886812169
+    },
+    {
+      "request_id": "r000008",
+      "status": "completed",
+      "actual_send_offset_s": 3.004280444001779,
+      "first_content_offset_s": 3.125813126003777,
+      "completed_offset_s": 4.014814203001151,
+      "server_request_id": "cmpl-ec5335094bd54e3d8d6216b2bf2fac88",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 888.8086300066789,
+        "mean_itl_ms": 59.25390866711192
+      },
+      "chunks": [
+        {
+          "at_offset_s": 3.125813126003777,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.1769892279990017,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.2282161580005777,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.2792664500011597,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.332127007000963,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.4131642440042924,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.465302201999293,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.517699383002764,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.569918918001349,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.6504108480003197,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7126453099990613,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7750091800044174,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.83776658300485,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.9000499399990076,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.9627382210019277,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.014644980998128,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 3.00411664218312,
+      "send_lag_s": 0.00016380181865915944
+    },
+    {
+      "request_id": "r000009",
+      "status": "completed",
+      "actual_send_offset_s": 3.2874899040034506,
+      "first_content_offset_s": 3.4128827230015304,
+      "completed_offset_s": 4.218740239004546,
+      "server_request_id": "cmpl-c09dcbab5530477da370629b3268e8e0",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 805.9806060045958,
+        "mean_itl_ms": 53.73204040030638
+      },
+      "chunks": [
+        {
+          "at_offset_s": 3.4128827230015304,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.465196470002411,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.5177254430018365,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.5697822389993235,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.6502908660040703,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7125194879990886,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7750708349994966,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.8378143110021483,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.900254699998186,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.962787431999459,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.014694662000693,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.055640531005338,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.09637379799824,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.137236624999787,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.1779401399981,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.218717558003846,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 3.2872759773374214,
+      "send_lag_s": 0.0002139266660292627
+    },
+    {
+      "request_id": "r000010",
+      "status": "completed",
+      "actual_send_offset_s": 3.520371881000756,
+      "first_content_offset_s": 3.6501765409993823,
+      "completed_offset_s": 4.333474553000997,
+      "server_request_id": "cmpl-e195e243542b4394b617156af2fb8c41",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 683.4052139965934,
+        "mean_itl_ms": 45.56034759977289
+      },
+      "chunks": [
+        {
+          "at_offset_s": 3.6501765409993823,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7127058600017335,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.7752162770048017,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.8376409920019796,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.9001081800015527,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 3.9628440189990215,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.0149586660045316,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.0557191140032955,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.096453730002395,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.13714151000022,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.178046263004944,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.218773981003324,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.247356839005079,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.276064256002428,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.304713438003091,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.333452797000064,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 3.520181935375817,
+      "send_lag_s": 0.00018994562493901412
+    },
+    {
+      "request_id": "r000011",
+      "status": "completed",
+      "actual_send_offset_s": 4.47664807500405,
+      "first_content_offset_s": 4.506885205999424,
+      "completed_offset_s": 4.978566274003242,
+      "server_request_id": "cmpl-f10dc743e54b43759f5b71e34d7eb637",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 471.55793700221693,
+        "mean_itl_ms": 31.437195800147794
+      },
+      "chunks": [
+        {
+          "at_offset_s": 4.506885205999424,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.535340171998541,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.563970998002333,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.592643060001137,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.621247768001922,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.649930646002758,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.678460520000954,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.706980212002236,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.735665938998864,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.764261374999478,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.792920213003526,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.821546800005308,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.8501930970014655,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.879919873004837,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.937733245002164,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.978532223998627,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 4.476429502197806,
+      "send_lag_s": 0.00021857280624359987
+    },
+    {
+      "request_id": "r000012",
+      "status": "completed",
+      "actual_send_offset_s": 4.872522639998351,
+      "first_content_offset_s": 4.937700602000405,
+      "completed_offset_s": 5.3773495979985455,
+      "server_request_id": "cmpl-68646eb6481d4366a9730f0d3dfa70d7",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 439.71461500041187,
+        "mean_itl_ms": 29.314307666694123
+      },
+      "chunks": [
+        {
+          "at_offset_s": 4.937700602000405,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 4.9784896850032965,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.007101592003892,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.03542680600367,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.0638885139997,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.092337510002835,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.120936450999579,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.149384729003941,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.177950853001676,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.20646006300376,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.234985859999142,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.263416056004644,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.291752359000384,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.320300311999745,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.348699720998411,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.3773177140028565,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 4.872343313579753,
+      "send_lag_s": 0.0001793264185980803
+    },
+    {
+      "request_id": "r000013",
+      "status": "completed",
+      "actual_send_offset_s": 5.576513127001817,
+      "first_content_offset_s": 5.606480145004753,
+      "completed_offset_s": 6.18833177700435,
+      "server_request_id": "cmpl-c0121867febe49d890f8b68b773db812",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 581.7805709957611,
+        "mean_itl_ms": 38.785371399717405
+      },
+      "chunks": [
+        {
+          "at_offset_s": 5.606480145004753,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.635114880999026,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.663611749005213,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.6922903369995765,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.72081719700509,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.7493245700025,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.777850373000547,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.8065142940031365,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.8352406910053105,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.864588363998337,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.922462801005167,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.9640245199989295,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.034421248004946,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.085682144002931,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.136931747001654,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.18829880800331,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 5.576238874945667,
+      "send_lag_s": 0.0002742520561502815
+    },
+    {
+      "request_id": "r000014",
+      "status": "completed",
+      "actual_send_offset_s": 5.861117862004903,
+      "first_content_offset_s": 5.922422094998183,
+      "completed_offset_s": 6.594490772004065,
+      "server_request_id": "cmpl-21b526789d11462087edac0edc003df1",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 672.0279790024506,
+        "mean_itl_ms": 44.80186526683004
+      },
+      "chunks": [
+        {
+          "at_offset_s": 5.922422094998183,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 5.964321944004041,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.0344819460005965,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.08582440000464,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.136895691000973,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.188587589000235,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.229101101998822,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.269743139004277,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.310307454004942,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.350842357998772,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.391253608002444,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.43179487100133,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.472504290002689,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.513140317001671,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.553741708004964,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.594456512000761,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 5.860879672291034,
+      "send_lag_s": 0.00023818971386901922
+    },
+    {
+      "request_id": "r000015",
+      "status": "completed",
+      "actual_send_offset_s": 5.957961113999772,
+      "first_content_offset_s": 6.034373056005279,
+      "completed_offset_s": 6.651772877004987,
+      "server_request_id": "cmpl-596b5f5ca0b442569d731954d4052761",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 617.4775670006056,
+        "mean_itl_ms": 41.16517113337371
+      },
+      "chunks": [
+        {
+          "at_offset_s": 6.034373056005279,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.085747858000104,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.137051978003001,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.188438427998335,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.229150824001408,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.269832955003949,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.310362008000084,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.350884596999094,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.391336412998498,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.431819246005034,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.472541249000642,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.513208542004577,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.5537726289985585,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.594585494000057,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.623077971002203,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.651749620003102,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 5.957786200806954,
+      "send_lag_s": 0.0001749131928185932
+    },
+    {
+      "request_id": "r000016",
+      "status": "completed",
+      "actual_send_offset_s": 6.909472931998607,
+      "first_content_offset_s": 6.939331159002904,
+      "completed_offset_s": 7.367143706003844,
+      "server_request_id": "cmpl-82ccd44d029144f99658196629cff2db",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 427.8305830011959,
+        "mean_itl_ms": 28.522038866746396
+      },
+      "chunks": [
+        {
+          "at_offset_s": 6.939331159002904,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.967603618002613,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.996132707005017,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.024751422999543,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.053430782005307,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.081846036999195,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.110281492001377,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.138841985004547,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.167362413005321,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.195830652002769,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.224245985002199,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.252688578002562,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.281189244000416,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.309965847998683,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.338510034001956,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.367112255000393,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 6.909272244329892,
+      "send_lag_s": 0.00020068766871528254
+    },
+    {
+      "request_id": "r000017",
+      "status": "completed",
+      "actual_send_offset_s": 7.7677044270021725,
+      "first_content_offset_s": 7.797716125001898,
+      "completed_offset_s": 8.41898724299972,
+      "server_request_id": "cmpl-68d787c8f0c840ffbf5d4d7d7f7f5f80",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 621.1556409980403,
+        "mean_itl_ms": 41.410376066536024
+      },
+      "chunks": [
+        {
+          "at_offset_s": 7.797716125001898,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.826043770000979,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.854583202999493,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.883023152004171,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.911356065000291,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.939766882998811,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.968162811004731,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.9965759580009035,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.026217017999443,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.085355549002998,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.156155623000814,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.2083294940021,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.260616685998684,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.313423234001675,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.36579896100011,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.418950632003543,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 7.767282907284132,
+      "send_lag_s": 0.00042151971804038624
+    },
+    {
+      "request_id": "r000018",
+      "status": "completed",
+      "actual_send_offset_s": 8.003217215002223,
+      "first_content_offset_s": 8.085164438001812,
+      "completed_offset_s": 8.955819938004424,
+      "server_request_id": "cmpl-7b71e3fbbe064d1ebedb466ab41f915b",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 870.1139659970067,
+        "mean_itl_ms": 58.007597733133785
+      },
+      "chunks": [
+        {
+          "at_offset_s": 8.085164438001812,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.156027798999276,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.20839618500031,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.260679532002541,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.313513248998788,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.365858249002486,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.419111075003457,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.488896834001935,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.540341817999433,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.59146863299975,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.643100118002621,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.69435350200365,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.745845525001641,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.801891016002628,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.88584613900457,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.955602021000232,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 8.00297182233898,
+      "send_lag_s": 0.00024539266324374864
+    },
+    {
+      "request_id": "r000019",
+      "status": "completed",
+      "actual_send_offset_s": 8.05345850300364,
+      "first_content_offset_s": 8.155961158998252,
+      "completed_offset_s": 9.01316691700049,
+      "server_request_id": "cmpl-26aca4460bbe466f9e103ff04794a6bb",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 856.7515309987357,
+        "mean_itl_ms": 57.116768733249046
+      },
+      "chunks": [
+        {
+          "at_offset_s": 8.155961158998252,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.208477583000786,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.26076763599849,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.313599573004467,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.36594424299983,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.41904403600347,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.488976977001585,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.540524187999836,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.591509568999754,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.642867230002594,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.694450095004868,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.745872760002385,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.802006265003001,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.886047345004044,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.95539364599972,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.012945590002346,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 8.053292718556033,
+      "send_lag_s": 0.00016578444760639854
+    },
+    {
+      "request_id": "r000020",
+      "status": "completed",
+      "actual_send_offset_s": 8.412717797000369,
+      "first_content_offset_s": 8.488827214001503,
+      "completed_offset_s": 9.262760812001943,
+      "server_request_id": "cmpl-d08bf806150a45d5b65485ad2c165b7d",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 773.955308002769,
+        "mean_itl_ms": 51.597020533517934
+      },
+      "chunks": [
+        {
+          "at_offset_s": 8.488827214001503,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.540395053998509,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.591645254004106,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.643023151998932,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.694413144999999,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.746073751004587,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.801959739001177,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.885795989001053,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.955558628003928,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.013019889003772,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.055984008999076,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.098070797001128,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.139783702004934,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.181025994002994,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.221871605004708,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.262720247999823,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 8.412453778207427,
+      "send_lag_s": 0.00026401879294191133
+    },
+    {
+      "request_id": "r000021",
+      "status": "completed",
+      "actual_send_offset_s": 8.755481992004206,
+      "first_content_offset_s": 8.885651475000486,
+      "completed_offset_s": 9.463747109002725,
+      "server_request_id": "cmpl-6b164198ad6d4a2789dafeb625e90488",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 578.3069800017984,
+        "mean_itl_ms": 38.553798666786555
+      },
+      "chunks": [
+        {
+          "at_offset_s": 8.885651475000486,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.95578905200091,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.013094057001581,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.056072895000398,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.098160658002598,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.139862821000861,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.181119264001609,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.221922980999807,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.262851746003435,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.291592139998102,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.320293028002197,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.348816272999102,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.377370082002017,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.40615373000037,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.434923425003944,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.463709998002741,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 8.755020703596832,
+      "send_lag_s": 0.00046128840737402754
+    },
+    {
+      "request_id": "r000022",
+      "status": "completed",
+      "actual_send_offset_s": 9.49515917700046,
+      "first_content_offset_s": 9.52556002500205,
+      "completed_offset_s": 9.960269501003495,
+      "server_request_id": "cmpl-dffb891a643748469aea693618403c81",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 434.6468020012253,
+        "mean_itl_ms": 28.976453466748353
+      },
+      "chunks": [
+        {
+          "at_offset_s": 9.52556002500205,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.55425635100255,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.583046173000184,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.611787113004539,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.640849865005293,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.669610688004468,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.698543543003325,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.727522204004345,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.756483470999228,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.785331343002326,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.8142873350007,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.843208117999893,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.87219518400525,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.901033792004455,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.930027125003107,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.960246442002244,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 9.49488603336503,
+      "send_lag_s": 0.00027314363543062825
+    },
+    {
+      "request_id": "r000023",
+      "status": "completed",
+      "actual_send_offset_s": 9.94985443400219,
+      "first_content_offset_s": 9.989926428002946,
+      "completed_offset_s": 10.489114408002933,
+      "server_request_id": "cmpl-af6cbf5a47ed4df386d2da0a2e9b5e7e",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 499.1916510043666,
+        "mean_itl_ms": 33.27944340029111
+      },
+      "chunks": [
+        {
+          "at_offset_s": 9.989926428002946,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.018779906000418,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.047700724004244,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.076645177003229,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.10541369800194,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.134252276999177,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.163045405002777,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.191915720999532,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.220605018999777,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.249404328002129,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.278287826004089,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.307780472001468,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.365920118005306,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.40690411900141,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.44790652699885,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.489086052999482,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 9.949564594491289,
+      "send_lag_s": 0.00028983951090211235
+    },
+    {
+      "request_id": "r000024",
+      "status": "completed",
+      "actual_send_offset_s": 10.303098119002243,
+      "first_content_offset_s": 10.365834978001658,
+      "completed_offset_s": 10.888366418002988,
+      "server_request_id": "cmpl-4b8299abdca54eec806cf1911acdab03",
+      "output_text": " four, but but what if the numbers are negative? What if the numbers are",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 522.4947820024681,
+        "mean_itl_ms": 34.83298546683121
+      },
+      "chunks": [
+        {
+          "at_offset_s": 10.365834978001658,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.406943597998179,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.447986220002349,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.489219552000577,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.518013373999565,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.54673416800506,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.575387493998278,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.604176745000586,
+          "text": " numbers",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.632924531004392,
+          "text": " are",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.661740256000485,
+          "text": " negative",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.690635416998703,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.719514689000789,
+          "text": " What",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.74877303300309,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.806543391001469,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.847367608002969,
+          "text": " numbers",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.88834355599829,
+          "text": " are",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 10.302859167473244,
+      "send_lag_s": 0.00023895152899910954
+    },
+    {
+      "request_id": "r000025",
+      "status": "completed",
+      "actual_send_offset_s": 10.731102454003121,
+      "first_content_offset_s": 10.806510410002375,
+      "completed_offset_s": 11.619198325002799,
+      "server_request_id": "cmpl-45a8b8e8c223471f93b4d9aa3d95cfde",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 812.6417989988113,
+        "mean_itl_ms": 54.176119933254085
+      },
+      "chunks": [
+        {
+          "at_offset_s": 10.806510410002375,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.847469385000295,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.888470900004904,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.917169279004156,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.945743545998994,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 10.975528280003346,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.035941934998846,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.118383223001729,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.180888044000312,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.243549855003948,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.3059109800015,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.368377446000522,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.430835816005128,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.493527504004305,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.556248102999234,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.61916521799867,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 10.730879228315008,
+      "send_lag_s": 0.0002232256881136152
+    },
+    {
+      "request_id": "r000026",
+      "status": "completed",
+      "actual_send_offset_s": 10.967643232004775,
+      "first_content_offset_s": 11.035892660998798,
+      "completed_offset_s": 11.931569018001028,
+      "server_request_id": "cmpl-d6a424f9e0214e41af7d83d8d0f996bc",
+      "output_text": " four, but but what if you have three plus three? What if you have",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 895.7515639995108,
+        "mean_itl_ms": 59.71677093330072
+      },
+      "chunks": [
+        {
+          "at_offset_s": 11.035892660998798,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.118529318999208,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.18106403099955,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.243724409003335,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.305969050998101,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.368524434998108,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.430901422005263,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.493686036003055,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.556395888001134,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.619285371001752,
+          "text": " plus",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.67139045100339,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.723044024001865,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.77525456299918,
+          "text": " What",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.827165801005322,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.879281287001504,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.931531194000854,
+          "text": " have",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 10.967423568514963,
+      "send_lag_s": 0.00021966348981194983
+    },
+    {
+      "request_id": "r000027",
+      "status": "completed",
+      "actual_send_offset_s": 10.992733765000594,
+      "first_content_offset_s": 11.118264427001122,
+      "completed_offset_s": 11.973142331000417,
+      "server_request_id": "cmpl-7d41894af6bc47fcaf2c7641a0e7a396",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 854.8985099987476,
+        "mean_itl_ms": 56.993233999916505
+      },
+      "chunks": [
+        {
+          "at_offset_s": 11.118264427001122,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.18095712899958,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.24361745799979,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.30605893300526,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.368438770005014,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.430994196998654,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.493593851002515,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.556312412998523,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.619393854001828,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.671245673001977,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.723286803004157,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.774999052002386,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.827349972001684,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.879467144004593,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.931781539002259,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.973120394999569,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 10.992501981697247,
+      "send_lag_s": 0.00023178330334694408
+    },
+    {
+      "request_id": "r000028",
+      "status": "completed",
+      "actual_send_offset_s": 11.024306824998348,
+      "first_content_offset_s": 11.118322346999776,
+      "completed_offset_s": 11.973278048004431,
+      "server_request_id": "cmpl-77324726fe35421d8dfd888b0cdfcb77",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 854.9525210037245,
+        "mean_itl_ms": 56.996834733581636
+      },
+      "chunks": [
+        {
+          "at_offset_s": 11.118322346999776,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.181119370005035,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.243893129001663,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.306188588998339,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.368633039004635,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.431118949003576,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.493784719001269,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.556492850999348,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.61949329500203,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.671316282001499,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.72313306399883,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.775144015002297,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.827263744002266,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.87937862000399,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.931721280001511,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 11.97324131300411,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 11.024084076502213,
+      "send_lag_s": 0.00022274849613523884
+    },
+    {
+      "request_id": "r000029",
+      "status": "completed",
+      "actual_send_offset_s": 12.447152692002419,
+      "first_content_offset_s": 12.477629598004569,
+      "completed_offset_s": 12.911774621999939,
+      "server_request_id": "cmpl-d0a42f3e4dbc41c2904a4ae53b6e1c70",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 434.1871540018474,
+        "mean_itl_ms": 28.945810266789824
+      },
+      "chunks": [
+        {
+          "at_offset_s": 12.477629598004569,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.506337699000142,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.535421387998213,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.564340239005105,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.59323056699941,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.622170438000467,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.651195522004855,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.680062753999664,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.709045032002905,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.737886296999932,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.766952433004917,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.795843995998439,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.82492414599983,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.853816891998576,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.882767422001052,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 12.911749167004018,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 12.44690998628193,
+      "send_lag_s": 0.00024270572048834538
+    },
+    {
+      "request_id": "r000030",
+      "status": "completed",
+      "actual_send_offset_s": 13.360645127999305,
+      "first_content_offset_s": 13.391647319003823,
+      "completed_offset_s": 13.960729277998325,
+      "server_request_id": "cmpl-acaddffbd0964e3090ad7df70a57c4fc",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 568.7352090026252,
+        "mean_itl_ms": 37.915680600175016
+      },
+      "chunks": [
+        {
+          "at_offset_s": 13.391647319003823,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.420586881002237,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.449524263000058,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.478462655999465,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.507508194001275,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.537143391004065,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.56623619900347,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.62443668999913,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.665401559999736,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.706436278000183,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.747432693002338,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.789557695999974,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.83333269200375,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.875617138000962,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.91802608800208,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.96059978500125,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 13.36039050973342,
+      "send_lag_s": 0.0002546182658846874
+    },
+    {
+      "request_id": "r000031",
+      "status": "completed",
+      "actual_send_offset_s": 13.536232621998352,
+      "first_content_offset_s": 13.624395732003904,
+      "completed_offset_s": 14.164557025003887,
+      "server_request_id": "cmpl-ca7f3e6233174d7eaeb40efe9297893b",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 540.226133998658,
+        "mean_itl_ms": 36.01507559991054
+      },
+      "chunks": [
+        {
+          "at_offset_s": 13.624395732003904,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.665489940001862,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.706517204002012,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.74746388100175,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.789604906000022,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.833150486003433,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.875660901998344,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.918081857002107,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.960673398003564,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 13.990612861001864,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.019766484001593,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.04861758500192,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.077462425004342,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.106634109004517,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.135443766004755,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.164533251001558,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 13.535992466672454,
+      "send_lag_s": 0.00024015532589771738
+    },
+    {
+      "request_id": "r000032",
+      "status": "completed",
+      "actual_send_offset_s": 14.634273469004256,
+      "first_content_offset_s": 14.665430922002997,
+      "completed_offset_s": 15.237731999004609,
+      "server_request_id": "cmpl-122e767528324856b9526e8e8175faab",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 572.1361889955006,
+        "mean_itl_ms": 38.14241259970004
+      },
+      "chunks": [
+        {
+          "at_offset_s": 14.665430922002997,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.694471152004553,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.723575529002119,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.752461233998474,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.78154435900069,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.810474300000351,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.840302870004962,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.869324234998203,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.898303770001803,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.927320346003398,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.95621538800333,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 14.985017853003228,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.015017618999991,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.081083183002193,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.171551671999623,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.237697961005324,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 14.633990369516788,
+      "send_lag_s": 0.0002830994874685189
+    },
+    {
+      "request_id": "r000033",
+      "status": "completed",
+      "actual_send_offset_s": 15.00360685600026,
+      "first_content_offset_s": 15.080970316004823,
+      "completed_offset_s": 15.85999059700407,
+      "server_request_id": "cmpl-1cae8a6c43ff4b80a35fcddff010f0d4",
+      "output_text": " four, but but what if the numbers are negative? - Quora\\nTwo",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 779.0878559972043,
+        "mean_itl_ms": 51.93919039981362
+      },
+      "chunks": [
+        {
+          "at_offset_s": 15.080970316004823,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.171667394002725,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.237906121998094,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.290839672998118,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.340147167000396,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.391090183002234,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.444183936000627,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.493768549000379,
+          "text": " numbers",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.539383130002534,
+          "text": " are",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.585264735003875,
+          "text": " negative",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.63074044699897,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.676800806999381,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.722358689003158,
+          "text": " Qu",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.768258820004121,
+          "text": "ora",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.813763266000024,
+          "text": "\\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.85994679700525,
+          "text": "Two",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 15.003327072736026,
+      "send_lag_s": 0.0002797832642347231
+    },
+    {
+      "request_id": "r000034",
+      "status": "completed",
+      "actual_send_offset_s": 15.057955110998591,
+      "first_content_offset_s": 15.171484726000926,
+      "completed_offset_s": 15.893154463003157,
+      "server_request_id": "cmpl-c32213624c134a44b88b957673be6426",
+      "output_text": " four, but but what if the numbers are negative? What if the numbers are",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 721.7689169992809,
+        "mean_itl_ms": 48.117927799952064
+      },
+      "chunks": [
+        {
+          "at_offset_s": 15.171484726000926,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.237850238001556,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.290941924002254,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.340239476005081,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.39118523900106,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.444282213000406,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.493813203000173,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.539432710000256,
+          "text": " numbers",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.585307296001702,
+          "text": " are",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.630831483998918,
+          "text": " negative",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.67684120600461,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.722450075998495,
+          "text": " What",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.768291339001735,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.813808504004555,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.86009775900311,
+          "text": " numbers",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 15.893131185999664,
+          "text": " are",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 15.057699474022524,
+      "send_lag_s": 0.00025563697606756364
+    },
+    {
+      "request_id": "r000035",
+      "status": "completed",
+      "actual_send_offset_s": 16.025811619001615,
+      "first_content_offset_s": 16.059734640002716,
+      "completed_offset_s": 16.58077976500499,
+      "server_request_id": "cmpl-2e641deb822e44aab0348b3dc64cce04",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 521.0383140001795,
+        "mean_itl_ms": 34.73588760001197
+      },
+      "chunks": [
+        {
+          "at_offset_s": 16.059734640002716,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.091918493002595,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.124675179002224,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.15673145800247,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.18910479600163,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.22187891000067,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.25473066000268,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.28690519600059,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.31891125900438,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.35142579400417,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.383761199002038,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.416270711000834,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.44836202100123,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.480755873999442,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.539477001002524,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.580757160001667,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 16.025588317198256,
+      "send_lag_s": 0.00022330180335927707
+    },
+    {
+      "request_id": "r000036",
+      "status": "completed",
+      "actual_send_offset_s": 16.464792175000184,
+      "first_content_offset_s": 16.539430404001905,
+      "completed_offset_s": 16.98563925200142,
+      "server_request_id": "cmpl-c708b04a908f496f9c800aff0bbddaef",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 446.27629799651913,
+        "mean_itl_ms": 29.751753199767943
+      },
+      "chunks": [
+        {
+          "at_offset_s": 16.539430404001905,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.5808625780046,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.60981820100278,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.63870293200307,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.66751364299853,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.696304037002847,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.725304129002325,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.754112537004403,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.783093966005254,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.81199588099844,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.840824710998277,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.869758730004833,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.898646519002796,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.927533355999913,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.95648616700055,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 16.9856019880026,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 16.464576732461637,
+      "send_lag_s": 0.0002154425385469949
+    },
+    {
+      "request_id": "r000037",
+      "status": "completed",
+      "actual_send_offset_s": 17.814749823002785,
+      "first_content_offset_s": 17.845435526003712,
+      "completed_offset_s": 18.280460251000477,
+      "server_request_id": "cmpl-e18298b907e14dc2bdca2f914e94055d",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 435.0857950048521,
+        "mean_itl_ms": 29.005719666990142
+      },
+      "chunks": [
+        {
+          "at_offset_s": 17.845435526003712,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 17.87448190500436,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 17.903377865004586,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 17.932331091004016,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 17.9613201040047,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 17.990246223998838,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.01926806600386,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.048163172003115,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.077265012005228,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.106178119000106,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.135259934002534,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.16430790800223,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.193324617001053,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.222326518000045,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.251360250003927,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.280432405001193,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 17.81452296025183,
+      "send_lag_s": 0.00022686275095651354
+    },
+    {
+      "request_id": "r000038",
+      "status": "completed",
+      "actual_send_offset_s": 18.38328533800086,
+      "first_content_offset_s": 18.413837418003823,
+      "completed_offset_s": 19.09758417300327,
+      "server_request_id": "cmpl-0b301e5150b448a2aa16ee05331f3b02",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 683.7043870036723,
+        "mean_itl_ms": 45.58029246691149
+      },
+      "chunks": [
+        {
+          "at_offset_s": 18.413837418003823,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.443698221002705,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.50206054699811,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.542960598999343,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.584009261001484,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.62526244000037,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.666555404000974,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.70779426700028,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.74901050900371,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.790125655003067,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.831200345004618,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.87212838200503,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.91292948800401,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.959705018998648,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.039306313999987,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.097552216000622,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 18.38307221490407,
+      "send_lag_s": 0.00021312309678833685
+    },
+    {
+      "request_id": "r000039",
+      "status": "completed",
+      "actual_send_offset_s": 18.432698370001162,
+      "first_content_offset_s": 18.502000927001063,
+      "completed_offset_s": 19.18973757600179,
+      "server_request_id": "cmpl-baf9f7a89687461589caa84963390de6",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 687.7086469976348,
+        "mean_itl_ms": 45.84724313317565
+      },
+      "chunks": [
+        {
+          "at_offset_s": 18.502000927001063,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.543094245003886,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.584128221002175,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.6253432980011,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.66667633200268,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.707947708004212,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.749122826004168,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.790234555002826,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.831270205999317,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.872233996000432,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.913045712004532,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.959945538001193,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.039444877002097,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.09767973900307,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.143927501005237,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.189705654003774,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 18.43248467915777,
+      "send_lag_s": 0.00021369084339184496
+    },
+    {
+      "request_id": "r000040",
+      "status": "completed",
+      "actual_send_offset_s": 18.920118385001842,
+      "first_content_offset_s": 19.03926733600383,
+      "completed_offset_s": 19.57466340400424,
+      "server_request_id": "cmpl-b495b340715c468693a0fe163f574b5b",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 535.4883860054542,
+        "mean_itl_ms": 35.69922573369695
+      },
+      "chunks": [
+        {
+          "at_offset_s": 19.03926733600383,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.0977304620028,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.144002515000466,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.189917333998892,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.221955696004443,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.25433445800445,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.286261089000618,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.318226788003813,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.350272118004796,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.382171199002187,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.414171714000986,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.446300597002846,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.478168628003914,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.510137456003577,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.54220570000325,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.574626950001402,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 18.919905172539927,
+      "send_lag_s": 0.00021321246191519094
+    },
+    {
+      "request_id": "r000041",
+      "status": "completed",
+      "actual_send_offset_s": 19.693097002003924,
+      "first_content_offset_s": 19.72680935200333,
+      "completed_offset_s": 20.212662891004584,
+      "server_request_id": "cmpl-0c256e472f0b4f128f8d0404f89160b5",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 485.8962899961625,
+        "mean_itl_ms": 32.393085999744166
+      },
+      "chunks": [
+        {
+          "at_offset_s": 19.72680935200333,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.75936278500012,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.791557903998182,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.8238807250018,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.855996816004335,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.88894130400149,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.921186176004994,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.95344547500281,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 19.985816614003852,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.018382246998954,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.050639516004594,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.08287135900173,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.115943162003532,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.148053533004713,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.18028971699823,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.212641434001853,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 19.692869501596288,
+      "send_lag_s": 0.00022750040763597212
+    },
+    {
+      "request_id": "r000042",
+      "status": "completed",
+      "actual_send_offset_s": 20.838938576001965,
+      "first_content_offset_s": 20.873458152003877,
+      "completed_offset_s": 21.452561302001413,
+      "server_request_id": "cmpl-2a1c478908d440c69ecc3349683915a4",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 578.831168000761,
+        "mean_itl_ms": 38.588744533384066
+      },
+      "chunks": [
+        {
+          "at_offset_s": 20.873458152003877,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.905661497999972,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.9383361240034,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 20.970742536002945,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.00357576100214,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.035851724001986,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.066527574999782,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.124949971002934,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.16551420000178,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.206323689999408,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.247225006998633,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.288019088999135,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.328813701999024,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.369822364002175,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.410731214004045,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.45233247500437,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 20.838757598254954,
+      "send_lag_s": 0.00018097774701075764
+    },
+    {
+      "request_id": "r000043",
+      "status": "completed",
+      "actual_send_offset_s": 21.040140208002413,
+      "first_content_offset_s": 21.124915853004495,
+      "completed_offset_s": 21.75713781000377,
+      "server_request_id": "cmpl-d7089233ca3f413c9c0a1ed5f8f2c4fa",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 632.0975410053506,
+        "mean_itl_ms": 42.139836067023374
+      },
+      "chunks": [
+        {
+          "at_offset_s": 21.124915853004495,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.1656447580026,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.206461569003295,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.247336133004865,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.288109681001515,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.328925722998974,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.3699278530039,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.410844448000717,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.452384460004396,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.510839447000762,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.551544230998843,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.592632054002024,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.633721990001504,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.674795325998275,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.71585329300433,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.756971506998525,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 21.039948772150463,
+      "send_lag_s": 0.00019143585194925095
+    },
+    {
+      "request_id": "r000044",
+      "status": "completed",
+      "actual_send_offset_s": 21.4164836380005,
+      "first_content_offset_s": 21.510764944003313,
+      "completed_offset_s": 22.016196251999645,
+      "server_request_id": "cmpl-b125a8f72ff748958b7e727aa53fb434",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 505.51337499928195,
+        "mean_itl_ms": 33.700891666618794
+      },
+      "chunks": [
+        {
+          "at_offset_s": 21.510764944003313,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.55165099000442,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.592686285999662,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.6337734070039,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.674841478001326,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.715902848998667,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.75709324500349,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.785775310003373,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.814547982998192,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.843391742004314,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.872052454004006,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.900796918002015,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.92967524300184,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.958440663998772,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.987214140004653,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.01617139299924,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 21.41628211183679,
+      "send_lag_s": 0.00020152616371049703
+    },
+    {
+      "request_id": "r000045",
+      "status": "completed",
+      "actual_send_offset_s": 22.020429891003005,
+      "first_content_offset_s": 22.050869111000793,
+      "completed_offset_s": 22.644588617004047,
+      "server_request_id": "cmpl-82a98ac0e7dd46f49a629426c614f531",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 593.594852995011,
+        "mean_itl_ms": 39.5729901996674
+      },
+      "chunks": [
+        {
+          "at_offset_s": 22.050869111000793,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.079634576999524,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.10814341000514,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.137263957003597,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.19496400099888,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.23550039700058,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.276563047002128,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.317588760000945,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.358445040001243,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.399264345003758,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.43996581400279,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.480897863999417,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.52173960499931,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.562617989999126,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.603533251000044,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.644531351004844,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 22.02019747053477,
+      "send_lag_s": 0.0002324204682331299
+    },
+    {
+      "request_id": "r000046",
+      "status": "completed",
+      "actual_send_offset_s": 22.111647653000546,
+      "first_content_offset_s": 22.194938842003467,
+      "completed_offset_s": 22.759829686998273,
+      "server_request_id": "cmpl-efe1fb592d664255aea08665a7469ba5",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 564.9441369969281,
+        "mean_itl_ms": 37.66294246646188
+      },
+      "chunks": [
+        {
+          "at_offset_s": 22.194938842003467,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.23559754100279,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.276648789003957,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.317680487998587,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.35854482799914,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.399364185002923,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.44006726400403,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.48098635000497,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.521825301999343,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.56271055900288,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.603615764004644,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.64472107500478,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.67335644800187,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.70210159099952,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.73091237200424,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.759804066998186,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 22.11144924575681,
+      "send_lag_s": 0.00019840724373665353
+    },
+    {
+      "request_id": "r000047",
+      "status": "completed",
+      "actual_send_offset_s": 23.054805373998533,
+      "first_content_offset_s": 23.08574996900279,
+      "completed_offset_s": 23.520300559001043,
+      "server_request_id": "cmpl-cfdbc797522247f992667cc17576c8b3",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 434.62475999695016,
+        "mean_itl_ms": 28.974983999796677
+      },
+      "chunks": [
+        {
+          "at_offset_s": 23.08574996900279,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.114687074004905,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.14366928600066,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.172417590001714,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.20134800500091,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.230411549004202,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.259373565000715,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.288196179004444,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.31718730400462,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.346067666003364,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.374966964998748,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.404055589002382,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.433014356000058,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.46208830999967,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.491167305001,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.52027311400161,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 23.054571290522823,
+      "send_lag_s": 0.0002340834757106336
+    },
+    {
+      "request_id": "r000048",
+      "status": "completed",
+      "actual_send_offset_s": 23.813823834003415,
+      "first_content_offset_s": 23.844646409001143,
+      "completed_offset_s": 24.542387210000015,
+      "server_request_id": "cmpl-fc67dfbf4c604a588e8b678fb9aca4b9",
+      "output_text": " four, but but what if the numbers are negative? - Quora\\nTwo",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 697.4053570011165,
+        "mean_itl_ms": 46.4936904667411
+      },
+      "chunks": [
+        {
+          "at_offset_s": 23.844646409001143,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.902489088999573,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.943227563002438,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.984090805999585,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.024877745003323,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.065592709004704,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.106381700003112,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.147354300999723,
+          "text": " numbers",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.188394026001333,
+          "text": " are",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.229374524002196,
+          "text": " negative",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.27026520200161,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.31252982300066,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.383715791002032,
+          "text": " Qu",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.43630018100521,
+          "text": "ora",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.488894793001236,
+          "text": "\\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.54209119600273,
+          "text": "Two",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 23.813605572349175,
+      "send_lag_s": 0.00021826165423988186
+    },
+    {
+      "request_id": "r000049",
+      "status": "completed",
+      "actual_send_offset_s": 23.83949434600072,
+      "first_content_offset_s": 23.90245669399883,
+      "completed_offset_s": 24.612791316001676,
+      "server_request_id": "cmpl-1114e2e81ab54a38879c7c46915f7063",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 710.2344689992606,
+        "mean_itl_ms": 47.348964599950705
+      },
+      "chunks": [
+        {
+          "at_offset_s": 23.90245669399883,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.94332799500262,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.98418191500241,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.024916262998886,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.065641173001495,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.106467247998808,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.14743819100113,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.188477123003395,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.22945643500134,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.270359146001283,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.31281149500137,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.383858544002578,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.43644728000072,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.489022740002838,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.54214231199876,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.612758888004464,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 23.839303405598297,
+      "send_lag_s": 0.00019094040242251253
+    },
+    {
+      "request_id": "r000050",
+      "status": "completed",
+      "actual_send_offset_s": 24.287011061998783,
+      "first_content_offset_s": 24.383685542998137,
+      "completed_offset_s": 25.232850822001637,
+      "server_request_id": "cmpl-abac58de7fec4c10b51bcf858d5b879c",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 849.1341289991396,
+        "mean_itl_ms": 56.60894193327598
+      },
+      "chunks": [
+        {
+          "at_offset_s": 24.383685542998137,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.43637149300048,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.488955813998473,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.54242983500444,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.612916502002918,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.65473897600168,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.72499509100453,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.776557227000012,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.828183976998844,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.87966538600449,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.931260277000547,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.982891422005196,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.034696741000516,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.087359858000127,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.16945383300481,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.23282827300136,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 24.286822905507005,
+      "send_lag_s": 0.00018815649177739147
+    },
+    {
+      "request_id": "r000051",
+      "status": "completed",
+      "actual_send_offset_s": 24.516494239003805,
+      "first_content_offset_s": 24.612687892004033,
+      "completed_offset_s": 25.441234883001016,
+      "server_request_id": "cmpl-2863824d39fc413ab49e7b83f9e9001e",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 828.6114329966949,
+        "mean_itl_ms": 55.24076219977966
+      },
+      "chunks": [
+        {
+          "at_offset_s": 24.612687892004033,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.65479319899896,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.725124301003234,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.77669959799823,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.828308925003512,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.87969041299948,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.931381287002296,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.98301326100045,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.034813017999113,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.087411861000874,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.169614700003876,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.232929204001266,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.285103392001474,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.337170133003383,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.389131725998595,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.44120439499966,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 24.5162970861384,
+      "send_lag_s": 0.00019715286540389343
+    },
+    {
+      "request_id": "r000052",
+      "status": "completed",
+      "actual_send_offset_s": 24.619383119003032,
+      "first_content_offset_s": 24.724952860000485,
+      "completed_offset_s": 25.523507532998337,
+      "server_request_id": "cmpl-34bc4f5ef53a40bf8f550061df29028d",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 798.5753770044539,
+        "mean_itl_ms": 53.2383584669636
+      },
+      "chunks": [
+        {
+          "at_offset_s": 24.724952860000485,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.776637107999704,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.8282435910005,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.87981248700089,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.931321536001633,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 24.982954263003194,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.034756310000375,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.087645580002572,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.169536352004798,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.233025981004175,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.285174975004338,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.337295669000014,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.389256476999435,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.441508634001366,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.48243593200459,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.52347688900045,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 24.619199449893358,
+      "send_lag_s": 0.00018366910967415606
+    },
+    {
+      "request_id": "r000053",
+      "status": "completed",
+      "actual_send_offset_s": 25.083198396001535,
+      "first_content_offset_s": 25.16941362900252,
+      "completed_offset_s": 25.754964894003933,
+      "server_request_id": "cmpl-0611bb0520794a6f98ce8f1b3ba24ed5",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 585.6616290038801,
+        "mean_itl_ms": 39.044108600258674
+      },
+      "chunks": [
+        {
+          "at_offset_s": 25.16941362900252,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.23309618300118,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.28524340900185,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.33723104299861,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.389192203001585,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.44135181900492,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.482527459003904,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.523605007998412,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.55239692699979,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.58125577500323,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.610066989000188,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.63897360199917,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.667930941999657,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.696928081000806,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.72596843499923,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.754936299999827,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 25.08297687206399,
+      "send_lag_s": 0.0002215239375438216
+    },
+    {
+      "request_id": "r000054",
+      "status": "completed",
+      "actual_send_offset_s": 26.822872179000115,
+      "first_content_offset_s": 26.853391181000916,
+      "completed_offset_s": 27.360217116001877,
+      "server_request_id": "cmpl-67890b1812fa459ba6d5f34a03035603",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 506.52542599709705,
+        "mean_itl_ms": 33.768361733139805
+      },
+      "chunks": [
+        {
+          "at_offset_s": 26.853391181000916,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.882502473003115,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.91143225200358,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.94036049499846,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.969266798005265,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.998260990003473,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.027161869998963,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.0561328900003,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.08505026200146,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.114079592000053,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.14307776500209,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.172081386001082,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.20106965499872,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.230991656004335,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.289876091002952,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.36005844700412,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 26.822682478609483,
+      "send_lag_s": 0.00018970039063148647
+    },
+    {
+      "request_id": "r000055",
+      "status": "completed",
+      "actual_send_offset_s": 27.224347763003607,
+      "first_content_offset_s": 27.289927172998432,
+      "completed_offset_s": 28.031389257004776,
+      "server_request_id": "cmpl-c3106d30d9f945d3be95123115fb8484",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 741.506122998544,
+        "mean_itl_ms": 49.433741533236265
+      },
+      "chunks": [
+        {
+          "at_offset_s": 27.289927172998432,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.360090620000847,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.40120053300052,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.44185051200475,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.482452276002732,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.523213421001856,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.56393703199865,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.604795345003367,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.646924599001068,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.718049619004887,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.77020263200393,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.822208092999063,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.874263144003635,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.926517516003514,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.978831179003464,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.031353787002445,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 27.22412982413002,
+      "send_lag_s": 0.00021793887358612096
+    },
+    {
+      "request_id": "r000056",
+      "status": "completed",
+      "actual_send_offset_s": 27.28445225800533,
+      "first_content_offset_s": 27.359956628999498,
+      "completed_offset_s": 28.073007135004445,
+      "server_request_id": "cmpl-9965659c9cc2468d8db9b2923b5f6720",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 713.161386003776,
+        "mean_itl_ms": 47.544092400251735
+      },
+      "chunks": [
+        {
+          "at_offset_s": 27.359956628999498,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.401288111999747,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.441776395004126,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.482370316000015,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.523307485003897,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.56402740300109,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.604871246003313,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.646962933002214,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.718161755001347,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.77033729499817,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.822246041003382,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.874288913000782,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.92657773999963,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.978952381003182,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.03164368600119,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.07298457700381,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 27.284255163755812,
+      "send_lag_s": 0.0001970942495184147
+    },
+    {
+      "request_id": "r000057",
+      "status": "completed",
+      "actual_send_offset_s": 27.62596911899891,
+      "first_content_offset_s": 27.71799098700285,
+      "completed_offset_s": 28.304732987002353,
+      "server_request_id": "cmpl-a0a2c34c683e41889cdf3e0eb60e5d35",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 16,
+        "total_tokens": 21
+      },
+      "server_metrics": {
+        "generation_time_ms": 586.7956060028519,
+        "mean_itl_ms": 39.11970706685679
+      },
+      "chunks": [
+        {
+          "at_offset_s": 27.71799098700285,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.770277456002077,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.822361318998446,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.874407351999253,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.926677105002454,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 27.97889274100453,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.031489279004745,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.073111246005283,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.10193984000216,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.131220025999937,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.160101856999972,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.18880210700445,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.21777884900075,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.246775220002746,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.275647560003563,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.304687513002136,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 27.625782418789846,
+      "send_lag_s": 0.00018670020906341733
+    },
+    {
+      "request_id": "r000058",
+      "status": "completed",
+      "actual_send_offset_s": 28.381108594003308,
+      "first_content_offset_s": 28.41152505700302,
+      "completed_offset_s": 28.845434522001597,
+      "server_request_id": "cmpl-b1517da7eea348bf8cc5b60287bd34b6",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 433.95394799881615,
+        "mean_itl_ms": 28.930263199921075
+      },
+      "chunks": [
+        {
+          "at_offset_s": 28.41152505700302,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.440300243004458,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.46906531100103,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.497900873000617,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.52672635699855,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.555519175999507,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.58443385099963,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.61322341900086,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.642148220002127,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.671094392004306,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.70019788400532,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.729486955999164,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.758481016004225,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.787533009999606,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.816355920003843,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 28.84541221499967,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 28.38087834799226,
+      "send_lag_s": 0.00023024601104637554
+    },
+    {
+      "request_id": "r000059",
+      "status": "completed",
+      "actual_send_offset_s": 29.934233266001684,
+      "first_content_offset_s": 29.96488662900083,
+      "completed_offset_s": 30.399472137003613,
+      "server_request_id": "cmpl-3549e865396c486f9bb2f3b655b3104a",
+      "output_text": " four, but but what if you add two to two? - Brainly.com",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 16,
+        "total_tokens": 20
+      },
+      "server_metrics": {
+        "generation_time_ms": 434.6275229981984,
+        "mean_itl_ms": 28.975168199879892
+      },
+      "chunks": [
+        {
+          "at_offset_s": 29.96488662900083,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 29.993872404003923,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.022719810003764,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.051710776999244,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.080534485001408,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.10940182700142,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.138335196999833,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.16726615600055,
+          "text": " add",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.196200461003173,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.22524961700401,
+          "text": " to",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.25426708300074,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.28318935700372,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.31220852000115,
+          "text": " -",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.341234479004925,
+          "text": " Brain",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.370294175001618,
+          "text": "ly",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 30.39944202300103,
+          "text": ".com",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 29.933973874512063,
+      "send_lag_s": 0.0002593914896209526
+    }
+  ]
+}

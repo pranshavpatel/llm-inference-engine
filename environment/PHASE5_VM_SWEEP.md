@@ -117,3 +117,16 @@ both server logs. If the report fails, return the files anyway. We will check
 failures, send lag, latency samples, capacity, and run provenance before using
 any numbers. Full-run throughput includes the drain and is not steady-state
 throughput; this pilot does not establish SLO goodput.
+
+## After the first pilot
+
+The saved 0.5/1/2 requests/s pilot completed without overload. To locate the
+capacity knee, repeat the same procedure with a **new** directory named
+`phase5-vm-sweep-high`: use `--rates 4,8,16` in `plan-sweep` and replace only
+the `phase5-vm-sweep/` output-directory prefix in commands above with
+`phase5-vm-sweep-high/`. Keep the model, server flags, warmup, fixed 30-second
+offered interval, 20-second bounded drain, and three paired repetitions
+unchanged. Do not replace `phase5-vm-pilot/` in the warmup trace path. Return
+the complete high-rate directory as an archive, including logs and any partial
+outputs if a run fails. These are still pilot measurements, not a scored
+sustainable-throughput frontier.
