@@ -17,8 +17,8 @@ class CharacterCodec:
     def encode(self, text):
         return [ord(character) for character in text]
 
-    def decode_token(self, token_id):
-        return chr(token_id)
+    def decode_tokens(self, token_ids):
+        return "".join(chr(token_id) for token_id in token_ids)
 
 
 class StubWorker:
@@ -143,6 +143,33 @@ class ServerTests(unittest.TestCase):
 
     def test_eos_maps_to_openai_stop_reason(self):
         self.assertEqual(CompletionService.finish_reason(FinishReason.EOS), "stop")
+
+    def test_stream_waits_for_complete_multibyte_character(self):
+        class SplitUnicodeCodec(CharacterCodec):
+            def decode_tokens(self, token_ids):
+                return "\ufffd" if len(token_ids) == 1 else "é"
+
+        self.server.service.codec = SplitUnicodeCodec()
+        status, _, body = self.request(
+            "POST",
+            "/v1/completions",
+            {"model": "test-model", "prompt": "x", "max_tokens": 2, "stream": True},
+        )
+        chunks = [
+            json.loads(line.removeprefix("data: "))
+            for line in body.decode().splitlines()
+            if line.startswith("data: {")
+        ]
+        self.assertEqual(status, 200)
+        self.assertEqual([chunk["choices"][0]["text"] for chunk in chunks], ["", "é"])
+
+        status, _, body = self.request(
+            "POST",
+            "/v1/completions",
+            {"model": "test-model", "prompt": "x", "max_tokens": 2},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["choices"][0]["text"], "é")
 
     def test_stream_disconnect_requests_cancellation(self):
         release = threading.Event()

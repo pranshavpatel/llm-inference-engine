@@ -131,7 +131,6 @@ def serve_demo(host: str, port: int) -> int:
     worker = InferenceWorker(
         Engine(scheduler, PagedQwen2Runner(model, manager, ReferencePagedAttention()))
     )
-    worker.start()
     server = make_server(
         worker,
         ByteTokenCodec(),
@@ -139,6 +138,7 @@ def serve_demo(host: str, port: int) -> int:
         host=host,
         port=port,
     )
+    worker.start()
     bound_host, bound_port = server.server_address
     print(
         json.dumps(
@@ -159,6 +159,61 @@ def serve_demo(host: str, port: int) -> int:
     finally:
         server.server_close()
         worker.stop()
+    return 0
+
+
+def serve_checkpoint(args) -> int:
+    """Serve a local checkpoint through the same worker and HTTP contract."""
+    from .runtime import ServingConfig, build_serving_runtime
+    from .server import make_server
+
+    if not 0 <= args.port <= 65535:
+        raise ValueError("port must be in [0, 65535]")
+    runtime = build_serving_runtime(
+        ServingConfig(
+            model_dir=args.model_dir,
+            model_name=args.model_name,
+            device=args.device,
+            dtype=args.dtype,
+            kv_pool_mib=args.kv_pool_mib,
+            block_size=args.block_size,
+            max_context_tokens=args.max_context_tokens,
+            max_num_sequences=args.max_num_sequences,
+            max_waiting_requests=args.max_waiting_requests,
+            command_capacity=args.command_capacity,
+            watermark=args.watermark,
+        )
+    )
+    server = make_server(
+        runtime.worker,
+        runtime.codec,
+        model=runtime.model_id,
+        host=args.host,
+        port=args.port,
+    )
+    runtime.worker.start()
+    bound_host, bound_port = server.server_address
+    print(
+        json.dumps(
+            {
+                "status": "ready",
+                "address": f"http://{bound_host}:{bound_port}",
+                "model": runtime.model_id,
+                "kv_blocks": runtime.num_blocks,
+                "kv_pool_bytes": runtime.kv_pool_bytes,
+                "checkpoint_files": runtime.checkpoint_files,
+                "attention_backend": "reference_paged_gather",
+            }
+        ),
+        flush=True,
+    )
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+        runtime.worker.stop()
     return 0
 
 
@@ -206,6 +261,20 @@ def main(argv=None) -> int:
     serve = sub.add_parser("serve-demo", help="Serve a tiny random model for HTTP contract testing")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
+    checkpoint = sub.add_parser("serve", help="Serve a local Qwen2 safetensors checkpoint")
+    checkpoint.add_argument("--model-dir", type=Path, required=True)
+    checkpoint.add_argument("--model-name")
+    checkpoint.add_argument("--host", default="127.0.0.1")
+    checkpoint.add_argument("--port", type=int, default=8000)
+    checkpoint.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    checkpoint.add_argument("--dtype", choices=("float32", "bfloat16"), default="bfloat16")
+    checkpoint.add_argument("--kv-pool-mib", type=int, default=2048)
+    checkpoint.add_argument("--block-size", type=int, default=16)
+    checkpoint.add_argument("--max-context-tokens", type=int, default=2048)
+    checkpoint.add_argument("--max-num-sequences", type=int, default=16)
+    checkpoint.add_argument("--max-waiting-requests", type=int, default=128)
+    checkpoint.add_argument("--command-capacity", type=int, default=128)
+    checkpoint.add_argument("--watermark", type=float, default=0.05)
     memory = sub.add_parser("memory", help="Compute KV capacity from model geometry")
     memory.add_argument("--config", type=Path, required=True)
     memory.add_argument("--pool-mib", type=int, default=4096)
@@ -225,6 +294,8 @@ def main(argv=None) -> int:
             report = scheduler_demo()
         elif args.command == "serve-demo":
             return serve_demo(args.host, args.port)
+        elif args.command == "serve":
+            return serve_checkpoint(args)
         elif args.command == "memory":
             geometry = ModelGeometry.from_config(json.loads(args.config.read_text()))
             report = geometry.capacity(args.pool_mib * 1024**2, args.block_size, args.dtype_bytes)

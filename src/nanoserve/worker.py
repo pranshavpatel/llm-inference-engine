@@ -27,7 +27,7 @@ class TokenCodec(Protocol):
 
     def encode(self, text: str) -> Sequence[int]: ...
 
-    def decode_token(self, token_id: int) -> str: ...
+    def decode_tokens(self, token_ids: Sequence[int]) -> str: ...
 
 
 class HuggingFaceTokenCodec:
@@ -40,10 +40,10 @@ class HuggingFaceTokenCodec:
     def encode(self, text: str) -> Sequence[int]:
         return self.tokenizer.encode(text, add_special_tokens=False)
 
-    def decode_token(self, token_id: int) -> str:
+    def decode_tokens(self, token_ids: Sequence[int]) -> str:
         return self.tokenizer.decode(
-            [token_id],
-            skip_special_tokens=False,
+            list(token_ids),
+            skip_special_tokens=True,
             clean_up_tokenization_spaces=False,
         )
 
@@ -56,14 +56,15 @@ class ByteTokenCodec:
     def encode(self, text: str) -> Sequence[int]:
         return tuple(text.encode("utf-8"))
 
-    def decode_token(self, token_id: int) -> str:
-        if (
+    def decode_tokens(self, token_ids: Sequence[int]) -> str:
+        if any(
             isinstance(token_id, bool)
             or not isinstance(token_id, int)
             or not 0 <= token_id <= 255
+            for token_id in token_ids
         ):
-            raise ValueError("byte token must be an integer in [0, 255]")
-        return bytes((token_id,)).decode("latin-1")
+            raise ValueError("byte tokens must be integers in [0, 255]")
+        return bytes(token_ids).decode("latin-1")
 
 
 @dataclass
@@ -166,21 +167,33 @@ class InferenceWorker:
     def _put_command(self, command, *, admission: bool) -> None:
         if not self.is_running:
             raise WorkerClosed("inference worker is not running")
-        try:
-            self._commands.put_nowait(command)
-        except queue.Full as error:
-            if admission:
+        if admission:
+            try:
+                self._commands.put_nowait(command)
+            except queue.Full as error:
                 with self._state_lock:
                     self._counters["rejected"] += 1
                 raise WorkerQueueFull("worker command queue is full") from error
-            self._commands.put(command, timeout=1)
+            return
+        while self.is_running:
+            try:
+                self._commands.put(command, timeout=0.1)
+                return
+            except queue.Full:
+                continue
+        raise WorkerClosed("inference worker stopped before accepting the command")
 
-    @staticmethod
-    def _wait_reply(reply: queue.Queue):
-        result = reply.get()
-        if isinstance(result, BaseException):
-            raise result
-        return result
+    def _wait_reply(self, reply: queue.Queue):
+        while True:
+            try:
+                result = reply.get(timeout=0.1)
+            except queue.Empty:
+                if not self.is_running:
+                    raise WorkerClosed("inference worker stopped before replying")
+                continue
+            if isinstance(result, BaseException):
+                raise result
+            return result
 
     def submit(
         self,
@@ -374,3 +387,9 @@ class InferenceWorker:
         finally:
             with self._state_lock:
                 self._running = False
+            while True:
+                try:
+                    command = self._commands.get_nowait()
+                except queue.Empty:
+                    break
+                command.reply.put(WorkerClosed("inference worker stopped"))

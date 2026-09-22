@@ -72,7 +72,9 @@ Runner exceptions already transition selected scheduler requests to `FAILED`. Th
 
 The standard-library HTTP server intentionally implements a narrow completions contract. Non-streaming handlers collect request-local events; streaming handlers translate each event into one SSE record and cancel on a broken connection. EOS maps to the OpenAI-style `stop` finish reason while length remains `length`. Health is process liveness, readiness requires a running inference worker, and metrics expose scheduler, cache, and worker counters as JSON rather than claiming Prometheus compatibility.
 
-`serve-demo` uses a seeded random tiny model and a byte codec so transport tests require no checkpoint download. It is not a language-quality or performance demonstration. Production startup must construct the same worker/service objects with pinned model weights and `HuggingFaceTokenCodec`.
+`serve-demo` uses a seeded random tiny model and a byte codec so transport tests require no checkpoint download. It is not a language-quality or performance demonstration. `serve` constructs the same worker/service objects from a local Qwen2 config, tokenizer, and coverage-checked safetensors checkpoint. It chooses the physical page count from the configured KV byte budget and rejects a pool that cannot admit a maximum-context request. Startup opens HTTP ingress only after model and KV allocation succeed.
+
+The HTTP server decodes the entire generated token prefix at each output event. This matters for byte-level tokenizers, where individual token pieces can be invalid UTF-8. Streaming withholds an incomplete replacement character until later tokens complete it; non-streaming decodes the full output once. EOS is excluded from decoded text and maps to the `stop` finish reason.
 
 ## Accounting and arrival plans
 
@@ -82,6 +84,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-An optimized Linux backend, production-checkpoint server startup, chat completions, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler and HTTP correctness path.
+An optimized Linux backend, chat completions, comparable saved-trace adapters, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler and HTTP correctness path.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

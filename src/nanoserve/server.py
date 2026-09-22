@@ -69,20 +69,17 @@ class CompletionService:
         )
         return handle, stream
 
-    def event_payload(self, handle, event: OutputEvent, *, streaming: bool) -> dict:
-        text = "" if event.token_id is None else self.codec.decode_token(event.token_id)
+    def event_payload(self, handle, event: OutputEvent, *, text: str) -> dict:
         finish_reason = self.finish_reason(event.finish_reason)
-        if streaming:
-            return {
-                "id": handle.request_id,
-                "object": "text_completion.chunk",
-                "created": int(handle.created_at),
-                "model": self.model,
-                "choices": [
-                    {"index": 0, "text": text, "finish_reason": finish_reason}
-                ],
-            }
-        return {"text": text, "finish_reason": finish_reason}
+        return {
+            "id": handle.request_id,
+            "object": "text_completion.chunk",
+            "created": int(handle.created_at),
+            "model": self.model,
+            "choices": [
+                {"index": 0, "text": text, "finish_reason": finish_reason}
+            ],
+        }
 
     @staticmethod
     def finish_reason(reason: Optional[FinishReason]) -> Optional[str]:
@@ -91,16 +88,16 @@ class CompletionService:
         return reason.value if reason is not None else None
 
     def collect(self, handle) -> dict:
-        text_parts = []
+        token_ids = []
         final_event: Optional[OutputEvent] = None
         for event in handle.iter_events():
             if event.error:
                 raise RuntimeError(event.error)
             if event.token_id is not None:
-                text_parts.append(self.codec.decode_token(event.token_id))
+                token_ids.append(event.token_id)
             final_event = event
         # Token count is exact because every non-error event carries one token.
-        completion_tokens = len(text_parts)
+        completion_tokens = len(token_ids)
         return {
             "id": handle.request_id,
             "object": "text_completion",
@@ -109,7 +106,7 @@ class CompletionService:
             "choices": [
                 {
                     "index": 0,
-                    "text": "".join(text_parts),
+                    "text": self.codec.decode_tokens(token_ids),
                     "finish_reason": (
                         self.finish_reason(final_event.finish_reason)
                         if final_event is not None and final_event.finish_reason is not None
@@ -225,17 +222,41 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Connection", "close")
         self.end_headers()
         self.close_connection = True
+        token_ids: list[int] = []
+        emitted_text = ""
         try:
             for event in handle.iter_events():
                 if event.error:
                     chunk = _error(event.error, "engine_error")
                 else:
-                    chunk = self.service.event_payload(handle, event, streaming=True)
+                    if event.token_id is not None:
+                        token_ids.append(event.token_id)
+                    decoded = self.service.codec.decode_tokens(token_ids)
+                    if not decoded.startswith(emitted_text):
+                        raise RuntimeError("tokenizer output changed text already streamed")
+                    # A byte-level tokenizer may show the Unicode replacement
+                    # character until later tokens finish a multibyte codepoint.
+                    stable = decoded if event.finished else decoded.split("\ufffd", 1)[0]
+                    text = stable[len(emitted_text) :]
+                    emitted_text = stable
+                    chunk = self.service.event_payload(handle, event, text=text)
                 data = f"data: {json.dumps(chunk, separators=(',', ':'))}\n\n"
                 self.wfile.write(data.encode("utf-8"))
                 self.wfile.flush()
             self.wfile.write(b"data: [DONE]\n\n")
             self.wfile.flush()
+        except RuntimeError as error:
+            chunk = _error(str(error), "engine_error")
+            try:
+                self.wfile.write(f"data: {json.dumps(chunk)}\n\n".encode("utf-8"))
+                self.wfile.write(b"data: [DONE]\n\n")
+                self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            try:
+                self.service.worker.cancel(handle.request_id)
+            except WorkerClosed:
+                pass
         except (BrokenPipeError, ConnectionResetError):
             try:
                 self.service.worker.cancel(handle.request_id)

@@ -2,7 +2,7 @@
 
 `nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel, production-checkpoint server startup, and controlled performance benchmarks are not implemented, and there are no performance claims.
+This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel and controlled performance benchmarks are not implemented, and there are no performance claims.
 
 ## Reproducible setup
 
@@ -72,7 +72,17 @@ $body = @{ model = "nanoserve-tiny-random"; prompt = "hello"; max_tokens = 4; st
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/v1/completions -ContentType application/json -Body $body
 ```
 
-The demo model and byte codec test transport and lifecycle behavior only; their text is not meaningful. The reusable `HuggingFaceTokenCodec` adapts a loaded tokenizer, but loading a production checkpoint into the server CLI remains a separate integration step. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
+The demo model and byte codec test transport and lifecycle behavior only; their text is not meaningful.
+
+To serve a locally available Qwen2 safetensors checkpoint with its tokenizer, use the `serve` command. It loads only local files, checks tensor coverage, and derives physical page count from the KV budget:
+
+```powershell
+$env:PYTHONPATH = "src"
+$snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
+.\.venv\Scripts\python.exe -m nanoserve serve --model-dir $snapshot --model-name Qwen/Qwen2.5-1.5B-Instruct --device cuda --dtype bfloat16 --kv-pool-mib 128 --max-context-tokens 64
+```
+
+The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
 
 ## Physical paged reference
 
@@ -128,7 +138,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The initial Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, validation, overload responses, health/readiness, and metrics. The full non-GPU suite passes `67` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, and startup from a saved tiny checkpoint. The full non-GPU suite passes `73` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 
@@ -142,4 +152,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The next Phase 4 increment is production-checkpoint startup plus identical saved-trace adapters for nanoserve, Hugging Face, and vLLM; controlled performance claims still require the target Linux GPU environment.
+The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. The next Phase 4 increment is identical saved-trace adapters for nanoserve, Hugging Face, and vLLM; controlled performance claims still require the target Linux GPU environment.
