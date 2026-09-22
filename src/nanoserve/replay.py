@@ -62,6 +62,61 @@ def make_completion_trace(
     return {**payload, "sha256": _checksum(payload)}
 
 
+def make_duration_completion_trace(
+    *,
+    duration_s: float,
+    rate: float,
+    seed: int,
+    model: str,
+    revision: str,
+    prompts: list[str],
+    max_tokens: int,
+) -> dict:
+    """Save every Poisson arrival in a fixed offered-load interval.
+
+    This plans arrivals only. Existing replay still drains all requests and
+    therefore does not implement a bounded-drain scored benchmark.
+    """
+    if isinstance(duration_s, bool) or not isinstance(duration_s, (int, float)) or not math.isfinite(duration_s) or duration_s <= 0:
+        raise ValueError("duration_s must be finite and positive")
+    if isinstance(rate, bool) or not isinstance(rate, (int, float)) or not math.isfinite(rate) or rate <= 0:
+        raise ValueError("rate must be finite and positive")
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        raise ValueError("seed must be an integer")
+    if not model or not revision or not prompts or any(not isinstance(prompt, str) or not prompt for prompt in prompts):
+        raise ValueError("model, revision, and prompts must be nonempty")
+    if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
+        raise ValueError("max_tokens must be a positive integer")
+    arrival_rng = random.Random(seed)
+    prompt_rng = random.Random(seed)
+    arrival = 0.0
+    requests = []
+    while True:
+        arrival += arrival_rng.expovariate(rate)
+        if arrival > duration_s:
+            break
+        requests.append({
+            "request_id": f"r{len(requests):06d}",
+            "arrival_offset_s": arrival,
+            "prompt": prompt_rng.choice(prompts),
+            "max_tokens": max_tokens,
+        })
+    if not requests:
+        raise ValueError("seeded interval has no arrivals; increase rate or duration_s")
+    payload = {
+        "schema_version": 1,
+        "kind": "completion-request-trace",
+        "model": model,
+        "revision": revision,
+        "seed": seed,
+        "rate_rps": float(rate),
+        "offered_interval_s": float(duration_s),
+        "arrival_process": "poisson",
+        "requests": requests,
+    }
+    return {**payload, "sha256": _checksum(payload)}
+
+
 def validate_completion_trace(trace: dict) -> None:
     if not isinstance(trace, dict):
         raise ValueError("trace must be a JSON object")
@@ -74,6 +129,14 @@ def validate_completion_trace(trace: dict) -> None:
     requests = trace.get("requests")
     if not isinstance(requests, list) or not requests:
         raise ValueError("trace requests must be a nonempty list")
+    offered_interval = trace.get("offered_interval_s")
+    if offered_interval is not None and (
+        isinstance(offered_interval, bool)
+        or not isinstance(offered_interval, (int, float))
+        or not math.isfinite(offered_interval)
+        or offered_interval <= 0
+    ):
+        raise ValueError("offered_interval_s must be finite and positive")
     seen: set[str] = set()
     previous = -1.0
     for request in requests:
@@ -91,6 +154,7 @@ def validate_completion_trace(trace: dict) -> None:
             or not math.isfinite(offset)
             or offset < 0
             or offset < previous
+            or (offered_interval is not None and offset > offered_interval)
         ):
             raise ValueError("trace arrival offsets must be finite and nondecreasing")
         if not isinstance(prompt, str) or not prompt:
