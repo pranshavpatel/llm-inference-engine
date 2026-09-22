@@ -120,41 +120,19 @@ and otherwise the replay's prompt, output limit, and ignore-EOS policy. It
 saves the full response and reports whether its output matches the earlier
 two-request vLLM replay. The returned file matched.
 
-## Next diagnostic: vLLM eager-mode ablation
+## Eager-mode check and disposition
 
-This is a correctness-only ablation, **not** a scored performance run. Stop the
-current vLLM server and wait for it to exit; leave nanoserve stopped. On the
-same L40S, restart vLLM with the exact pilot command in
-`../PHASE5_VM_PILOT.md`, adding `--enforce-eager` and saving to a new log file:
+The attached `vllm-eager-server.log` confirms vLLM 0.30.0, the pinned model
+and tokenizer revision, BF16, FlashAttention 2, and `enforce_eager=True` with
+compilation and CUDA graphs disabled. The saved
+`vllm-eager-logprob-probe-r000000.json` has the same trace/replay checksums and
+request policy as the prior vLLM probe. It again generated
+` four, but what if you have three`, including ` what` at step 3; ` but` is
+outside its top ten. Thus compilation and CUDA graphs are not required for
+the observed difference. This is a correctness-only check, not a throughput
+measurement.
 
-```bash
-cd ~/llm-inference-engine
-source .venv-vllm/bin/activate
-VLLM_USE_FLASHINFER_SAMPLER=0 vllm serve Qwen/Qwen2.5-1.5B-Instruct \
-  --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 \
-  --tokenizer-revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 \
-  --generation-config vllm --dtype bfloat16 \
-  --max-model-len 64 --gpu-memory-utilization 0.3 \
-  --enforce-eager --host 127.0.0.1 --port 8000 \
-  2>&1 | tee phase5-vm-pilot/vllm-eager-server.log
-```
-
-In a second terminal after readiness:
-
-```bash
-cd ~/llm-inference-engine
-source .venv-vllm/bin/activate
-PYTHONPATH=src python scripts/phase5_vllm_logprob_probe.py \
-  --trace phase5-vm-pilot/fixed-trace.json \
-  --vllm-replay phase5-vm-pilot/vllm-fixed.json \
-  --request-id r000000 \
-  --endpoint http://127.0.0.1:8000/v1/completions \
-  --output phase5-vm-pilot/vllm-eager-logprob-probe-r000000.json
-```
-
-Return both the JSON and the new server log, including startup configuration.
-If eager vLLM still favors ` what`, compilation/CUDA graphs are not necessary
-for the discrepancy. If it instead favors ` but`, the changed execution mode
-is implicated, but further checks must separate compilation from CUDA graphs.
-[vLLM 0.30 documents](https://docs.vllm.ai/en/v0.30.0/cli/serve/) that
-`--enforce-eager` disables both.
+The two-token outputs agreed in the Phase 4 smoke and the eight-token fixed
+output contract passed in this pilot. We will disclose this longer greedy-text
+difference without running further kernel-level probes as part of Phase 5.
+The next task is the paired same-GPU load pilot in `../PHASE5_VM_SWEEP.md`.
