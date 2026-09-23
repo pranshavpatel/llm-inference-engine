@@ -1,0 +1,1707 @@
+{
+  "schema_version": 1,
+  "kind": "completion-replay",
+  "mode": "fixed-window-bounded-drain",
+  "trace_sha256": "23b3eadbfe05672e0ff56e7bcbe47d9946a260b5b5f1e06cb615f039935e025c",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "adapter": "vllm-http",
+  "started_at_utc": "2026-09-22T23:15:33.463858+00:00",
+  "offered_interval_s": 30.0,
+  "drain_s": 20.0,
+  "drain_deadline_offset_s": 50.0,
+  "elapsed_s": 30.027122405001137,
+  "summary": {
+    "requests": 17,
+    "completed": 17,
+    "failed": 0,
+    "timed_out": 0,
+    "not_sent": 0,
+    "missing_usage": 0
+  },
+  "records": [
+    {
+      "request_id": "r000000",
+      "status": "completed",
+      "actual_send_offset_s": 1.0516001760042855,
+      "first_content_offset_s": 1.0627382419988862,
+      "completed_offset_s": 1.137177315998997,
+      "server_request_id": "cmpl-86ac6e71927c16dc",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 1.0627382419988862,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0674158850015374,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0723845540051116,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0774606720005977,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0823623950054753,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0872585990000516,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0923053590013296,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0971935300040059,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.102174402003584,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1071579310009838,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1122042550050537,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1171195240021916,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1220838029985316,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1270645650001825,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.132045370999549,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1371482540052966,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 1.05030851096753,
+      "send_lag_s": 0.001291665036755374
+    },
+    {
+      "request_id": "r000001",
+      "status": "completed",
+      "actual_send_offset_s": 2.612238943002012,
+      "first_content_offset_s": 2.6226507160026813,
+      "completed_offset_s": 2.6970215590044972,
+      "server_request_id": "cmpl-a71ba656d3d4c8e3",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 2.6226507160026813,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.627373768002144,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.632225239001855,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.637179951001599,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.642142923003121,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.647039693001716,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.652179034004803,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6569956690000254,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6621332400027313,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.666962447001424,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6719679930029088,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6770421250039362,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.681930190999992,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.6869074319984065,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.691855752003903,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 2.697000013999059,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 2.6119584734540897,
+      "send_lag_s": 0.00028046954792237955
+    },
+    {
+      "request_id": "r000002",
+      "status": "completed",
+      "actual_send_offset_s": 6.5738345089994255,
+      "first_content_offset_s": 6.585058672004379,
+      "completed_offset_s": 6.659415154004819,
+      "server_request_id": "cmpl-8f1ca5233bd659e3",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 6.585058672004379,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.5896430460052215,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.594596510003612,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.599536292000266,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.604498076005257,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.609519319004903,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.614544765005121,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.619439646005048,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.624420833999466,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.629394444003992,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.634494295998593,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.639343249000376,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.644348389003426,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.649441879002552,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.65428367700224,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.659394636000798,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 6.573492405132686,
+      "send_lag_s": 0.0003421038667390519
+    },
+    {
+      "request_id": "r000003",
+      "status": "completed",
+      "actual_send_offset_s": 6.962573996002902,
+      "first_content_offset_s": 6.9731057259996305,
+      "completed_offset_s": 7.047524970002996,
+      "server_request_id": "cmpl-87745d6c01d3dd03",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 6.9731057259996305,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.977693102999183,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.98285619699891,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.9877661610007635,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.992604721999669,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 6.997556963004172,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.002515079002478,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.007482799002901,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.012589331003255,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.017456444002164,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.022452971999883,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.02744900900143,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.032443950003653,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.037418265004817,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.042377564001072,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.047502402005193,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 6.962278197454912,
+      "send_lag_s": 0.00029579854798988947
+    },
+    {
+      "request_id": "r000004",
+      "status": "completed",
+      "actual_send_offset_s": 7.47273873299855,
+      "first_content_offset_s": 7.4829484799993224,
+      "completed_offset_s": 7.558513328003755,
+      "server_request_id": "cmpl-a44533a6077350ce",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 7.4829484799993224,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.487666970999271,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.492665777004731,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.497517551004421,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.5025254680003854,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.5074292220015195,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.512415185003192,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.517417453003873,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.522518156001752,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.527413135001552,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.533419972001866,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.537680122004531,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.54334349000419,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.54837585700443,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.553201514005195,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.558489076000114,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 7.472474405093653,
+      "send_lag_s": 0.0002643279048974989
+    },
+    {
+      "request_id": "r000005",
+      "status": "completed",
+      "actual_send_offset_s": 7.5318443100040895,
+      "first_content_offset_s": 7.548194358998444,
+      "completed_offset_s": 7.622806796003715,
+      "server_request_id": "cmpl-bf9458183458b81e",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 7.548194358998444,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.553151494001213,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.55843385100161,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.563182933001372,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.5679448430018965,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.573094890998618,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.577912049004226,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.582943148001505,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.587873939999554,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.592845297003805,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.597897829000431,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.602796489998582,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.607798277000256,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.612776172005397,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.617711637001776,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.622784646002401,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 7.53153235219881,
+      "send_lag_s": 0.0003119578052794836
+    },
+    {
+      "request_id": "r000006",
+      "status": "completed",
+      "actual_send_offset_s": 7.77984212100273,
+      "first_content_offset_s": 7.789782070998626,
+      "completed_offset_s": 7.866697751000174,
+      "server_request_id": "cmpl-b25d7b901d0e0934",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 7.789782070998626,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.79448208300164,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.799696330999723,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.804615250999632,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.81017934600095,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.814879206001933,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.82016963299975,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.825269840002875,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.830514970999502,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.835635338000429,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.8405898380005965,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.845837147004204,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.850927422005043,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.856082480000623,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.861200147002819,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.866674975004571,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 7.779601121818445,
+      "send_lag_s": 0.00024099918428532874
+    },
+    {
+      "request_id": "r000007",
+      "status": "completed",
+      "actual_send_offset_s": 7.797616927004128,
+      "first_content_offset_s": 7.814946224003506,
+      "completed_offset_s": 7.891230847999395,
+      "server_request_id": "cmpl-909bd5857a122d8b",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 7.814946224003506,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.820224959003099,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.825316570000723,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.830575029998727,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.835687828002847,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.840622831005021,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.845874267004547,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.850962060998427,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.856113829999231,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.861235750999185,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.866624059002788,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.871315347998461,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.876248842003406,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.881225066004845,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.886142989998916,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 7.891206380998483,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 7.797290370853888,
+      "send_lag_s": 0.00032655615023990947
+    },
+    {
+      "request_id": "r000008",
+      "status": "completed",
+      "actual_send_offset_s": 8.138380131000304,
+      "first_content_offset_s": 8.148297869003727,
+      "completed_offset_s": 8.222769343999971,
+      "server_request_id": "cmpl-88e1718c77b3bd93",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 8.148297869003727,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.15296163700259,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.157993035005347,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.162863135999942,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.167879877000814,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.172829378003371,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.17790769500425,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.182885312999133,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.187862564998795,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.19274174200109,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.197730876003334,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.202695163003227,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.207670750998659,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.212659501004964,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.217596364003839,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 8.22273501100426,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 8.13813247413141,
+      "send_lag_s": 0.00024765686889338667
+    },
+    {
+      "request_id": "r000009",
+      "status": "completed",
+      "actual_send_offset_s": 9.580312919999415,
+      "first_content_offset_s": 9.59082550000312,
+      "completed_offset_s": 9.665308247000212,
+      "server_request_id": "cmpl-8186400f8643717a",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 9.59082550000312,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.59546970500378,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.60049125200021,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.605529549000494,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.610416601004545,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.61529850900115,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.6203067450042,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.625271602002613,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.63027456800046,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.635287456003425,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.640261783002643,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.645319266004662,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.650290382000094,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.655196371000784,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.660183454005164,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 9.665287016003276,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 9.580045920459664,
+      "send_lag_s": 0.000266999539750401
+    },
+    {
+      "request_id": "r000010",
+      "status": "completed",
+      "actual_send_offset_s": 18.691745592004736,
+      "first_content_offset_s": 18.7030141130017,
+      "completed_offset_s": 18.777367287002562,
+      "server_request_id": "cmpl-84b2b3c8dea437a9",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 18.7030141130017,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.707901227004186,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.712726413999917,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.717508621004527,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.722547085999395,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.72737599899847,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.732432714001334,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.737375076998433,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.742374934998224,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.747357979998924,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.752430778004054,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.757281575999514,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.762280647002626,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.767259467000258,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.77221426700271,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 18.777346736002073,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 18.691456015513808,
+      "send_lag_s": 0.0002895764909283116
+    },
+    {
+      "request_id": "r000011",
+      "status": "completed",
+      "actual_send_offset_s": 21.05687946800026,
+      "first_content_offset_s": 21.067829300001904,
+      "completed_offset_s": 21.142245723000087,
+      "server_request_id": "cmpl-99a9a4944b4264b0",
+      "output_text": " Paris. The capital of France is also the capital of which country?\nA)",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 21,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 21.067829300001904,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.072539346001577,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.077470978001656,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.08232823700382,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.087370834000467,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.092277620002278,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.097273195002344,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.102332533999288,
+          "text": " also",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.107326358003775,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.112189227998897,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.11717757500446,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.122175050004444,
+          "text": " which",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.127123794998624,
+          "text": " country",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.132162399000663,
+          "text": "?\n",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.137094910998712,
+          "text": "A",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 21.14222426700144,
+          "text": ")",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 21.056598022616022,
+      "send_lag_s": 0.00028144538423902077
+    },
+    {
+      "request_id": "r000012",
+      "status": "completed",
+      "actual_send_offset_s": 22.007911460001196,
+      "first_content_offset_s": 22.018875772002502,
+      "completed_offset_s": 22.093371884999215,
+      "server_request_id": "cmpl-98bca61b3e7941ed",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 22.018875772002502,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.023745678001433,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.028568850000738,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.033454413998697,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.0384302320017,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.04334514400398,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.048341018999054,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.053349476998847,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.058295192000514,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.063291544000094,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.06838988000527,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.073303427998326,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.078363093998632,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.083232055003464,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.088197757999296,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 22.09335120000469,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 22.007600476975373,
+      "send_lag_s": 0.00031098302582321935
+    },
+    {
+      "request_id": "r000013",
+      "status": "completed",
+      "actual_send_offset_s": 23.046516298003553,
+      "first_content_offset_s": 23.057369918002223,
+      "completed_offset_s": 23.13177452200034,
+      "server_request_id": "cmpl-8972f5af6855f356",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 23.057369918002223,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.06203206200007,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.067000973001996,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.07199257100001,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.076898726001673,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.081923274003202,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.086772287999338,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.091860828004428,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.096779277999303,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.101774608003325,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.106742971998756,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.111725481998292,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.116691675000766,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.12177000700467,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.12663247000455,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 23.131744080004864,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 23.046148685139816,
+      "send_lag_s": 0.00036761286373732105
+    },
+    {
+      "request_id": "r000014",
+      "status": "completed",
+      "actual_send_offset_s": 25.397244658001,
+      "first_content_offset_s": 25.407551183998294,
+      "completed_offset_s": 25.482067101998837,
+      "server_request_id": "cmpl-8b7bb29dcead7a94",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 25.407551183998294,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.41234982500464,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.417192973000056,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.422296623000875,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.427153921002173,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.432166007005435,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.437124736999976,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.44206798200321,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.447175254004833,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.452080645001843,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.45705099800398,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.462009264003427,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.46697983600461,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.47197312500066,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.476928187003068,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 25.482045980003022,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 25.396981761445417,
+      "send_lag_s": 0.00026289655558286995
+    },
+    {
+      "request_id": "r000015",
+      "status": "completed",
+      "actual_send_offset_s": 26.18677170700539,
+      "first_content_offset_s": 26.19647975100088,
+      "completed_offset_s": 26.271029082003224,
+      "server_request_id": "cmpl-a272804148520a9c",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 26.19647975100088,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.201219956004934,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.206170691002626,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.211224634003884,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.216107938998903,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.221239452999725,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.226194064998708,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.231154033004714,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.23613982900133,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.24098059500102,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.246098333998816,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.25096743800532,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.256054689001758,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.261035807001463,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.265894137999567,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.270992183002818,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 26.186387834314896,
+      "send_lag_s": 0.0003838726904952239
+    },
+    {
+      "request_id": "r000016",
+      "status": "completed",
+      "actual_send_offset_s": 26.339434264002193,
+      "first_content_offset_s": 26.348792955002864,
+      "completed_offset_s": 26.423375629005022,
+      "server_request_id": "cmpl-b6f0046d19017238",
+      "output_text": " four, but what if you have three apples and two oranges? How many fruits",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 20,
+        "completion_tokens": 16
+      },
+      "chunks": [
+        {
+          "at_offset_s": 26.348792955002864,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.353563192002184,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.35854106899933,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.36350823000248,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.3684595099985,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.3735111269998,
+          "text": " you",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.378447255003266,
+          "text": " have",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.383523643002263,
+          "text": " three",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.388376959002926,
+          "text": " apples",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.393398234002234,
+          "text": " and",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.398360844003037,
+          "text": " two",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.403454819002945,
+          "text": " oranges",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.40833281000232,
+          "text": "?",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.413285007001832,
+          "text": " How",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.41825575099938,
+          "text": " many",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 26.423354839003878,
+          "text": " fruits",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 26.33918564269338,
+      "send_lag_s": 0.0002486213088133127
+    }
+  ]
+}

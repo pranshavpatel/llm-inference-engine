@@ -53,9 +53,9 @@ Phase 4 now includes a dependency-free HTTP correctness path. `InferenceWorker` 
 
 The implemented API subset is:
 
-- `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, and greedy `temperature=0`.
-- JSON completions with exact prompt/completion token accounting, or SSE chunks terminated by `data: [DONE]`.
-- `GET /health`, `GET /ready`, and JSON `GET /metrics`.
+- `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, greedy `temperature=0`, and optional boolean `ignore_eos` for fixed-output experiments.
+- JSON completions with exact prompt/completion token accounting, or SSE chunks terminated by `data: [DONE]`. When streaming usage is requested, the final nanoserve usage chunk also reports server-side `generation_time_ms` and `mean_itl_ms` from actual token events; the latter is null for one-token outputs.
+- `GET /health`, `GET /ready`, and JSON `GET /metrics`. The worker metrics include a cumulative `generated_tokens` counter: one increment per emitted model token, excluding recomputed history and terminal events without a token. Take differences between boundary samples for an internal output-token count; the counter alone does not define a benchmark measurement window.
 - `400` for unsupported inputs, `429` for bounded-queue overload, `503` when the worker is unavailable, and disconnect cancellation for streaming responses.
 
 Run a local contract demo backed by a deterministic, randomly initialized tiny Qwen2 model:
@@ -101,11 +101,11 @@ The committed two-request debug trace was replayed against the pinned Hugging Fa
 
 ## Phase 5 experiment groundwork
 
-`plan-sweep` writes reproducible, independently seeded Poisson arrival traces for fixed offered-load intervals. Each trace is saved once and can be replayed unchanged against all engines. The current protocol uses normal EOS behavior, so `max_tokens` is a ceiling, not a guaranteed fixed output length. Use a new output directory for each plan:
+`plan-sweep` writes reproducible, independently seeded Poisson arrival traces for fixed offered-load intervals. Each trace is saved once and can be replayed unchanged against all engines. Use `--ignore-eos` for the fixed-output benchmark policy: EOS token IDs still count toward `max_tokens`, and a completed HTTP replay is marked failed unless usage reports exactly that many generated tokens with a `length` finish. Without the flag, normal EOS behavior remains available for correctness checks. vLLM 0.30 supports the `ignore_eos` completion parameter as a [server extension](https://docs.vllm.ai/en/v0.30.0/serving/online_serving/openai_compatible_server/). Use a new output directory for each plan:
 
 ```powershell
 $env:PYTHONPATH = "src"
-.\.venv\Scripts\python.exe -m nanoserve plan-sweep --rates 1,2,4 --repetitions 3 --duration-s 30 --seed 42 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --output-dir phase5-pilot-plan
+.\.venv\Scripts\python.exe -m nanoserve plan-sweep --rates 1,2,4 --repetitions 3 --duration-s 30 --seed 42 --model Qwen/Qwen2.5-1.5B-Instruct --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 --prompt "The capital of France is" --prompt "Two plus two equals" --max-tokens 16 --ignore-eos --output-dir phase5-pilot-plan
 ```
 
 `analyze-replay` validates a saved record against its checksummed trace, then exports a manifest, per-request CSV, timestamped chunk-event JSONL, and aggregate JSON. For a small format check using the committed Phase 4 records:
@@ -114,7 +114,27 @@ $env:PYTHONPATH = "src"
 .\.venv\Scripts\python.exe -m nanoserve analyze-replay --trace environment/phase4-debug-trace.json --replay environment/phase4-vllm-smoke.json --output-dir phase4-vllm-analysis
 ```
 
-The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, and inter-content-chunk gaps with sample counts. Failures and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. Full-run throughput includes startup and drain, not a steady measurement window. These commands establish a pilot and analysis path; scored same-GPU sweeps, bounded drain, fixed-length output policy, repetitions, profiles, and plots remain to be completed before any comparative performance claim.
+For a fixed-window trace, HTTP replay can now stop after an explicit drain interval. Work still in flight becomes `timed_out`; work queued behind the client worker limit becomes `not_sent`. The command interrupts active sockets and refuses to save a report if its client threads cannot stop. For example, with nanoserve already serving the matching checkpoint:
+
+```powershell
+.\.venv\Scripts\python.exe -m nanoserve replay --trace phase5-pilot-plan/trace-rate-00-rep-00.json --engine nanoserve --endpoint http://127.0.0.1:8000/v1/completions --bounded-drain-s 10 --max-workers 32 --output phase5-pilot-nanoserve.json
+```
+
+The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, inter-content-chunk gaps, and optional server-reported TPOT with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. vLLM 0.30 can supply per-request token timing in the final usage chunk when started with [`--enable-per-request-metrics`](https://docs.vllm.ai/en/v0.30.0/features/per_request_metrics/); that mode may add CPU overhead, so its effect needs checking before scored runs. Full-run throughput includes startup and drain, not a steady measurement window. The installed-vLLM fixed-output policy pilot passed; HF eager matches nanoserve exactly on both requests, while vLLM's longer generated text diverged on one. Saved L40S HF and vLLM probes reproduce their respective replays and show different fourth-token rankings, not a near-tie; eager vLLM retained its original output. The discrepancy is documented without further Phase 5 kernel probing. See [the saved pilot evidence](environment/phase5-vm-pilot/README.md). The [paired L40S load pilot](environment/PHASE5_VM_SWEEP.md) is next. Scored same-GPU sweeps, profiles, and plots remain before any comparative performance claim.
+
+For the first Ubuntu L40S same-GPU policy check, follow [the Phase 5 VM pilot runbook](environment/PHASE5_VM_PILOT.md). It runs vLLM and nanoserve sequentially, saves both full replay files, and records the environment and server startup configuration.
+
+The first [paired L40S load pilot](environment/phase5-vm-sweep/README.md) replayed nine matching traces per engine at 0.5, 1, and 2 requests/s. Both engines completed all 348 requests with 16 output tokens, no missing usage, and under 1.8 ms maximum per-run p99 send lag. KV capacity was 4,672 token slots on each. nanoserve's median-of-run p99 client TTFT rose from 111 to 173 ms; vLLM's stayed near 17 ms. Neither engine saturated at these offered rates, so matching delivered output rates are not evidence of equal capacity.
+
+The [4/8/16 requests/s pilot](environment/phase5-vm-sweep-high/README.md) completed cleanly at 4 requests/s (362/362 per engine), but nanoserve's 8/16 runs had seconds of client send lag with the 32-worker replay pool. They are not valid server-only capacity points. A narrow 5/6/7 requests/s follow-up with 256 non-polling client workers and a predeclared send-lag gate is the next GPU measurement; see the [VM runbook](environment/PHASE5_VM_SWEEP.md). vLLM completed all 2,574 high-rate requests without send lag or failure, but its maximum capacity was not reached.
+
+After a larger paired pilot, save each engine's replay files under its own directory using the trace filenames from `sweep-plan.json` (for example `phase5-runs/nanoserve/trace-rate-00-rep-00.json`). The report command validates every trace/replay pairing and regenerates run-level CSV, per-rate CSV, and two labeled SVG diagnostics:
+
+```powershell
+.\.venv\Scripts\python.exe -m nanoserve report-sweep --plan phase5-pilot-plan/sweep-plan.json --replays nanoserve=phase5-runs/nanoserve --replays vllm=phase5-runs/vllm --output-dir phase5-pilot-report
+```
+
+The report displays the median and range of **per-run** p99 TTFT values; it does not pool requests and relabel that value as a pooled p99. Hollow plot points denote at least one failed repetition. Zero observed failures alone does not establish stable throughput or a sustainable frontier.
 
 ## Physical paged reference
 
@@ -170,7 +190,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, saved-record consistency, honest metric labels, and export files. The full non-GPU suite passes `89` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, sweep provenance, optional server TPOT, honest metric labels, and export files. The full non-GPU suite passes `107` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 

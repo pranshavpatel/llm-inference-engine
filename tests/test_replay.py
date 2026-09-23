@@ -4,13 +4,20 @@ import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from types import SimpleNamespace
+
+import torch
 
 from nanoserve.replay import (
     HTTPCompletionsAdapter,
+    HuggingFaceAdapter,
     make_completion_trace,
+    make_duration_completion_trace,
+    replay_bounded_http_trace,
     replay_completion_trace,
     validate_completion_trace,
 )
+from nanoserve.experiment import analyze_replay
 
 
 class ReplayTests(unittest.TestCase):
@@ -47,6 +54,131 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(saved, make_completion_trace(rate=100, **arguments))
         self.assertEqual(saved, make_completion_trace(rate=100.0, **arguments))
 
+    def test_fixed_output_trace_is_checksummed_and_rejects_bad_policy(self):
+        trace = make_duration_completion_trace(
+            duration_s=0.1, rate=100, seed=7, model="test-model",
+            revision="revision", prompts=["p"], max_tokens=3, ignore_eos=True,
+        )
+        self.assertTrue(all(request["ignore_eos"] for request in trace["requests"]))
+        validate_completion_trace(trace)
+        trace["requests"][0]["ignore_eos"] = 1
+        with self.assertRaisesRegex(ValueError, "ignore_eos"):
+            validate_completion_trace(trace)
+
+    def test_http_fixed_output_policy_failure_is_retained(self):
+        captured = []
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                return
+
+            def do_POST(self):
+                captured.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                events = [
+                    {"id": "remote", "choices": [{"text": "A", "finish_reason": "stop"}]},
+                    {"id": "remote", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}},
+                ]
+                body = "".join(f"data: {json.dumps(event)}\n\n" for event in events) + "data: [DONE]\n\n"
+                encoded = body.encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        trace = make_completion_trace(
+            count=1, rate=1000, seed=7, model="test-model", revision="revision",
+            prompts=["p"], max_tokens=3, ignore_eos=True,
+        )
+        try:
+            host, port = server.server_address
+            adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
+            replay = replay_completion_trace(trace, adapter)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(2)
+
+        self.assertTrue(captured[0]["ignore_eos"])
+        self.assertEqual(replay["summary"]["failed"], 1)
+        self.assertIn("fixed-output policy mismatch", replay["records"][0]["error"])
+        self.assertEqual(replay["records"][0]["usage"]["completion_tokens"], 1)
+
+    def test_http_fixed_output_policy_accepts_exact_token_usage(self):
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                return
+
+            def do_POST(self):
+                payload = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                assert payload["ignore_eos"] is True
+                events = [
+                    {"id": "remote", "choices": [{"text": "A", "finish_reason": None}]},
+                    {"id": "remote", "choices": [{"text": "B", "finish_reason": None}]},
+                    {"id": "remote", "choices": [{"text": "C", "finish_reason": "length"}]},
+                    {"id": "remote", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 3, "total_tokens": 4}},
+                ]
+                body = "".join(f"data: {json.dumps(event)}\n\n" for event in events) + "data: [DONE]\n\n"
+                encoded = body.encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        trace = make_completion_trace(
+            count=1, rate=1000, seed=7, model="test-model", revision="revision",
+            prompts=["p"], max_tokens=3, ignore_eos=True,
+        )
+        try:
+            host, port = server.server_address
+            adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
+            replay = replay_completion_trace(trace, adapter)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(2)
+
+        self.assertEqual(replay["summary"]["completed"], 1)
+        self.assertEqual(replay["records"][0]["output_text"], "ABC")
+
+    def test_hf_baseline_can_count_eos_as_a_generated_token(self):
+        class Tokenizer:
+            eos_token_id = 9
+
+            def encode(self, prompt, add_special_tokens=False):
+                return [1]
+
+            def decode(self, token_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False):
+                return "" if skip_special_tokens else str(token_ids)
+
+        class Model:
+            def __call__(self, *args, **kwargs):
+                logits = torch.zeros((1, 1, 10), dtype=torch.float32)
+                logits[0, 0, 9] = 1
+                return SimpleNamespace(logits=logits, past_key_values=None)
+
+        adapter = object.__new__(HuggingFaceAdapter)
+        adapter._torch = torch
+        adapter.tokenizer = Tokenizer()
+        adapter.model = Model()
+        adapter.device = torch.device("cpu")
+        adapter._lock = threading.Lock()
+        request = {"request_id": "fixed", "prompt": "p", "max_tokens": 3, "ignore_eos": True}
+        fixed = adapter.run(request, time.monotonic())
+        normal = adapter.run({**request, "ignore_eos": False}, time.monotonic())
+
+        self.assertEqual(fixed["usage"]["completion_tokens"], 3)
+        self.assertEqual(fixed["finish_reason"], "length")
+        self.assertEqual(normal["usage"]["completion_tokens"], 1)
+        self.assertEqual(normal["finish_reason"], "stop")
+
     def test_replay_retains_every_completion_and_failure_in_trace_order(self):
         class FakeAdapter:
             name = "fake"
@@ -81,7 +213,8 @@ class ReplayTests(unittest.TestCase):
                 events = [
                     {"id": "remote-1", "choices": [{"text": "hello", "finish_reason": None}]},
                     {"id": "remote-1", "choices": [{"text": " world", "finish_reason": "length"}]},
-                    {"id": "remote-1", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 3, "total_tokens": 4}},
+                    {"id": "remote-1", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 3, "total_tokens": 4},
+                     "metrics": {"generation_time_ms": 24.0, "mean_itl_ms": 12.0}},
                 ]
                 body = "".join(f"data: {json.dumps(event)}\n\n" for event in events)
                 body += "data: [DONE]\n\n"
@@ -111,6 +244,7 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(record["output_text"], "hello world")
         self.assertEqual(len(record["chunks"]), 2)
         self.assertEqual(record["usage"]["completion_tokens"], 3)
+        self.assertEqual(record["server_metrics"]["mean_itl_ms"], 12.0)
         self.assertEqual(result["summary"]["missing_usage"], 0)
         self.assertTrue(captured[0]["stream_options"]["include_usage"])
 
@@ -143,6 +277,91 @@ class ReplayTests(unittest.TestCase):
         self.assertIn("HTTP 429", record["error"])
         self.assertIn("actual_send_offset_s", record)
         self.assertIn("send_lag_s", record)
+
+    def test_bounded_replay_completes_fast_fixed_window_requests(self):
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                return
+
+            def do_POST(self):
+                self.rfile.read(int(self.headers["Content-Length"]))
+                events = [
+                    {"id": "remote", "choices": [{"text": " ok", "finish_reason": "length"}]},
+                    {"id": "remote", "choices": [], "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}},
+                ]
+                body = "".join(f"data: {json.dumps(event)}\n\n" for event in events) + "data: [DONE]\n\n"
+                encoded = body.encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        trace = make_duration_completion_trace(
+            duration_s=0.05, rate=100, seed=7, model="test-model",
+            revision="revision", prompts=["p"], max_tokens=1,
+        )
+        try:
+            host, port = server.server_address
+            adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
+            replay = replay_bounded_http_trace(trace, adapter, drain_s=1, max_workers=4)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(2)
+        self.assertEqual(replay["summary"]["completed"], len(trace["requests"]))
+        self.assertEqual(replay["summary"]["timed_out"], 0)
+        self.assertEqual(replay["summary"]["not_sent"], 0)
+        aggregate, _, _ = analyze_replay(trace, replay)
+        self.assertEqual(aggregate["cohort"]["completed"], len(trace["requests"]))
+
+    def test_bounded_replay_retains_inflight_and_queued_at_cutoff(self):
+        release = threading.Event()
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                return
+
+            def do_POST(self):
+                self.rfile.read(int(self.headers["Content-Length"]))
+                release.wait(2)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        trace = make_duration_completion_trace(
+            duration_s=0.2, rate=100, seed=7, model="test-model",
+            revision="revision", prompts=["p"], max_tokens=1,
+        )
+        self.assertGreater(len(trace["requests"]), 1)
+        try:
+            host, port = server.server_address
+            adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
+            started = time.monotonic()
+            replay = replay_bounded_http_trace(trace, adapter, drain_s=0.1, max_workers=1)
+            self.assertLess(time.monotonic() - started, 1.5)
+        finally:
+            release.set()
+            server.shutdown()
+            server.server_close()
+            thread.join(2)
+        self.assertEqual(replay["summary"]["completed"], 0)
+        self.assertGreaterEqual(replay["summary"]["timed_out"], 1)
+        self.assertGreaterEqual(replay["summary"]["not_sent"], 1)
+        self.assertEqual(replay["summary"]["failed"], len(trace["requests"]))
+        self.assertEqual([record["request_id"] for record in replay["records"]], [request["request_id"] for request in trace["requests"]])
+        aggregate, _, _ = analyze_replay(trace, replay)
+        self.assertGreaterEqual(aggregate["cohort"]["failure_types"]["drain_timeout"], 1)
+
+    def test_bounded_replay_requires_fixed_window(self):
+        adapter = HTTPCompletionsAdapter("http://127.0.0.1:8000/v1/completions", "test-model")
+        with self.assertRaisesRegex(ValueError, "offered_interval"):
+            replay_bounded_http_trace(self.make_trace(), adapter, drain_s=1)
 
 
 if __name__ == "__main__":

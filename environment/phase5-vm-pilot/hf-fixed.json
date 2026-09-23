@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "kind": "completion-replay",
+  "trace_sha256": "6b23eae8b7abd3d2b9339fccfcf56d3481eff4604095305213847219f25969f9",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "adapter": "huggingface-eager",
+  "started_at_utc": "2026-09-22T22:26:49.868617+00:00",
+  "elapsed_s": 1.2400531169987516,
+  "summary": {
+    "requests": 2,
+    "completed": 2,
+    "failed": 0,
+    "missing_usage": 0
+  },
+  "records": [
+    {
+      "request_id": "r000000",
+      "status": "completed",
+      "actual_send_offset_s": 0.005697947999578901,
+      "first_content_offset_s": 0.8420996279965038,
+      "completed_offset_s": 1.0376281810022192,
+      "server_request_id": null,
+      "output_text": " four, but but what if the numbers",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 8,
+        "total_tokens": 12
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.8420996279965038,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.928732611995656,
+          "text": ",",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.9471370999963256,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.9651212710014079,
+          "text": " but",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.983233131999441,
+          "text": " what",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.001431541000784,
+          "text": " if",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0195462999981828,
+          "text": " the",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.0376151649979874,
+          "text": " numbers",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.003913148442348043,
+      "send_lag_s": 0.001784799557230858
+    },
+    {
+      "request_id": "r000001",
+      "status": "completed",
+      "actual_send_offset_s": 1.0380100789989228,
+      "first_content_offset_s": 1.1125520509958733,
+      "completed_offset_s": 1.2398502110008849,
+      "server_request_id": null,
+      "output_text": " Paris. The capital of France is also",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 8,
+        "total_tokens": 13
+      },
+      "chunks": [
+        {
+          "at_offset_s": 1.1125520509958733,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1307165030011674,
+          "text": ".",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1488138689965126,
+          "text": " The",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1668854849995114,
+          "text": " capital",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.1849669459988945,
+          "text": " of",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.203097612997226,
+          "text": " France",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.2214315449964488,
+          "text": " is",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 1.239839531997859,
+          "text": " also",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.005548333012402824,
+      "send_lag_s": 1.03246174598652
+    }
+  ]
+}

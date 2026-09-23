@@ -41,6 +41,9 @@ class CompletionService:
         max_tokens = payload.get("max_tokens", 16)
         if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
             raise ValueError("max_tokens must be a positive integer")
+        ignore_eos = payload.get("ignore_eos", False)
+        if not isinstance(ignore_eos, bool):
+            raise ValueError("ignore_eos must be a boolean")
         stream = payload.get("stream", False)
         if not isinstance(stream, bool):
             raise ValueError("stream must be a boolean")
@@ -64,6 +67,7 @@ class CompletionService:
             "model",
             "prompt",
             "max_tokens",
+            "ignore_eos",
             "stream",
             "n",
             "temperature",
@@ -78,7 +82,7 @@ class CompletionService:
         handle = self.worker.submit(
             prompt_ids,
             max_tokens,
-            eos_token_id=self.codec.eos_token_id,
+            eos_token_id=None if ignore_eos else self.codec.eos_token_id,
         )
         return handle, stream, include_usage
 
@@ -236,6 +240,9 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.close_connection = True
         token_ids: list[int] = []
+        first_token_at: float | None = None
+        last_token_at: float | None = None
+        token_times_available = True
         emitted_text = ""
         errored = False
         try:
@@ -246,6 +253,12 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
                 else:
                     if event.token_id is not None:
                         token_ids.append(event.token_id)
+                        if event.emitted_at is None:
+                            token_times_available = False
+                        else:
+                            if first_token_at is None:
+                                first_token_at = event.emitted_at
+                            last_token_at = event.emitted_at
                     decoded = self.service.codec.decode_tokens(token_ids)
                     if not decoded.startswith(emitted_text):
                         raise RuntimeError("tokenizer output changed text already streamed")
@@ -259,6 +272,12 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(data.encode("utf-8"))
                 self.wfile.flush()
             if include_usage and not errored:
+                generation_time_ms = None
+                mean_itl_ms = None
+                if token_times_available and first_token_at is not None and last_token_at is not None:
+                    generation_time_ms = (last_token_at - first_token_at) * 1000
+                    if len(token_ids) > 1:
+                        mean_itl_ms = generation_time_ms / (len(token_ids) - 1)
                 usage_chunk = {
                     "id": handle.request_id,
                     "object": "text_completion.chunk",
@@ -269,6 +288,10 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
                         "prompt_tokens": handle.prompt_tokens,
                         "completion_tokens": len(token_ids),
                         "total_tokens": handle.prompt_tokens + len(token_ids),
+                    },
+                    "metrics": {
+                        "generation_time_ms": generation_time_ms,
+                        "mean_itl_ms": mean_itl_ms,
                     },
                 }
                 data = f"data: {json.dumps(usage_chunk, separators=(',', ':'))}\n\n"

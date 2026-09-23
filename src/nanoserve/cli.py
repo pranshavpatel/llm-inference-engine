@@ -294,6 +294,7 @@ def main(argv=None) -> int:
     requests.add_argument("--revision", required=True)
     requests.add_argument("--prompt", action="append", dest="prompts", required=True)
     requests.add_argument("--max-tokens", type=int, default=16)
+    requests.add_argument("--ignore-eos", action="store_true", help="Require max-tokens generated tokens")
     requests.add_argument("--output", type=Path, required=True)
     replay = sub.add_parser("replay", help="Replay a saved completion trace")
     replay.add_argument("--trace", type=Path, required=True)
@@ -304,11 +305,16 @@ def main(argv=None) -> int:
     replay.add_argument("--dtype", choices=("float32", "bfloat16"), default="bfloat16")
     replay.add_argument("--timeout-s", type=float, default=60)
     replay.add_argument("--max-workers", type=int, default=32)
+    replay.add_argument("--bounded-drain-s", type=float, help="Stop a fixed-window HTTP trace after this drain interval")
     replay.add_argument("--output", type=Path, required=True)
     analysis = sub.add_parser("analyze-replay", help="Export honest full-cohort metrics from one saved replay")
     analysis.add_argument("--trace", type=Path, required=True)
     analysis.add_argument("--replay", type=Path, required=True)
     analysis.add_argument("--output-dir", type=Path, required=True)
+    sweep_report = sub.add_parser("report-sweep", help="Regenerate paired pilot CSV and SVG diagnostics")
+    sweep_report.add_argument("--plan", type=Path, required=True, help="Path to sweep-plan.json")
+    sweep_report.add_argument("--replays", action="append", required=True, metavar="ENGINE=DIR")
+    sweep_report.add_argument("--output-dir", type=Path, required=True)
     sweep = sub.add_parser("plan-sweep", help="Save fixed-window Poisson traces for paired pilot runs")
     sweep.add_argument("--rates", required=True, help="Comma-separated target requests per second")
     sweep.add_argument("--repetitions", type=int, default=3)
@@ -318,6 +324,7 @@ def main(argv=None) -> int:
     sweep.add_argument("--revision", required=True)
     sweep.add_argument("--prompt", action="append", dest="prompts", required=True)
     sweep.add_argument("--max-tokens", type=int, default=64)
+    sweep.add_argument("--ignore-eos", action="store_true", help="Require max-tokens generated tokens")
     sweep.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
@@ -345,6 +352,7 @@ def main(argv=None) -> int:
                 revision=args.revision,
                 prompts=args.prompts,
                 max_tokens=args.max_tokens,
+                ignore_eos=args.ignore_eos,
             )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -352,6 +360,19 @@ def main(argv=None) -> int:
             from .experiment import write_analysis
 
             report = write_analysis(args.trace, args.replay, args.output_dir)
+        elif args.command == "report-sweep":
+            from .experiment import write_sweep_report
+
+            replay_dirs = {}
+            for item in args.replays:
+                if "=" not in item:
+                    raise ValueError("--replays must use ENGINE=DIR")
+                name, directory = item.split("=", 1)
+                if not name or not directory or name in replay_dirs:
+                    raise ValueError("--replays engine names must be unique and nonempty")
+                replay_dirs[name] = Path(directory)
+            report = write_sweep_report(args.plan, replay_dirs, args.output_dir)
+            report = {key: value for key, value in report.items() if key not in ("runs", "by_rate")}
         elif args.command == "plan-sweep":
             from .experiment import write_sweep_plan
 
@@ -365,6 +386,7 @@ def main(argv=None) -> int:
                 revision=args.revision,
                 prompts=args.prompts,
                 max_tokens=args.max_tokens,
+                ignore_eos=args.ignore_eos,
             )
         else:
             from .replay import (
@@ -386,6 +408,8 @@ def main(argv=None) -> int:
                     name=f"{args.engine}-http",
                 )
             else:
+                if args.bounded_drain_s is not None:
+                    raise ValueError("--bounded-drain-s is supported only for HTTP engines")
                 if args.model_dir is None:
                     raise ValueError("--model-dir is required for Hugging Face replay")
                 if (
@@ -396,9 +420,17 @@ def main(argv=None) -> int:
                 adapter = HuggingFaceAdapter(
                     args.model_dir, device=args.device, dtype=args.dtype
                 )
-            report = replay_completion_trace(
-                workload, adapter, max_workers=args.max_workers
-            )
+            if args.bounded_drain_s is None:
+                report = replay_completion_trace(
+                    workload, adapter, max_workers=args.max_workers
+                )
+            else:
+                from .replay import replay_bounded_http_trace
+
+                report = replay_bounded_http_trace(
+                    workload, adapter, drain_s=args.bounded_drain_s,
+                    max_workers=args.max_workers,
+                )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
             report = {key: value for key, value in report.items() if key != "records"}

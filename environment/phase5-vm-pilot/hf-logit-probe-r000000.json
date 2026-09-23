@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "kind": "phase5-hf-logit-probe",
+  "performance_claim": false,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "trace_sha256": "6b23eae8b7abd3d2b9339fccfcf56d3481eff4604095305213847219f25969f9",
+  "hf_replay_file_sha256": "34c231e04f6195d199a7c8e00e942272519293e102780bab78f18fd3c2dd0d87",
+  "request_id": "r000000",
+  "prompt": "Two plus two equals",
+  "dtype": "bfloat16",
+  "attention_backend": "huggingface-eager",
+  "device": "NVIDIA L40S",
+  "torch": "2.13.0+cu132",
+  "transformers": "5.17.0",
+  "generated_text": " four, but but what if the numbers",
+  "matches_hf_replay": true,
+  "steps": [
+    {
+      "generation_step": 0,
+      "chosen_token_id": 3040,
+      "chosen_text": " four",
+      "top_two_logit_margin": 1.125,
+      "top_five": [
+        {
+          "token_id": 3040,
+          "text": " four",
+          "logit": 21.625
+        },
+        {
+          "token_id": 4236,
+          "text": " five",
+          "logit": 20.5
+        },
+        {
+          "token_id": 1128,
+          "text": " what",
+          "logit": 20.125
+        },
+        {
+          "token_id": 2326,
+          "text": " three",
+          "logit": 19.125
+        },
+        {
+          "token_id": 32671,
+          "text": " ______",
+          "logit": 19.0
+        }
+      ]
+    },
+    {
+      "generation_step": 1,
+      "chosen_token_id": 11,
+      "chosen_text": ",",
+      "top_two_logit_margin": 0.0,
+      "top_five": [
+        {
+          "token_id": 13,
+          "text": ".",
+          "logit": 21.25
+        },
+        {
+          "token_id": 11,
+          "text": ",",
+          "logit": 21.25
+        },
+        {
+          "token_id": 374,
+          "text": " is",
+          "logit": 20.375
+        },
+        {
+          "token_id": 304,
+          "text": " in",
+          "logit": 19.75
+        },
+        {
+          "token_id": 624,
+          "text": ".\n",
+          "logit": 19.125
+        }
+      ]
+    },
+    {
+      "generation_step": 2,
+      "chosen_token_id": 714,
+      "chosen_text": " but",
+      "top_two_logit_margin": 0.5,
+      "top_five": [
+        {
+          "token_id": 714,
+          "text": " but",
+          "logit": 20.625
+        },
+        {
+          "token_id": 1290,
+          "text": " right",
+          "logit": 20.125
+        },
+        {
+          "token_id": 323,
+          "text": " and",
+          "logit": 19.875
+        },
+        {
+          "token_id": 537,
+          "text": " not",
+          "logit": 19.0
+        },
+        {
+          "token_id": 476,
+          "text": " or",
+          "logit": 18.875
+        }
+      ]
+    },
+    {
+      "generation_step": 3,
+      "chosen_token_id": 714,
+      "chosen_text": " but",
+      "top_two_logit_margin": 0.75,
+      "top_five": [
+        {
+          "token_id": 714,
+          "text": " but",
+          "logit": 20.375
+        },
+        {
+          "token_id": 2326,
+          "text": " three",
+          "logit": 19.625
+        },
+        {
+          "token_id": 1290,
+          "text": " right",
+          "logit": 19.625
+        },
+        {
+          "token_id": 323,
+          "text": " and",
+          "logit": 19.5
+        },
+        {
+          "token_id": 537,
+          "text": " not",
+          "logit": 18.875
+        }
+      ]
+    },
+    {
+      "generation_step": 4,
+      "chosen_token_id": 1128,
+      "chosen_text": " what",
+      "top_two_logit_margin": 0.125,
+      "top_five": [
+        {
+          "token_id": 1128,
+          "text": " what",
+          "logit": 20.375
+        },
+        {
+          "token_id": 2326,
+          "text": " three",
+          "logit": 20.25
+        },
+        {
+          "token_id": 5519,
+          "text": " plus",
+          "logit": 19.875
+        },
+        {
+          "token_id": 1378,
+          "text": " two",
+          "logit": 19.875
+        },
+        {
+          "token_id": 421,
+          "text": " if",
+          "logit": 19.75
+        }
+      ]
+    },
+    {
+      "generation_step": 5,
+      "chosen_token_id": 421,
+      "chosen_text": " if",
+      "top_two_logit_margin": 0.25,
+      "top_five": [
+        {
+          "token_id": 421,
+          "text": " if",
+          "logit": 23.75
+        },
+        {
+          "token_id": 911,
+          "text": " about",
+          "logit": 23.5
+        },
+        {
+          "token_id": 8573,
+          "text": " happens",
+          "logit": 22.875
+        },
+        {
+          "token_id": 1558,
+          "text": " does",
+          "logit": 22.25
+        },
+        {
+          "token_id": 374,
+          "text": " is",
+          "logit": 21.25
+        }
+      ]
+    },
+    {
+      "generation_step": 6,
+      "chosen_token_id": 279,
+      "chosen_text": " the",
+      "top_two_logit_margin": 0.0,
+      "top_five": [
+        {
+          "token_id": 498,
+          "text": " you",
+          "logit": 21.0
+        },
+        {
+          "token_id": 279,
+          "text": " the",
+          "logit": 21.0
+        },
+        {
+          "token_id": 825,
+          "text": " one",
+          "logit": 20.625
+        },
+        {
+          "token_id": 1052,
+          "text": " there",
+          "logit": 20.5
+        },
+        {
+          "token_id": 582,
+          "text": " we",
+          "logit": 20.5
+        }
+      ]
+    },
+    {
+      "generation_step": 7,
+      "chosen_token_id": 5109,
+      "chosen_text": " numbers",
+      "top_two_logit_margin": 0.875,
+      "top_five": [
+        {
+          "token_id": 5109,
+          "text": " numbers",
+          "logit": 21.875
+        },
+        {
+          "token_id": 1378,
+          "text": " two",
+          "logit": 21.0
+        },
+        {
+          "token_id": 1372,
+          "text": " number",
+          "logit": 20.125
+        },
+        {
+          "token_id": 3405,
+          "text": " question",
+          "logit": 19.875
+        },
+        {
+          "token_id": 1973,
+          "text": " order",
+          "logit": 19.25
+        }
+      ]
+    }
+  ]
+}

@@ -87,6 +87,7 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(len(set(runner.thread_ids)), 1)
         self.assertNotEqual(runner.thread_ids[0], main_thread)
         self.assertEqual(stats["worker"]["completed"], 2)
+        self.assertEqual(stats["worker"]["generated_tokens"], 5)
         self.assertEqual(manager.blocks.stats()["active_requests"], 0)
 
     def test_cancel_waits_for_current_step_then_releases_request(self):
@@ -114,6 +115,7 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(scheduler.snapshot("cancel-me").state, RequestState.CANCELLED)
         self.assertEqual(manager.blocks.stats()["active_requests"], 0)
         self.assertEqual(result[0].finish_reason, FinishReason.CANCELLED)
+        self.assertEqual(worker.stats()["worker"]["generated_tokens"], len([event for event in events if event.token_id is not None]))
 
     def test_runner_failure_reaches_request_stream_and_worker_survives(self):
         manager = make_manager()
@@ -130,6 +132,7 @@ class WorkerTests(unittest.TestCase):
         self.assertIn("injected worker failure", event.error)
         self.assertTrue(stats["worker"]["running"])
         self.assertEqual(stats["worker"]["failed"], 1)
+        self.assertEqual(stats["worker"]["generated_tokens"], 0)
 
     def test_worker_rejects_calls_outside_lifecycle(self):
         manager = make_manager()

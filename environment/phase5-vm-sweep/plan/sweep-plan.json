@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "phase5-sweep-plan",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "rates_rps": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "repetitions": 3,
+  "duration_s": 30.0,
+  "base_seed": 42,
+  "max_tokens": 16,
+  "output_policy": "ignore EOS; require exactly max_tokens generated tokens",
+  "status": "arrival plan only; not a scored benchmark run",
+  "traces": [
+    {
+      "file": "trace-rate-00-rep-00.json",
+      "rate_index": 0,
+      "repetition": 0,
+      "seed": 42,
+      "target_rate_rps": 0.5,
+      "offered_interval_s": 30.0,
+      "requests": 21,
+      "trace_sha256": "abd9b7003672060f6b99434e67a0f0fe35867115b5792a406c61c3e4e1325e92"
+    },
+    {
+      "file": "trace-rate-00-rep-01.json",
+      "rate_index": 0,
+      "repetition": 1,
+      "seed": 43,
+      "target_rate_rps": 0.5,
+      "offered_interval_s": 30.0,
+      "requests": 17,
+      "trace_sha256": "bf78dc821dd924b70b702157942c3f71fec365dc0846e1d1badff1a395414f99"
+    },
+    {
+      "file": "trace-rate-00-rep-02.json",
+      "rate_index": 0,
+      "repetition": 2,
+      "seed": 44,
+      "target_rate_rps": 0.5,
+      "offered_interval_s": 30.0,
+      "requests": 17,
+      "trace_sha256": "23b3eadbfe05672e0ff56e7bcbe47d9946a260b5b5f1e06cb615f039935e025c"
+    },
+    {
+      "file": "trace-rate-01-rep-00.json",
+      "rate_index": 1,
+      "repetition": 0,
+      "seed": 42,
+      "target_rate_rps": 1.0,
+      "offered_interval_s": 30.0,
+      "requests": 33,
+      "trace_sha256": "0771f58e19c3d848ea1966ac810b69a0113ffb69ab1fd8b1898c7d2dec65e6be"
+    },
+    {
+      "file": "trace-rate-01-rep-01.json",
+      "rate_index": 1,
+      "repetition": 1,
+      "seed": 43,
+      "target_rate_rps": 1.0,
+      "offered_interval_s": 30.0,
+      "requests": 33,
+      "trace_sha256": "1dd53cca1803fe8376449b26ad32709a39afc79334dd46db58456bb1bb52176e"
+    },
+    {
+      "file": "trace-rate-01-rep-02.json",
+      "rate_index": 1,
+      "repetition": 2,
+      "seed": 44,
+      "target_rate_rps": 1.0,
+      "offered_interval_s": 30.0,
+      "requests": 35,
+      "trace_sha256": "e60ac6b51ddf0619d56b629d9446816e3472d330bf3a20273aadbc4e11f01fa2"
+    },
+    {
+      "file": "trace-rate-02-rep-00.json",
+      "rate_index": 2,
+      "repetition": 0,
+      "seed": 42,
+      "target_rate_rps": 2.0,
+      "offered_interval_s": 30.0,
+      "requests": 66,
+      "trace_sha256": "9669c7c1d5b763f7fb41c9046be94c267d3463c96ec595db5648503067e21893"
+    },
+    {
+      "file": "trace-rate-02-rep-01.json",
+      "rate_index": 2,
+      "repetition": 1,
+      "seed": 43,
+      "target_rate_rps": 2.0,
+      "offered_interval_s": 30.0,
+      "requests": 60,
+      "trace_sha256": "7996a6f9f43e1039dda551345acfe5d15f5cc77cc0d238a8ea4e08cf018323f1"
+    },
+    {
+      "file": "trace-rate-02-rep-02.json",
+      "rate_index": 2,
+      "repetition": 2,
+      "seed": 44,
+      "target_rate_rps": 2.0,
+      "offered_interval_s": 30.0,
+      "requests": 66,
+      "trace_sha256": "225a6786e0e021058961cd378aba7630f115896cee5514ab275b90d2b00b2954"
+    }
+  ]
+}
