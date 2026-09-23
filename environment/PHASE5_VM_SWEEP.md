@@ -118,15 +118,25 @@ failures, send lag, latency samples, capacity, and run provenance before using
 any numbers. Full-run throughput includes the drain and is not steady-state
 throughput; this pilot does not establish SLO goodput.
 
-## After the first pilot
+## After the archived pilots
 
-The saved 0.5/1/2 requests/s pilot completed without overload. To locate the
-capacity knee, repeat the same procedure with a **new** directory named
-`phase5-vm-sweep-high`: use `--rates 4,8,16` in `plan-sweep` and replace only
+The saved 0.5/1/2 requests/s pilot completed without overload. The subsequent
+4/8/16 pilot showed a clean 4 requests/s point, but its 32-worker client fell
+behind intended send times at 8 and 16 requests/s. Those higher rows cannot
+locate server-only sustainable capacity.
+
+In the next VM session, repeat the same procedure with a **new** directory
+named `phase5-vm-sweep-knee`. Use `--rates 5,6,7` in `plan-sweep`, replace only
 the `phase5-vm-sweep/` output-directory prefix in commands above with
-`phase5-vm-sweep-high/`. Keep the model, server flags, warmup, fixed 30-second
-offered interval, 20-second bounded drain, and three paired repetitions
-unchanged. Do not replace `phase5-vm-pilot/` in the warmup trace path. Return
-the complete high-rate directory as an archive, including logs and any partial
-outputs if a run fails. These are still pilot measurements, not a scored
-sustainable-throughput frontier.
+`phase5-vm-sweep-knee/`, and change `--max-workers 32` to `--max-workers 256`
+for **both** engines. The driver now parks idle workers instead of polling.
+Keep the model, server flags, warmup, 30-second offered interval, 20-second
+drain, and three paired repetitions unchanged. Do not replace
+`phase5-vm-pilot/` in the warmup trace path.
+
+Before treating a run as a server-capacity observation, require its p99
+client send lag to be at most 50 ms and report all failed, timed-out, and
+not-sent requests. This is a predeclared pilot gate, not a retroactive fix
+for the archived 8/16 points. Return the complete knee directory as an
+archive even if some runs fail this gate. These remain pilot measurements,
+not a scored sustainable-throughput frontier.

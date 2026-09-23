@@ -547,7 +547,7 @@ def replay_bounded_http_trace(
     started_at = datetime.now(timezone.utc).isoformat()
     start = time.monotonic()
     deadline = start + offered_s + drain_s
-    pending: queue.Queue[dict] = queue.Queue()
+    pending: queue.Queue[dict | None] = queue.Queue()
     stopped = threading.Event()
     lock = threading.Lock()
     started: dict[str, float] = {}
@@ -556,11 +556,8 @@ def replay_bounded_http_trace(
 
     def consume() -> None:
         while not stopped.is_set():
-            try:
-                request = pending.get(timeout=0.02)
-            except queue.Empty:
-                continue
-            if stopped.is_set() or time.monotonic() >= deadline:
+            request = pending.get()
+            if request is None or stopped.is_set() or time.monotonic() >= deadline:
                 return
             request_id = request["request_id"]
             with lock:
@@ -604,6 +601,8 @@ def replay_bounded_http_trace(
             time.sleep(min(0.02, max(0, deadline - time.monotonic())))
     finally:
         stopped.set()
+        for _ in threads:
+            pending.put_nowait(None)
         adapter.abort_active()
         shutdown_deadline = time.monotonic() + 2.0
         for thread in threads:

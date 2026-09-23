@@ -10,3 +10,7 @@ environment/phase5-vm-sweep/plan/* -text
 environment/phase5-vm-sweep/vllm/* -text
 environment/phase5-vm-sweep/nanoserve/* -text
 environment/phase5-vm-sweep/report/* -text
+
+# Keep the high-rate source archive intact and its small report byte-stable.
+environment/phase5-vm-sweep-high/*.zip binary
+environment/phase5-vm-sweep-high/report/* -text
