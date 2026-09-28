@@ -28,6 +28,28 @@ do not widen it merely to make the check pass. No speedup is claimed from the
 probe, and the reference backend stays the default until the optimized path
 passes end-to-end parity and a same-host measurement.
 
+The first VM attempt imported FlashInfer but reached JIT compilation during
+`wrapper.plan()` and failed because `nvcc` is unavailable. This is an
+environment/kernel-loading failure, not a numerical mismatch. Before trying
+to install a system CUDA toolkit, use the matching prebuilt packages:
+
+```bash
+uv pip install 'flashinfer-cubin==0.6.18.post1' \
+  --index-url https://flashinfer.ai/whl
+uv pip install 'flashinfer-jit-cache==0.6.18.post1+cu130' \
+  --index-url https://flashinfer.ai/whl/cu130
+uv pip check
+flashinfer show-config > phase6-flashinfer-config.txt
+python scripts/phase6_flashinfer_probe.py \
+  --output phase6-flashinfer-probe-aot.json
+```
+
+The VM currently reports PyTorch `2.13.0+cu132`, whereas FlashInfer publishes
+the matching JIT-cache wheel for CUDA 13.0, not 13.2. The AOT smoke result must
+therefore decide compatibility; do not claim it works based on wheel install
+alone. If it still requests `nvcc` or reports a CUDA-library mismatch, keep
+the resulting JSON and config rather than repeatedly changing dependencies.
+
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
 `last_page_len` metadata. The repository pins `flashinfer-python==0.6.18.post1`
