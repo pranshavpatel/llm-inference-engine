@@ -110,6 +110,14 @@ class RuntimeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "CPU serving"):
             build_serving_runtime(self.serving_config(dtype="bfloat16"))
 
+    def test_flashinfer_selection_rejects_cpu_before_model_load(self):
+        with self.assertRaisesRegex(ValueError, "requires CUDA"):
+            build_serving_runtime(self.serving_config(attention_backend="flashinfer"))
+
+    def test_reference_remains_default_backend(self):
+        runtime = build_serving_runtime(self.serving_config())
+        self.assertEqual(runtime.attention_backend, "pytorch-gather-reference")
+
     def test_fixed_batch_profile_driver_completes_and_releases_pages(self):
         runtime = build_serving_runtime(self.serving_config())
         prompt = tuple(runtime.codec.encode("hello"))

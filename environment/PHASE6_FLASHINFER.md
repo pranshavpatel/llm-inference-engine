@@ -50,6 +50,31 @@ therefore decide compatibility; do not claim it works based on wheel install
 alone. If it still requests `nvcc` or reports a CUDA-library mismatch, keep
 the resulting JSON and config rather than repeatedly changing dependencies.
 
+The returned AOT probe **passed**; see `phase6-flashinfer-probe/`. The next
+gate is model-level parity for the opt-in decode adapter, followed by a
+same-host, same-protocol measurement before any speed claim.
+
+The adapter is now selectable with `nanoserve serve --attention-backend
+flashinfer`; `reference` remains the default. The opt-in path uses FlashInfer
+for one-token decode batches and the gather oracle for prefill or mixed-query
+batches. It is restricted to the probed BF16 12/2-head, 128-dim, 16-token-page
+geometry. Run the model-level check on the same VM after fetching the latest
+branch:
+
+```bash
+git pull --ff-only origin codex/phase-6-optimized-attention
+python scripts/phase6_model_backend_parity.py \
+  --model-dir "$(<phase5-vm-sweep-knee/model-snapshot-path.txt)" \
+  --output phase6-model-backend-parity.json
+```
+
+Return `phase6-model-backend-parity.json` whether it passes or fails. The script
+uses one loaded model and separate KV pools, compares four page-boundary
+prompt lengths through prefill and eight teacher-forced decode steps, and
+records per-request full-logit errors and top-token mismatches. It does not
+time the backends. Do not run headline performance comparisons until this
+gate and a server-level correctness replay pass.
+
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
 `last_page_len` metadata. The repository pins `flashinfer-python==0.6.18.post1`

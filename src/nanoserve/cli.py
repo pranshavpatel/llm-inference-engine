@@ -182,6 +182,7 @@ def serve_checkpoint(args) -> int:
             max_waiting_requests=args.max_waiting_requests,
             command_capacity=args.command_capacity,
             watermark=args.watermark,
+            attention_backend=args.attention_backend,
         )
     )
     server = make_server(
@@ -202,7 +203,7 @@ def serve_checkpoint(args) -> int:
                 "kv_blocks": runtime.num_blocks,
                 "kv_pool_bytes": runtime.kv_pool_bytes,
                 "checkpoint_files": runtime.checkpoint_files,
-                "attention_backend": "reference_paged_gather",
+                "attention_backend": runtime.attention_backend,
             }
         ),
         flush=True,
@@ -275,6 +276,7 @@ def main(argv=None) -> int:
     checkpoint.add_argument("--max-waiting-requests", type=int, default=128)
     checkpoint.add_argument("--command-capacity", type=int, default=128)
     checkpoint.add_argument("--watermark", type=float, default=0.05)
+    checkpoint.add_argument("--attention-backend", choices=("reference", "flashinfer"), default="reference")
     memory = sub.add_parser("memory", help="Compute KV capacity from model geometry")
     memory.add_argument("--config", type=Path, required=True)
     memory.add_argument("--pool-mib", type=int, default=4096)

@@ -41,7 +41,7 @@ def probe() -> dict:
     query = torch.randn(len(lengths), 12, 1, 128, dtype=cache.dtype, device=cache.device)
     expected = ReferencePagedAttention().decode(query, cache, 0, metadata)[:, :, 0, :]
     indptr, indices, last_page_len = flashinfer_page_tensors(metadata, cache)
-    workspace = torch.empty(128 * 1024 * 1024, dtype=torch.uint8, device=cache.device)
+    workspace = torch.zeros(128 * 1024 * 1024, dtype=torch.uint8, device=cache.device)
     wrapper = flashinfer.decode.BatchDecodeWithPagedKVCacheWrapper(workspace, "NHD")
     wrapper.plan(
         indptr, indices, last_page_len,

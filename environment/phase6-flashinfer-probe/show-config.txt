@@ -1,0 +1,33 @@
+=== Version Info ===
+FlashInfer version: 0.6.18.post1
+flashinfer-cubin version: 0.6.18.post1
+flashinfer-jit-cache version: 0.6.18.post1+cu130
+=== Torch Version Info ===
+Torch version: 2.13.0+cu132
+CUDA runtime available: Yes
+
+=== Environment Variables ===
+FLASHINFER_CACHE_DIR: /home/ppatel49/.cache/flashinfer
+FLASHINFER_CUBIN_DIR: /home/ppatel49/llm-inference-engine/.venv-vllm-managed/lib/python3.12/site-packages/flashinfer_cubin/cubins
+FLASHINFER_CUDA_ARCH_LIST: {(8, '9')}
+FLASHINFER_CUDA_VERSION: 13.2
+FLASHINFER_CUBINS_REPOSITORY: https://edge.urm.nvidia.com/artifactory/sw-kernelinferencelibrary-public-generic-local/
+CUDA_VERSION: 13.2
+CUDA_HOME:
+NVCC found: No
+
+=== Artifact Path ===
+TRTLLM_GEN_FMHA: 2d6a5a029eefcc388ec0ceb87efb55d8bcce5c3c/fmha/trtllm-gen/
+TRTLLM_GEN_BMM: 8ec29a98612c3670f9f28825d1ed19f09496073b/batched_gemm-fa419f4-31ee4e5/
+TRTLLM_GEN_GEMM: 2d6a5a029eefcc388ec0ceb87efb55d8bcce5c3c/gemm-fa419f4-25754e6/
+CUDNN_SDPA: a72d85b019dc125b9f711300cb989430f762f5a6/fmha/cudnn/
+DEEPGEMM: 7ec7ac40b9fd48172651b77ff2ebe20d79decc39/deep-gemm/
+DSL_FMHA: 5b34f84266cbc2135066ce96885b664992535670/fmha/cute-dsl/
+DSL_FMHA_ARCHS: ('sm_100a', 'sm_103a', 'sm_107a', 'sm_110a')
+
+=== Downloaded Cubins ===
+Downloaded 42749/42749 cubins
+
+=== Module Status ===
+No modules found. Registering default modules...
+❌ Module registration failed: No supported CUDA architectures found for major versions [9, 10, 11, 12].

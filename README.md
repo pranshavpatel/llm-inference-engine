@@ -2,7 +2,7 @@
 
 `nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel and controlled performance benchmarks are not implemented, and there are no performance claims.
+The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter is under model-level validation on an Ubuntu L40S; its prefill path still uses the gather oracle. Controlled performance claims are not yet established.
 
 ## Reproducible setup
 
@@ -30,7 +30,7 @@ $env:NANOSERVE_RUN_GPU_PAGING = "1"
 
 The exact validated versions are PyTorch `2.13.0+cu130`, Transformers `4.57.6`, safetensors `0.6.2`, and pytest `8.4.2`. `requirements/model.txt` is the platform-neutral model stack; `requirements/flashinfer-linux.txt` records the proposed optimized-backend pin.
 
-FlashInfer `0.6.18.post1` publishes Linux-only wheels. This Windows host has neither WSL nor Docker, so FlashInfer was not installed and no optimized-backend compatibility is claimed. The Phase 0 fallback smoke test gathers noncontiguous physical pages and executes PyTorch SDPA. It is a correctness check, not an optimized backend.
+FlashInfer `0.6.18.post1` is Linux-only and is not needed for Windows reference-path development. On the Ubuntu L40S VM, its paged-decode BF16 kernel passed the targeted page-boundary compatibility probe with matching prebuilt cubin/JIT-cache packages and no `nvcc`; see `environment/phase6-flashinfer-probe/`. This does not establish full model parity or serving speed. The Phase 0 PyTorch SDPA smoke remains a separate reference check.
 
 ## Continuous scheduling
 
@@ -83,6 +83,8 @@ $snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa79
 ```
 
 The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
+
+On the validated Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. See `environment/PHASE6_FLASHINFER.md` for the model-level parity gate; do not use the opt-in path for scored runs before it passes.
 
 ## Saved trace replay
 
@@ -204,4 +206,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU environment.
+The targeted FlashInfer paged-decode kernel gate passed on the Linux L40S, and the model-level opt-in gate is pending. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU protocol.

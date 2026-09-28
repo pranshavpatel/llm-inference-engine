@@ -2,7 +2,7 @@ import unittest
 
 import torch
 
-from nanoserve.attention import ReferencePagedAttention
+from nanoserve.attention import FlashInferPagedAttention, ReferencePagedAttention
 from nanoserve.memory import BlockManager, KVCacheSpec, PagedKVCache, PagedKVCacheManager
 from nanoserve.model import PagedQwen2Runner, Qwen2Config, Qwen2ForCausalLM
 
@@ -31,6 +31,14 @@ def setup_runner(backend=None):
 
 
 class PagedModelTests(unittest.TestCase):
+    def test_flashinfer_backend_prefill_uses_reference_on_cpu(self):
+        model, _, _, manager, runner = setup_runner(FlashInferPagedAttention(4))
+        tokens = torch.tensor([1, 4, 9, 16, 25])
+        manager.allocate("a", len(tokens))
+        expected = model(tokens.unsqueeze(0)).logits[0]
+        actual = runner.forward(["a"], [tokens])[0]
+        torch.testing.assert_close(actual, expected, rtol=1e-5, atol=2e-6)
+
     def test_single_request_prefill_matches_contiguous_model_at_boundaries(self):
         for length in (3, 4, 5):
             model, blocks, _, manager, runner = setup_runner()
