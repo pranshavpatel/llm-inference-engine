@@ -26,7 +26,7 @@ BF16 is the selected deployment dtype because this GPU reports native support, a
 
 ## Phase 0 backend decision
 
-The preferred optimized backend is FlashInfer `0.6.18.post1`. Windows remains the local reference-path host; the Ubuntu L40S VM passed a targeted BF16 paged-decode check on 16-token pages with Qwen2.5-1.5B head geometry. Its first model-level comparison to BF16 gather failed despite exact prefill agreement, but the worst two attention layers matched a float32 attention oracle. The adapter remains opt-in and unapproved for scored serving runs until a functional HTTP replay and controlled measurement pass.
+The preferred optimized backend is FlashInfer `0.6.18.post1`. Windows remains the local reference-path host; the Ubuntu L40S VM passed a targeted BF16 paged-decode check on 16-token pages with Qwen2.5-1.5B head geometry. Its first model-level comparison to BF16 gather failed despite exact prefill agreement, but the worst two attention layers matched a float32 attention oracle. A two-request opt-in HTTP replay completed with matching text and usage. The adapter remains opt-in; a controlled same-host measurement has not yet established a serving speedup.
 
 The Phase 0 fallback is a standalone PyTorch SDPA smoke test that scatters contiguous KV tensors into noncontiguous physical pages, gathers them through a page table, and checks prefill and decode outputs against the original tensors. Page sizes 1, 16, 32, and 64 passed in FP16 and BF16 for the Qwen2.5-1.5B attention geometry. It remains a feasibility record and has no performance claim.
 
@@ -90,6 +90,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-The FlashInfer kernel passed the target-geometry smoke and is wired as an opt-in decode backend; prefill remains gather-based. The BF16-gather full-model parity comparison failed, with its largest attention gap explained by comparison to a float32 oracle. A functional opt-in serving replay is the next gate. Chat completions and controlled headline benchmarks remain unimplemented. Phase 4 completed a functional vLLM trace replay. The validated gather backend remains the default scheduler and HTTP correctness path; no optimized-path speedup is claimed.
+The FlashInfer kernel passed the target-geometry smoke and is wired as an opt-in decode backend; prefill remains gather-based. The BF16-gather full-model parity comparison failed, with its largest attention gap explained by comparison to a float32 oracle. The short opt-in serving replay passed. Chat completions and controlled headline benchmarks remain unimplemented. Phase 4 completed a functional vLLM trace replay. The validated gather backend remains the default scheduler and HTTP correctness path; no optimized-path speedup is claimed.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

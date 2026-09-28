@@ -2,7 +2,7 @@
 
 `nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter passed a targeted L40S kernel probe and matched a float32 attention oracle on the real model's worst-differing layers. Its prefill path still uses the gather oracle. Full-model outputs differ from the BF16 gather path; the opt-in server path awaits a functional replay, and no speedup is claimed.
+The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter passed a targeted L40S kernel probe, matched a float32 attention oracle on the real model's worst-differing layers, and completed a two-request functional HTTP replay with matching outputs and usage. Its prefill path still uses the gather oracle. Full-model outputs differ from the BF16 gather path; no speedup is claimed. See [BENCHMARKS.md](BENCHMARKS.md) for the current measurement evidence and limits.
 
 ## Reproducible setup
 
@@ -84,7 +84,7 @@ $snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa79
 
 The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
 
-On the probed Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. See `environment/PHASE6_FLASHINFER.md` for the numerical-parity evidence and next functional replay; do not use the opt-in path for scored runs yet.
+On the probed Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. The two-request functional replay passed; see `environment/phase6-flashinfer-server-smoke/` and `environment/PHASE6_FLASHINFER.md` for the evidence. A controlled same-host measurement remains necessary before using this path in performance claims.
 
 ## Saved trace replay
 
@@ -192,7 +192,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, sweep provenance, optional server TPOT, honest metric labels, and export files. The full non-GPU suite passes `107` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, sweep provenance, optional server TPOT, honest metric labels, and export files. The full non-GPU suite passes `113` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 
@@ -206,4 +206,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The targeted FlashInfer paged-decode kernel gate passed on the Linux L40S. The first model-level comparison to BF16 gather failed, while the worst attention layers matched a float32 oracle; a functional opt-in server replay is next. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU protocol.
+The targeted FlashInfer paged-decode kernel gate and two-request opt-in server replay passed on the Linux L40S. The first model-level comparison to BF16 gather failed, while the worst attention layers matched a float32 oracle. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU protocol.

@@ -135,8 +135,9 @@ where the original gap was largest; it does not make the earlier full-model
 BF16-reference parity run pass, establish exact greedy text, or prove a
 serving speedup. The optimized backend stays opt-in.
 
-Next run one short functional HTTP replay on the same VM. Keep the reference
-service stopped and use two terminals. Terminal A:
+The short functional HTTP replay has now passed. The original reproduction
+commands follow; keep the reference service stopped and use two terminals.
+Terminal A:
 
 ```bash
 cd ~/llm-inference-engine
@@ -162,9 +163,13 @@ python -m nanoserve replay \
   --output phase6-flashinfer-server-smoke.json
 ```
 
-Return the replay JSON and server log. The gate is complete requests, no
-server errors, and matching token-usage contract. This is a functional smoke,
-not a throughput comparison.
+The saved [`phase6-flashinfer-server-smoke/`](phase6-flashinfer-server-smoke/)
+contains the returned replay JSON and server log. The server readiness record
+identifies `flashinfer-paged-decode-reference-prefill`. Both requests completed
+without reported failures or missing usage; their text, finish reasons, and
+token counts match the reference debug trace replay. The VM can be released
+after this gate. This is a functional smoke, not a throughput comparison; the
+next GPU-dependent task is a separate controlled same-host performance run.
 
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
