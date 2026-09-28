@@ -140,3 +140,9 @@ not-sent requests. This is a predeclared pilot gate, not a retroactive fix
 for the archived 8/16 points. Return the complete knee directory as an
 archive even if some runs fail this gate. These remain pilot measurements,
 not a scored sustainable-throughput frontier.
+
+The completed knee pilot and its interpretation are archived in
+[`phase5-vm-sweep-knee/`](phase5-vm-sweep-knee/README.md). All nine paired
+runs passed the client send-lag gate; exploratory high-rate reruns are not
+needed to locate the observed nanoserve latency knee. Profiling and scored
+measurements are separate follow-up work.

@@ -12,6 +12,7 @@ from safetensors.torch import save_file
 from tokenizers import Tokenizer, models, pre_tokenizers
 from transformers import PreTrainedTokenizerFast
 
+from scripts.profile_paged_decode import run_batch
 from nanoserve.model import Qwen2Config, Qwen2ForCausalLM
 from nanoserve.runtime import ServingConfig, build_serving_runtime
 from nanoserve.server import make_server
@@ -108,6 +109,15 @@ class RuntimeTests(unittest.TestCase):
     def test_configuration_rejects_unsupported_cpu_dtype(self):
         with self.assertRaisesRegex(ValueError, "CPU serving"):
             build_serving_runtime(self.serving_config(dtype="bfloat16"))
+
+    def test_fixed_batch_profile_driver_completes_and_releases_pages(self):
+        runtime = build_serving_runtime(self.serving_config())
+        prompt = tuple(runtime.codec.encode("hello"))
+        result = run_batch(runtime.worker.engine, (prompt, prompt), tokens=2, prefix="profile-test")
+        self.assertEqual(result["requests"], 2)
+        self.assertEqual(result["tokens_per_request"], 2)
+        self.assertEqual(len(result["decode_step_wall_ms"]), 1)
+        self.assertEqual(runtime.worker.engine.scheduler.cache_manager.stats()["active_requests"], 0)
 
 
 if __name__ == "__main__":
