@@ -1,0 +1,1184 @@
+{
+  "schema_version": 1,
+  "kind": "flashinfer-attention-layer-diagnostic",
+  "status": "failed",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "torch": "2.13.0+cu132",
+  "device": "NVIDIA L40S",
+  "dtype": "bfloat16",
+  "prompt_lengths": [
+    1,
+    16,
+    17,
+    33
+  ],
+  "layers": 28,
+  "atol": 0.03,
+  "rtol": 0.03,
+  "max_absolute_error": 1.7890625,
+  "mismatched_elements": 908,
+  "first_mismatch": {
+    "layer": 0,
+    "request_id": "r0",
+    "sequence_length": 2,
+    "max_absolute_error": 0.55078125,
+    "mean_absolute_error": 0.024419229477643967,
+    "mismatched_elements": 276,
+    "elements": 1536,
+    "fp32_oracle": {
+      "reference_max_absolute_error": 0.55078125,
+      "flashinfer_max_absolute_error": 0.001953125,
+      "reference_mismatched_elements": 276,
+      "flashinfer_mismatched_elements": 0
+    }
+  },
+  "first_two_layer_oracle": [
+    {
+      "layer": 0,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.55078125,
+        "flashinfer_max_absolute_error": 0.001953125,
+        "reference_mismatched_elements": 276,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 0,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.3046875,
+        "flashinfer_max_absolute_error": 3.0517578125e-05,
+        "reference_mismatched_elements": 100,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 0,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 1.7890625,
+        "flashinfer_max_absolute_error": 0.00390625,
+        "reference_mismatched_elements": 227,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 0,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.234375,
+        "flashinfer_max_absolute_error": 0.0,
+        "reference_mismatched_elements": 66,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.1171875,
+        "flashinfer_max_absolute_error": 3.0517578125e-05,
+        "reference_mismatched_elements": 63,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.0927734375,
+        "flashinfer_max_absolute_error": 9.5367431640625e-07,
+        "reference_mismatched_elements": 27,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.13916015625,
+        "flashinfer_max_absolute_error": 0.00048828125,
+        "reference_mismatched_elements": 103,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.0693359375,
+        "flashinfer_max_absolute_error": 0.0,
+        "reference_mismatched_elements": 26,
+        "flashinfer_mismatched_elements": 0
+      }
+    }
+  ],
+  "records": [
+    {
+      "layer": 0,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.55078125,
+      "mean_absolute_error": 0.024419229477643967,
+      "mismatched_elements": 276,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.55078125,
+        "flashinfer_max_absolute_error": 0.001953125,
+        "reference_mismatched_elements": 276,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 0,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.3046875,
+      "mean_absolute_error": 0.011030977591872215,
+      "mismatched_elements": 100,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.3046875,
+        "flashinfer_max_absolute_error": 3.0517578125e-05,
+        "reference_mismatched_elements": 100,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 0,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 1.7890625,
+      "mean_absolute_error": 0.022698089480400085,
+      "mismatched_elements": 227,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 1.7890625,
+        "flashinfer_max_absolute_error": 0.00390625,
+        "reference_mismatched_elements": 227,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 0,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.234375,
+      "mean_absolute_error": 0.008540833368897438,
+      "mismatched_elements": 66,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.234375,
+        "flashinfer_max_absolute_error": 0.0,
+        "reference_mismatched_elements": 66,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.1171875,
+      "mean_absolute_error": 0.006858409848064184,
+      "mismatched_elements": 63,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.1171875,
+        "flashinfer_max_absolute_error": 3.0517578125e-05,
+        "reference_mismatched_elements": 63,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0927734375,
+      "mean_absolute_error": 0.005506747867912054,
+      "mismatched_elements": 27,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.0927734375,
+        "flashinfer_max_absolute_error": 9.5367431640625e-07,
+        "reference_mismatched_elements": 27,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.13916015625,
+      "mean_absolute_error": 0.008733544498682022,
+      "mismatched_elements": 103,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.13916015625,
+        "flashinfer_max_absolute_error": 0.00048828125,
+        "reference_mismatched_elements": 103,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 1,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0693359375,
+      "mean_absolute_error": 0.005213608033955097,
+      "mismatched_elements": 26,
+      "elements": 1536,
+      "fp32_oracle": {
+        "reference_max_absolute_error": 0.0693359375,
+        "flashinfer_max_absolute_error": 0.0,
+        "reference_mismatched_elements": 26,
+        "flashinfer_mismatched_elements": 0
+      }
+    },
+    {
+      "layer": 2,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0007358817383646965,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 2,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.01171875,
+      "mean_absolute_error": 0.0007574015762656927,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 2,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0013886051019653678,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 2,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.001513838768005371,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 3,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.00390625,
+      "mean_absolute_error": 0.00015982493641786277,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 3,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0004991057212464511,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 3,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.01171875,
+      "mean_absolute_error": 0.0006743208505213261,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 3,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00065423030173406,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 4,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 7.3147879447788e-05,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 4,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0002035022189375013,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 4,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00021340248349588364,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 4,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0003208286943845451,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 5,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0002709518594201654,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 5,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0546875,
+      "mean_absolute_error": 0.0009054100955836475,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 5,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.05078125,
+      "mean_absolute_error": 0.0010973333846777678,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 5,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0005330117419362068,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 6,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 8.601334411650896e-05,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 6,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00021467234182637185,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 6,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0002509690821170807,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 6,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0001861008204286918,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 7,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0011589322239160538,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 7,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.03515625,
+      "mean_absolute_error": 0.0020707729272544384,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 7,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.03515625,
+      "mean_absolute_error": 0.002459160517901182,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 7,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.046875,
+      "mean_absolute_error": 0.002448079641908407,
+      "mismatched_elements": 1,
+      "elements": 1536
+    },
+    {
+      "layer": 8,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0001059266141965054,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 8,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0087890625,
+      "mean_absolute_error": 0.0004472800937946886,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 8,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.000851113349199295,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 8,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0006426200270652771,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 9,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.00010832476982614025,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 9,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.00023215208784677088,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 9,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0003625396639108658,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 9,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.00041953008621931076,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 10,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00019518131739459932,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 10,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0005413121543824673,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 10,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00045205032802186906,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 10,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0003763865679502487,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 11,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.00021516741253435612,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 11,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0004359697923064232,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 11,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0003687652642838657,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 11,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00041356560541316867,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 12,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 7.157865911722183e-05,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 12,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.000829333090223372,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 12,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.033203125,
+      "mean_absolute_error": 0.0016063799848780036,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 12,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0008772627334110439,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 13,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.00012467088527046144,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 13,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0014008397702127695,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 13,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.000997984199784696,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 13,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.01953125,
+      "mean_absolute_error": 0.001139187952503562,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 14,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.00011233566328883171,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 14,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0011345259845256805,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 14,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0008975531673058867,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 14,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0009210879798047245,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 15,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0001962877286132425,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 15,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.02734375,
+      "mean_absolute_error": 0.0019610263407230377,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 15,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.03515625,
+      "mean_absolute_error": 0.002243354916572571,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 15,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0546875,
+      "mean_absolute_error": 0.0032624131999909878,
+      "mismatched_elements": 2,
+      "elements": 1536
+    },
+    {
+      "layer": 16,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.00012188864639028907,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 16,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.021484375,
+      "mean_absolute_error": 0.0008553405059501529,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 16,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0004975969786755741,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 16,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0005419282242655754,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 17,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0001367829681839794,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 17,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0006435340037569404,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 17,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0006596408784389496,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 17,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.000647667795419693,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 18,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0234375,
+      "mean_absolute_error": 0.0007122860988602042,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 18,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.064453125,
+      "mean_absolute_error": 0.0046844277530908585,
+      "mismatched_elements": 11,
+      "elements": 1536
+    },
+    {
+      "layer": 18,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.07421875,
+      "mean_absolute_error": 0.0038089740555733442,
+      "mismatched_elements": 3,
+      "elements": 1536
+    },
+    {
+      "layer": 18,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0625,
+      "mean_absolute_error": 0.003971286118030548,
+      "mismatched_elements": 2,
+      "elements": 1536
+    },
+    {
+      "layer": 19,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0001360261085210368,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 19,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0009583006030879915,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 19,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0008733738213777542,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 19,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0010556578636169434,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 20,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0003973604179918766,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 20,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0009963908232748508,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 20,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0008087782189249992,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 20,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.000900345272384584,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 21,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0001994352787733078,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 21,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0003904998302459717,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 21,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0003842930309474468,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 21,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0003220612998120487,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 22,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.00390625,
+      "mean_absolute_error": 0.0001288565545110032,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 22,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0005654396954923868,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 22,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0006606075912714005,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 22,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0004142970428802073,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 23,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.001953125,
+      "mean_absolute_error": 0.00010097857739310712,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 23,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.01171875,
+      "mean_absolute_error": 0.0008118280093185604,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 23,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.001321328803896904,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 23,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.015625,
+      "mean_absolute_error": 0.0005962509894743562,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 24,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.03515625,
+      "mean_absolute_error": 0.0008539374684914947,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 24,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.0390625,
+      "mean_absolute_error": 0.001954845618456602,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 24,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.046875,
+      "mean_absolute_error": 0.001967174932360649,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 24,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0020681670866906643,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 25,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0004055928438901901,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 25,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.000719558447599411,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 25,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.0078125,
+      "mean_absolute_error": 0.0006420451099984348,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 25,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0007498674094676971,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 26,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0003815119562204927,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 26,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.000978295225650072,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 26,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.000986532075330615,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 26,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0011785365641117096,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 27,
+      "request_id": "r0",
+      "sequence_length": 2,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.002607923001050949,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 27,
+      "request_id": "r1",
+      "sequence_length": 17,
+      "max_absolute_error": 0.03125,
+      "mean_absolute_error": 0.0037258206866681576,
+      "mismatched_elements": 0,
+      "elements": 1536
+    },
+    {
+      "layer": 27,
+      "request_id": "r2",
+      "sequence_length": 18,
+      "max_absolute_error": 0.048828125,
+      "mean_absolute_error": 0.005013033747673035,
+      "mismatched_elements": 1,
+      "elements": 1536
+    },
+    {
+      "layer": 27,
+      "request_id": "r3",
+      "sequence_length": 34,
+      "max_absolute_error": 0.0625,
+      "mean_absolute_error": 0.002890275791287422,
+      "mismatched_elements": 0,
+      "elements": 1536
+    }
+  ]
+}

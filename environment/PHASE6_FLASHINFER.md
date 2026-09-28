@@ -122,6 +122,50 @@ the model-logit difference is a numerical-reference issue rather than a
 page-mapping bug. If neither matches, keep the optimized path gated and do
 not add more benchmark work to it without a specific correctness fix.
 
+The returned float32-oracle check supports the numerical-reference
+explanation. In all eight request/layer-0-or-1 comparisons, FlashInfer had
+**zero** elements outside the original attention tolerance against the
+float32 oracle; its largest absolute error was `0.00390625`. The BF16 gather
+path had 888 out-of-tolerance elements against the same oracle, with a
+maximum absolute error of `1.7890625`. The raw artifact is
+`phase6-attention-oracle.json`, source SHA-256
+`d95bf126cc5526d100c2067fb46ef8f0b8ce602ebb4e34f260246bf9545af896`.
+This validates the targeted decode kernel against higher-precision attention
+where the original gap was largest; it does not make the earlier full-model
+BF16-reference parity run pass, establish exact greedy text, or prove a
+serving speedup. The optimized backend stays opt-in.
+
+Next run one short functional HTTP replay on the same VM. Keep the reference
+service stopped and use two terminals. Terminal A:
+
+```bash
+cd ~/llm-inference-engine
+git pull --ff-only origin codex/phase-6-optimized-attention
+source .venv-vllm-managed/bin/activate
+python -m nanoserve serve \
+  --model-dir "$(<phase5-vm-sweep-knee/model-snapshot-path.txt)" \
+  --model-name Qwen/Qwen2.5-1.5B-Instruct \
+  --device cuda --dtype bfloat16 --kv-pool-mib 128 \
+  --max-context-tokens 64 --attention-backend flashinfer \
+  --host 127.0.0.1 --port 8001 2>&1 | tee phase6-flashinfer-server.log
+```
+
+After the server prints ready, terminal B:
+
+```bash
+cd ~/llm-inference-engine
+source .venv-vllm-managed/bin/activate
+python -m nanoserve replay \
+  --trace environment/phase4-debug-trace.json \
+  --engine nanoserve \
+  --endpoint http://127.0.0.1:8001/v1/completions \
+  --output phase6-flashinfer-server-smoke.json
+```
+
+Return the replay JSON and server log. The gate is complete requests, no
+server errors, and matching token-usage contract. This is a functional smoke,
+not a throughput comparison.
+
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
 `last_page_len` metadata. The repository pins `flashinfer-python==0.6.18.post1`

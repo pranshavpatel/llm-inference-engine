@@ -2,7 +2,7 @@
 
 `nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter is under investigation on an Ubuntu L40S: its targeted attention probe passed, but its first full-model parity run failed. Its prefill path still uses the gather oracle. Controlled performance claims are not yet established.
+The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter passed a targeted L40S kernel probe and matched a float32 attention oracle on the real model's worst-differing layers. Its prefill path still uses the gather oracle. Full-model outputs differ from the BF16 gather path; the opt-in server path awaits a functional replay, and no speedup is claimed.
 
 ## Reproducible setup
 
@@ -84,7 +84,7 @@ $snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa79
 
 The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
 
-On the probed Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. See `environment/PHASE6_FLASHINFER.md` for the failed model-level parity gate; do not use the opt-in path for scored runs.
+On the probed Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. See `environment/PHASE6_FLASHINFER.md` for the numerical-parity evidence and next functional replay; do not use the opt-in path for scored runs yet.
 
 ## Saved trace replay
 
@@ -206,4 +206,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The targeted FlashInfer paged-decode kernel gate passed on the Linux L40S, but the first model-level opt-in gate failed and is being diagnosed. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU protocol.
+The targeted FlashInfer paged-decode kernel gate passed on the Linux L40S. The first model-level comparison to BF16 gather failed, while the worst attention layers matched a float32 oracle; a functional opt-in server replay is next. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU protocol.
