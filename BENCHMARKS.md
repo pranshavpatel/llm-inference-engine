@@ -54,11 +54,12 @@ FlashInfer-versus-reference latency or throughput comparison has been run.
 
 ## Remaining release measurement
 
-Use a later, isolated same-L40S session to compare reference nanoserve and
-opt-in FlashInfer nanoserve under identical pinned model, trace, KV budget,
-output policy, and client protocol. Capture warmup, environment, raw replays,
-server logs, client send lag, error/usage checks, and a predeclared latency or
-goodput acceptance rule. Only then report an optimized-path speed comparison.
+Use the [same-L40S runbook](environment/PHASE6_VM_COMPARE.md) to compare
+reference nanoserve and opt-in FlashInfer nanoserve under identical pinned
+model, trace, KV budget, output policy, and client protocol. Capture warmup,
+environment, raw replays, server logs, client send lag, and error/usage checks.
+Only after inspecting the resulting run quality and sample sizes should we
+report an optimized-path speed comparison.
 A broader vLLM comparison must separately state its feature and kernel
 differences. Until those runs exist, no headline throughput or speedup number
 belongs in the README or resume.
