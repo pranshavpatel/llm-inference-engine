@@ -26,7 +26,7 @@ BF16 is the selected deployment dtype because this GPU reports native support, a
 
 ## Phase 0 backend decision
 
-The preferred optimized backend is FlashInfer `0.6.18.post1`. Windows remains the local reference-path host; the Ubuntu L40S VM passed a targeted BF16 paged-decode check on 16-token pages with Qwen2.5-1.5B head geometry. The opt-in adapter is now gated at model level rather than assumed correct from package import alone.
+The preferred optimized backend is FlashInfer `0.6.18.post1`. Windows remains the local reference-path host; the Ubuntu L40S VM passed a targeted BF16 paged-decode check on 16-token pages with Qwen2.5-1.5B head geometry. Its first model-level decode parity run failed despite exact prefill agreement, so the adapter remains experimental and unapproved for scored serving runs.
 
 The Phase 0 fallback is a standalone PyTorch SDPA smoke test that scatters contiguous KV tensors into noncontiguous physical pages, gathers them through a page table, and checks prefill and decode outputs against the original tensors. Page sizes 1, 16, 32, and 64 passed in FP16 and BF16 for the Qwen2.5-1.5B attention geometry. It remains a feasibility record and has no performance claim.
 
@@ -90,6 +90,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-The FlashInfer kernel passed the target-geometry smoke and is wired as an opt-in decode backend; prefill remains gather-based, and model-level parity and serving replay are pending. Chat completions and controlled headline benchmarks remain unimplemented. Phase 4 completed a functional vLLM trace replay. The validated gather backend remains the default scheduler and HTTP correctness path; no optimized-path speedup is claimed.
+The FlashInfer kernel passed the target-geometry smoke and is wired as an opt-in decode backend; prefill remains gather-based, but model-level parity failed and serving replay is deferred. Chat completions and controlled headline benchmarks remain unimplemented. Phase 4 completed a functional vLLM trace replay. The validated gather backend remains the default scheduler and HTTP correctness path; no optimized-path speedup is claimed.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

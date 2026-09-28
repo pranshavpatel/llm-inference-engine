@@ -75,6 +75,29 @@ records per-request full-logit errors and top-token mismatches. It does not
 time the backends. Do not run headline performance comparisons until this
 gate and a server-level correctness replay pass.
 
+The returned model-level run **failed**: prefill logits matched exactly, but
+decode produced 1,547,252 out-of-tolerance logits over the four requests and
+eight steps, with two top-token changes and a maximum absolute logit difference
+of 12.03125. The raw result is `phase6-flashinfer-model-parity.json` (source
+SHA-256 `83cc2cb3d3bb15f9c745999f566a5c32c0dd9ae1a1e0a8e0130a9b0fa68d9a71`).
+The synthetic attention probe is therefore insufficient to approve the
+optimized serving path. Do not relax the fixed model-logit tolerance to turn
+this into a pass.
+
+One bounded diagnostic isolates the first decode step by comparing each
+layer's attention output on the **same** reference hidden states and KV cache;
+it returns the reference output to later layers so differences cannot
+propagate. On the L40S VM:
+
+```bash
+git pull --ff-only origin codex/phase-6-optimized-attention
+python scripts/phase6_attention_diagnose.py \
+  --model-dir "$(<phase5-vm-sweep-knee/model-snapshot-path.txt)" \
+  --output phase6-attention-diagnostic.json
+```
+
+Return `phase6-attention-diagnostic.json` even if the diagnostic exits nonzero.
+
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
 `last_page_len` metadata. The repository pins `flashinfer-python==0.6.18.post1`
