@@ -98,6 +98,30 @@ python scripts/phase6_attention_diagnose.py \
 
 Return `phase6-attention-diagnostic.json` even if the diagnostic exits nonzero.
 
+That diagnostic found the gap concentrated in the first two layers while
+keeping all subsequent hidden states on the reference path: layer 0 had 669
+out-of-tolerance attention elements (maximum absolute error 1.7890625), layer
+1 had 219, and only 20 combined occurred across layers 2–27. The raw result
+is `phase6-attention-diagnostic.json`, source SHA-256
+`abee2f7d53a459f6698b2889f90c125af9a2c050e6381856fc0faa43b112bfbc`.
+This is not evidence of a page-table fault by itself: the synthetic page
+probe passed, and BF16 versus fused-kernel arithmetic can differ. One final
+targeted check compares both paths with a float32 attention oracle on layers
+0–1, using identical real-model Q/K/V. Run the updated script with a new
+output filename:
+
+```bash
+git pull --ff-only origin codex/phase-6-optimized-attention
+python scripts/phase6_attention_diagnose.py \
+  --model-dir "$(<phase5-vm-sweep-knee/model-snapshot-path.txt)" \
+  --output phase6-attention-oracle.json
+```
+
+If FlashInfer matches the float32 oracle and the BF16 gather path does not,
+the model-logit difference is a numerical-reference issue rather than a
+page-mapping bug. If neither matches, keep the optimized path gated and do
+not add more benchmark work to it without a specific correctness fix.
+
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
 `last_page_len` metadata. The repository pins `flashinfer-python==0.6.18.post1`

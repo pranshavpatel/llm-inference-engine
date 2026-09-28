@@ -14,7 +14,10 @@ from pathlib import Path
 
 import torch
 
-from nanoserve.attention import AttentionBackend, FlashInferPagedAttention, ReferencePagedAttention
+from nanoserve.attention import (
+    AttentionBackend, FlashInferPagedAttention, ReferencePagedAttention,
+    contiguous_attention,
+)
 from nanoserve.runtime import ServingConfig, build_serving_runtime
 
 
@@ -43,7 +46,7 @@ class CompareDecode(AttentionBackend):
             left = expected[row].float()
             right = actual[row].float()
             close = torch.isclose(left, right, atol=ATOL, rtol=RTOL)
-            self.records.append({
+            record = {
                 "layer": layer,
                 "request_id": f"r{row}",
                 "sequence_length": metadata.sequence_lengths[row],
@@ -51,7 +54,26 @@ class CompareDecode(AttentionBackend):
                 "mean_absolute_error": float((left - right).abs().mean().item()),
                 "mismatched_elements": int((~close).sum().item()),
                 "elements": left.numel(),
-            })
+            }
+            if layer < 2:
+                key, value = cache.gather(
+                    layer, metadata.block_tables[row], metadata.sequence_lengths[row]
+                )
+                oracle = contiguous_attention(
+                    query[row].float(), key.float(), value.float(),
+                    query_start=metadata.sequence_lengths[row] - 1,
+                ).to(cache.dtype).float()
+                record["fp32_oracle"] = {
+                    "reference_max_absolute_error": float((left - oracle).abs().max().item()),
+                    "flashinfer_max_absolute_error": float((right - oracle).abs().max().item()),
+                    "reference_mismatched_elements": int((
+                        ~torch.isclose(left, oracle, atol=ATOL, rtol=RTOL)
+                    ).sum().item()),
+                    "flashinfer_mismatched_elements": int((
+                        ~torch.isclose(right, oracle, atol=ATOL, rtol=RTOL)
+                    ).sum().item()),
+                }
+            self.records.append(record)
         # Do not feed candidate differences into later layers in this test.
         return expected
 
@@ -60,6 +82,7 @@ def run(model_dir: Path) -> dict:
     model_dir = model_dir.resolve()
     if model_dir.parent.name != "snapshots" or model_dir.name != REVISION:
         raise ValueError("model-dir must be the pinned Hugging Face snapshot")
+    torch.backends.cuda.matmul.allow_tf32 = False
     runtime = build_serving_runtime(ServingConfig(
         model_dir=model_dir, model_name=MODEL, device="cuda", dtype="bfloat16",
         kv_pool_mib=128, block_size=16, max_context_tokens=64,
@@ -101,6 +124,12 @@ def run(model_dir: Path) -> dict:
         "max_absolute_error": max(item["max_absolute_error"] for item in records),
         "mismatched_elements": sum(item["mismatched_elements"] for item in records),
         "first_mismatch": next((item for item in records if item["mismatched_elements"]), None),
+        "first_two_layer_oracle": [
+            {key: value for key, value in item.items() if key in (
+                "layer", "request_id", "sequence_length", "fp32_oracle"
+            )}
+            for item in records if "fp32_oracle" in item
+        ],
         "records": records,
     }
 
