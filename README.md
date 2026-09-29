@@ -4,6 +4,9 @@
 
 The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter passed a targeted L40S kernel probe, matched a float32 attention oracle on the real model's worst-differing layers, and completed a two-request functional HTTP replay. In a paired same-L40S diagnostic at 4 requests/s, median-of-run p50 client TTFT was 168.0 ms for reference versus 72.9 ms for FlashInfer. Its prefill path still uses the gather oracle, and longer greedy outputs differ from the BF16 reference path; the optimized backend is not an exact-output replacement. See [BENCHMARKS.md](BENCHMARKS.md) for measurement context and limits.
 
+For a short presentation of the live scheduler and saved GPU evidence, see
+[DEMO.md](DEMO.md).
+
 ## Reproducible setup
 
 Python 3.10 or newer is required. The allocator and planning utilities retain a dependency-free base install:

@@ -10,6 +10,8 @@ the display process, not another compute workload. Both readiness logs show
 the pinned Qwen2.5-1.5B-Instruct model, 292 KV blocks, a 128 MiB KV pool, and
 the intended reference or FlashInfer decode backend. Both used the same BF16
 checkpoint, 16-token pages, 64-token context, and 16 active sequences.
+FlashInfer also allocates a 128 MiB planning workspace that the reference
+backend does not, so equal KV pools do not imply equal total GPU memory use.
 
 The saved plan used identical independently seeded Poisson traces for both
 backends: 1/2/4/6/10/16 offered requests/s, three 60-second repetitions per
@@ -26,6 +28,22 @@ separates completion within the 60-second offered window from completion in
 drain. The archive retains all raw traces, replays, environment records,
 server logs, and the VM-generated report. The browsable `report/` copy is
 included here.
+
+To reproduce the summary on a Windows checkout with the model/test
+dependencies installed, expand `source.zip` into a new directory (for example
+`phase6-review`), then run:
+
+```powershell
+Expand-Archive -LiteralPath environment/phase6-vm-compare/source.zip -DestinationPath phase6-review
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe scripts/phase6_compare_summary.py `
+  --run-dir phase6-review/phase6-vm-compare-20260928T232156Z `
+  --output phase6-review/reproduced-summary.json
+```
+
+The summary script validates each replay against its checksummed trace. A
+local rerun of `nanoserve report-sweep` reproduced the VM `report.json` as
+parsed JSON; the text bytes differed only because of Windows newline output.
 
 | Offered requests/s | Reference: completed by 60 s / offered | FlashInfer: completed by 60 s / offered | Reference median run p50 client TTFT | FlashInfer median run p50 client TTFT |
 | ---: | ---: | ---: | ---: | ---: |
@@ -58,6 +76,7 @@ This is a controlled **diagnostic** comparison, not a scored p99 frontier or
 SLO-goodput claim. Each low-rate repetition has too few completions for a
 strong p99 estimate; full-run throughput includes drain; the sample is one
 VM session with the reference server run first. The generated-token strings
-also differ even when output length is fixed. The data supports an observed
+also differ even when output length is fixed. Peak GPU memory was not sampled
+during requests. The data supports an observed
 same-host latency and backlog improvement under this workload, not a
 universal speedup or an exact-output replacement guarantee.

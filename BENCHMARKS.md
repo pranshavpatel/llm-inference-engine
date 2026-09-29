@@ -66,6 +66,8 @@ The data supports an observed latency/backlog improvement on this pinned
 short-prompt workload, not a scored capacity frontier. The long greedy text
 differed for all 4,468 requests completed by both paths, so the optimized
 backend is not an exact-output replacement for BF16 gather.
+The two servers had equal 128 MiB KV pools, but FlashInfer allocated an
+additional 128 MiB planning workspace; total GPU memory was not matched.
 
 For a future headline comparison, use longer and mixed-length workloads,
 predeclare the goodput/SLO rule, collect enough completions per repetition
