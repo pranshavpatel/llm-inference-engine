@@ -20,24 +20,26 @@ command -v uv >/dev/null || { curl -LsSf https://astral.sh/uv/install.sh | sh; e
 git clone https://github.com/pranshavpatel/llm-inference-engine.git
 cd llm-inference-engine
 git switch codex/phase-6-optimized-attention
-uv venv --python 3.12 .venv-vllm-managed
-source .venv-vllm-managed/bin/activate
-uv pip install 'vllm==0.30.0'
-uv pip install -r requirements/model.txt
-uv pip install -e .
-uv pip install -r requirements/flashinfer-linux.txt
+uv python install 3.12
+uv venv --python 3.12 --managed-python --seed .venv-phase6
+source .venv-phase6/bin/activate
+uv pip install 'torch==2.13.0' -r requirements/model.txt -r requirements/flashinfer-linux.txt -e .
 flashinfer install-cubin-wheel
 flashinfer install-jit-cache-wheel
 uv pip check
-python scripts/phase6_flashinfer_probe.py --output phase6-fresh-probe.json
+python scripts/phase6_flashinfer_probe.py --output phase6-fresh-probe-managed.json
 ```
 
+The managed Python is required on restricted Ubuntu images where system
+`Python.h` is absent. `--seed` installs pip because the pinned FlashInfer
+wheel helper invokes `python -m pip`. Do not install vLLM for this NanoServe
+collection: the current vLLM 0.30 package metadata requires Transformers 5,
+which conflicts with this project's pinned Transformers 4.57.6 model stack.
 The run is valid only if the probe status is `passed`. The previous working
 L40S stack had torch 2.13.0+cu132, FlashInfer 0.6.18.post1, matching cubin
 0.6.18.post1, and JIT cache 0.6.18.post1+cu130, without `nvcc`. Capture any
 install/probe error and stop rather than substituting a different kernel
-stack without a compatibility check. The vLLM package supplies the CUDA
-PyTorch environment; this collection does not start vLLM itself.
+stack without a compatibility check. This collection does not start vLLM.
 
 Download the exact Qwen snapshot and run the one-command collection:
 
@@ -48,7 +50,8 @@ python scripts/phase6_vm_scored.py --model-dir "$MODEL_DIR" --output-dir "$OUT"
 ```
 
 The script archives all collected data at `$OUT.zip`, including partial data
-after an ordinary run error. Send the entire zip, plus `phase6-fresh-probe.json`.
+after an ordinary run error. Send the entire zip, plus
+`phase6-fresh-probe-managed.json`.
 The run executes reference and FlashInfer on identical short mixed and long
 prefill plans, then a 2x2 block-size (16/32) x batching-limit (1/16) ablation
 on reference attention at fixed 256 MiB KV memory. The 2x2 does **not** claim
