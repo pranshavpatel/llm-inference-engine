@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="395" viewBox="0 0 760 395">
+<rect width="100%" height="100%" fill="white"/>
+<text x="380" y="30" text-anchor="middle" font-family="sans-serif" font-size="18">Reference ablation at 2 offered requests/s</text>
+<text x="280" y="67" text-anchor="middle" font-family="sans-serif" font-size="14">16-token blocks</text>
+<text x="565" y="67" text-anchor="middle" font-family="sans-serif" font-size="14">32-token blocks</text>
+<text x="60" y="150" font-family="sans-serif" font-size="13">batch cap 1</text>
+<rect x="140" y="85" width="265" height="120" rx="6" fill="#f2f6fb" stroke="#7993ad"/>
+<text x="154" y="115" font-family="sans-serif" font-size="16">32.1 emitted tokens/s</text>
+<text x="154" y="142" font-family="sans-serif" font-size="13">SLO goodput 0.00 req/s</text>
+<text x="154" y="169" font-family="sans-serif" font-size="13">weighted frag. 5.2%</text>
+<text x="154" y="192" font-family="sans-serif" font-size="12">failed 260/387</text>
+<rect x="425" y="85" width="265" height="120" rx="6" fill="#f2f6fb" stroke="#7993ad"/>
+<text x="439" y="115" font-family="sans-serif" font-size="16">32.3 emitted tokens/s</text>
+<text x="439" y="142" font-family="sans-serif" font-size="13">SLO goodput 0.00 req/s</text>
+<text x="439" y="169" font-family="sans-serif" font-size="13">weighted frag. 10.9%</text>
+<text x="439" y="192" font-family="sans-serif" font-size="12">failed 258/387</text>
+<text x="60" y="290" font-family="sans-serif" font-size="13">batch cap 16</text>
+<rect x="140" y="225" width="265" height="120" rx="6" fill="#f2f6fb" stroke="#7993ad"/>
+<text x="154" y="255" font-family="sans-serif" font-size="16">75.4 emitted tokens/s</text>
+<text x="154" y="282" font-family="sans-serif" font-size="13">SLO goodput 0.00 req/s</text>
+<text x="154" y="309" font-family="sans-serif" font-size="13">weighted frag. 4.4%</text>
+<text x="154" y="332" font-family="sans-serif" font-size="12">failed 92/387</text>
+<rect x="425" y="225" width="265" height="120" rx="6" fill="#f2f6fb" stroke="#7993ad"/>
+<text x="439" y="255" font-family="sans-serif" font-size="16">76.5 emitted tokens/s</text>
+<text x="439" y="282" font-family="sans-serif" font-size="13">SLO goodput 0.00 req/s</text>
+<text x="439" y="309" font-family="sans-serif" font-size="13">weighted frag. 8.7%</text>
+<text x="439" y="332" font-family="sans-serif" font-size="12">failed 88/387</text>
+<text x="380" y="375" text-anchor="middle" font-family="sans-serif" font-size="12">Same 256 MiB KV budget; all four points are overloaded. This is not paging-off.</text>
+</svg>

@@ -89,6 +89,17 @@ The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and
 
 On the probed Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. The two-request functional replay and paired same-L40S diagnostic are saved under `environment/phase6-flashinfer-server-smoke/` and `environment/phase6-vm-compare/`. Longer outputs differ between backends; use the opt-in path with that limitation.
 
+A later [fixed-window L40S sweep](environment/phase6-vm-scored/README.md) scored
+the reference and FlashInfer paths on paired synthetic short/long requests.
+At 2 offered short requests/s (40/131/248 prompt tokens, 64 fixed output
+tokens), the median of three runs measured 75.4 versus 136.6 output tokens
+emitted within each 60-second interval, with 0.00 versus 2.12 requests/s
+meeting the predeclared TTFT <= 1 s and TPOT <= 100 ms SLOs. The reference
+path was overloaded there; this is an observed pinned-workload capacity
+result, not a universal speedup or proof of exact numerical parity. The
+archive includes raw traces, failures, resource samples, and a regenerable
+report. A same-session vLLM baseline on these traces is still pending.
+
 ## Saved trace replay
 
 `trace-requests` writes a checksummed workload with fixed arrival offsets and prompt text. `replay` sends those requests at their scheduled times and retains one record per request, including failures, actual send lag, first content, completion, exact usage when the endpoint supplies it, and timestamped content chunks. HTTP chunks are not assumed to equal model tokens.
