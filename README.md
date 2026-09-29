@@ -7,6 +7,19 @@ The gather-based paged backend remains the default correctness path. An opt-in F
 For a short presentation of the live scheduler and saved GPU evidence, see
 [DEMO.md](DEMO.md).
 
+```mermaid
+flowchart LR
+    Client[Completion clients] --> HTTP[HTTP and SSE service]
+    HTTP --> Worker[Single-owner inference worker]
+    Worker --> Scheduler[Decode-first continuous scheduler]
+    Scheduler --> Pages[Block manager and physical KV pages]
+    Scheduler --> Runner[Qwen2 model runner]
+    Pages --> Runner
+    Runner --> Attention[Reference gather or opt-in FlashInfer decode]
+    Runner --> Worker
+    Worker --> HTTP
+```
+
 ## Reproducible setup
 
 Python 3.10 or newer is required. The allocator and planning utilities retain a dependency-free base install:
