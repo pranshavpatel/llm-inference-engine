@@ -1,4 +1,4 @@
-"""Slow gather-based paged attention used as the correctness oracle."""
+"""Slow gather-based paging oracle; BF16 arithmetic is not an FP32 oracle."""
 
 from __future__ import annotations
 

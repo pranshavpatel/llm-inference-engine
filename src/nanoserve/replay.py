@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Protocol
 from urllib.parse import urlsplit
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 from nanoserve.bench import make_trace
 
@@ -527,6 +529,7 @@ def replay_bounded_http_trace(
     *,
     drain_s: float,
     max_workers: int = 32,
+    token_window_endpoint: str | None = None,
 ) -> dict:
     """Offer a fixed-window trace and retain queued/in-flight work at cutoff.
 
@@ -633,6 +636,21 @@ def replay_bounded_http_trace(
             record["send_lag_s"] = record["actual_send_offset_s"] - request["arrival_offset_s"]
         records.append(record)
     completed = sum(record["status"] == "completed" for record in records)
+    token_window = None
+    if token_window_endpoint is not None:
+        try:
+            query = urlencode({"start_s": repr(start), "end_s": repr(start + offered_s)})
+            with urlopen(f"{token_window_endpoint}?{query}", timeout=5) as response:
+                token_window = json.load(response)
+            if (token_window.get("clock") != "time.monotonic"
+                    or token_window.get("start_s") != start
+                    or token_window.get("end_s") != start + offered_s
+                    or isinstance(token_window.get("emitted_tokens"), bool)
+                    or not isinstance(token_window.get("emitted_tokens"), int)
+                    or token_window["emitted_tokens"] < 0):
+                raise ValueError("invalid token-window response")
+        except Exception as error:
+            token_window = {"error": f"{type(error).__name__}: {error}"}
     return {
         "schema_version": 1,
         "kind": "completion-replay",
@@ -646,6 +664,7 @@ def replay_bounded_http_trace(
         "drain_s": drain_s,
         "drain_deadline_offset_s": cutoff_offset,
         "elapsed_s": time.monotonic() - start,
+        **({"server_token_window": token_window} if token_window_endpoint is not None else {}),
         "summary": {
             "requests": len(records),
             "completed": completed,

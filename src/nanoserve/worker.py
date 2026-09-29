@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from collections import deque
 import math
 import queue
 import threading
@@ -145,6 +146,8 @@ class InferenceWorker:
             "rejected": 0,
             "generated_tokens": 0,
         }
+        self._token_emission_times: deque[float] = deque(maxlen=1_000_000)
+        self._token_emission_times_evicted = False
         self._stats_cache: dict = {}
 
     @property
@@ -239,6 +242,16 @@ class InferenceWorker:
             }
             return result
 
+    def count_emitted_tokens(self, start_s: float, end_s: float) -> int:
+        """Count actual token events in a monotonic-clock measurement window."""
+        if not all(math.isfinite(value) for value in (start_s, end_s)) or end_s <= start_s:
+            raise ValueError("token window must have finite, increasing bounds")
+        with self._state_lock:
+            if self._token_emission_times_evicted and (not self._token_emission_times or
+                    start_s < self._token_emission_times[0]):
+                raise ValueError("token window precedes retained emissions")
+            return sum(start_s <= emitted_at < end_s for emitted_at in self._token_emission_times)
+
     def stop(self, timeout: float = 5) -> None:
         if not math.isfinite(timeout) or timeout < 0:
             raise ValueError("timeout must be finite and nonnegative")
@@ -273,6 +286,9 @@ class InferenceWorker:
         if event.token_id is not None:
             with self._state_lock:
                 self._counters["generated_tokens"] += 1
+                if len(self._token_emission_times) == self._token_emission_times.maxlen:
+                    self._token_emission_times_evicted = True
+                self._token_emission_times.append(event.emitted_at if event.emitted_at is not None else self._clock())
         handle._events.put(event)
         if event.finished:
             del self._handles[event.request_id]

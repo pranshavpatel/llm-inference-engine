@@ -76,11 +76,14 @@ class WorkerTests(unittest.TestCase):
         main_thread = threading.get_ident()
 
         with InferenceWorker(engine) as worker:
+            window_start = time.monotonic()
             first = worker.submit([1, 2], 3, request_id="first")
             second = worker.submit([10], 2, request_id="second")
             first_events = list(first.iter_events(timeout=2))
             second_events = list(second.iter_events(timeout=2))
+            window_end = time.monotonic()
             stats = worker.stats()
+            emitted_in_window = worker.count_emitted_tokens(window_start - 1, window_end + 1)
 
         self.assertEqual([event.token_id for event in first_events], [3, 4, 5])
         self.assertEqual([event.token_id for event in second_events], [11, 12])
@@ -88,6 +91,7 @@ class WorkerTests(unittest.TestCase):
         self.assertNotEqual(runner.thread_ids[0], main_thread)
         self.assertEqual(stats["worker"]["completed"], 2)
         self.assertEqual(stats["worker"]["generated_tokens"], 5)
+        self.assertEqual(emitted_in_window, 5)
         self.assertEqual(manager.blocks.stats()["active_requests"], 0)
 
     def test_cancel_waits_for_current_step_then_releases_request(self):

@@ -182,6 +182,7 @@ def serve_checkpoint(args) -> int:
             max_waiting_requests=args.max_waiting_requests,
             command_capacity=args.command_capacity,
             watermark=args.watermark,
+            attention_backend=args.attention_backend,
         )
     )
     server = make_server(
@@ -202,7 +203,7 @@ def serve_checkpoint(args) -> int:
                 "kv_blocks": runtime.num_blocks,
                 "kv_pool_bytes": runtime.kv_pool_bytes,
                 "checkpoint_files": runtime.checkpoint_files,
-                "attention_backend": "reference_paged_gather",
+                "attention_backend": runtime.attention_backend,
             }
         ),
         flush=True,
@@ -275,6 +276,7 @@ def main(argv=None) -> int:
     checkpoint.add_argument("--max-waiting-requests", type=int, default=128)
     checkpoint.add_argument("--command-capacity", type=int, default=128)
     checkpoint.add_argument("--watermark", type=float, default=0.05)
+    checkpoint.add_argument("--attention-backend", choices=("reference", "flashinfer"), default="reference")
     memory = sub.add_parser("memory", help="Compute KV capacity from model geometry")
     memory.add_argument("--config", type=Path, required=True)
     memory.add_argument("--pool-mib", type=int, default=4096)
@@ -306,6 +308,7 @@ def main(argv=None) -> int:
     replay.add_argument("--timeout-s", type=float, default=60)
     replay.add_argument("--max-workers", type=int, default=32)
     replay.add_argument("--bounded-drain-s", type=float, help="Stop a fixed-window HTTP trace after this drain interval")
+    replay.add_argument("--token-window-endpoint", help="Optional nanoserve /metrics/token-window URL for exact in-window emitted-token count")
     replay.add_argument("--output", type=Path, required=True)
     analysis = sub.add_parser("analyze-replay", help="Export honest full-cohort metrics from one saved replay")
     analysis.add_argument("--trace", type=Path, required=True)
@@ -421,6 +424,8 @@ def main(argv=None) -> int:
                     args.model_dir, device=args.device, dtype=args.dtype
                 )
             if args.bounded_drain_s is None:
+                if args.token_window_endpoint is not None:
+                    raise ValueError("--token-window-endpoint requires --bounded-drain-s")
                 report = replay_completion_trace(
                     workload, adapter, max_workers=args.max_workers
                 )
@@ -430,6 +435,7 @@ def main(argv=None) -> int:
                 report = replay_bounded_http_trace(
                     workload, adapter, drain_s=args.bounded_drain_s,
                     max_workers=args.max_workers,
+                    token_window_endpoint=args.token_window_endpoint,
                 )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")

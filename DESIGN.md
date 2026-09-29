@@ -26,7 +26,7 @@ BF16 is the selected deployment dtype because this GPU reports native support, a
 
 ## Phase 0 backend decision
 
-The preferred optimized backend remains FlashInfer `0.6.18.post1`, but its published wheels require Linux. The current host is native Windows without WSL or Docker. Building the architecture around an unexercised FlashInfer API would therefore violate the compatibility gate.
+The preferred optimized backend is FlashInfer `0.6.18.post1`. Windows remains the local reference-path host; the Ubuntu L40S VM passed a targeted BF16 paged-decode check on 16-token pages with Qwen2.5-1.5B head geometry. Its first model-level comparison to BF16 gather failed despite exact prefill agreement, but the worst two attention layers matched a float32 attention oracle. A two-request opt-in HTTP replay completed with matching text and usage. A later paired same-L40S run observed lower latency and less backlog with FlashInfer on fixed short prompts, but all paired 16-token greedy strings differed. The adapter remains opt-in and is not an exact-output replacement for the BF16 gather path.
 
 The Phase 0 fallback is a standalone PyTorch SDPA smoke test that scatters contiguous KV tensors into noncontiguous physical pages, gathers them through a page table, and checks prefill and decode outputs against the original tensors. Page sizes 1, 16, 32, and 64 passed in FP16 and BF16 for the Qwen2.5-1.5B attention geometry. It remains a feasibility record and has no performance claim.
 
@@ -90,6 +90,6 @@ The trace builder uses an isolated seeded random generator. Arrival offsets are 
 
 ## Deferred work
 
-An optimized Linux backend, chat completions, an actual vLLM trace replay, and controlled benchmarks remain unimplemented. No throughput, latency, concurrency, or memory-saving result is claimed. FlashInfer agreement on the exact target geometry remains a deferred Phase 2 optimization gate; the validated gather backend is the current scheduler and HTTP correctness path.
+The FlashInfer kernel passed the target-geometry smoke and is wired as an opt-in decode backend; prefill remains gather-based. The BF16-gather full-model parity comparison failed, with its largest attention gap explained by comparison to a float32 oracle. The short opt-in serving replay passed, and a paired same-host diagnostic observed a workload-specific latency improvement alongside divergent longer text. A later fixed-window L40S sweep saved SLO goodput, in-window token throughput, and sampled resource behavior for paired synthetic short/long workloads; see [BENCHMARKS.md](BENCHMARKS.md). A same-session vLLM score on those exact traces, production trace-derived workload, and strong p99 tail sample remain pending. Chat completions remain unimplemented. The validated gather backend remains the default scheduler and HTTP correctness path; no universal optimized-path speedup is claimed.
 
 Real-model FP32 static-batch paged execution matched all 32 greedy tokens and stayed within `1.33e-4` maximum prefill logit error versus individual contiguous forwards. BF16 matched 31/32 tokens; the first divergence had an exactly tied contiguous top-two score and a `0.125` paged margin. FP32 remains the architecture oracle, and the BF16 divergence is a recorded numerical limitation.

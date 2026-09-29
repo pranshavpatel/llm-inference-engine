@@ -31,3 +31,7 @@ softmax, model projections/MLP, or Python scheduling dominates the step. A
 server-level score or cross-engine SLO comparison needs a separate, declared
 protocol after profiling; do not compare this profile's wall times with vLLM
 HTTP latency.
+
+The returned profile has been summarized in `phase6-paged-profile/README.md`.
+The next bounded step is the FlashInfer compatibility gate in
+`PHASE6_FLASHINFER.md`; the raw 464 MB trace is intentionally not committed.

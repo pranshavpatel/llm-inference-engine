@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "completion-replay",
+  "trace_sha256": "b283b40c9a433735f3a6e5134011c34192cae14708c60e6ec1746875f06e59d1",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "adapter": "nanoserve-http",
+  "started_at_utc": "2026-09-28T23:01:00.846004+00:00",
+  "elapsed_s": 0.48425968599985936,
+  "summary": {
+    "requests": 2,
+    "completed": 2,
+    "failed": 0,
+    "missing_usage": 0
+  },
+  "records": [
+    {
+      "request_id": "r000000",
+      "status": "completed",
+      "actual_send_offset_s": 0.007455195000147796,
+      "first_content_offset_s": 0.46274888800053304,
+      "completed_offset_s": 0.4839191170003687,
+      "server_request_id": "cmpl-d64ef3d488cf4e21af1bc60f7fba3e4d",
+      "output_text": " four,",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 2,
+        "total_tokens": 6
+      },
+      "server_metrics": {
+        "generation_time_ms": 21.39871600047627,
+        "mean_itl_ms": 21.39871600047627
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.46274888800053304,
+          "text": " four",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.48388241500015283,
+          "text": ",",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.003913148442348043,
+      "send_lag_s": 0.0035420465577997535
+    },
+    {
+      "request_id": "r000001",
+      "status": "completed",
+      "actual_send_offset_s": 0.007358482000199729,
+      "first_content_offset_s": 0.38140490500063606,
+      "completed_offset_s": 0.46285458900001686,
+      "server_request_id": "cmpl-11a11c759f2c4f0aa85884cc74b436d6",
+      "output_text": " Paris.",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 2,
+        "total_tokens": 7
+      },
+      "server_metrics": {
+        "generation_time_ms": 81.5807599992695,
+        "mean_itl_ms": 81.5807599992695
+      },
+      "chunks": [
+        {
+          "at_offset_s": 0.38140490500063606,
+          "text": " Paris",
+          "finish_reason": null
+        },
+        {
+          "at_offset_s": 0.46282207900003414,
+          "text": ".",
+          "finish_reason": "length"
+        }
+      ],
+      "intended_arrival_offset_s": 0.005548333012402824,
+      "send_lag_s": 0.0018101489877969043
+    }
+  ]
+}
