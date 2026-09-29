@@ -308,6 +308,7 @@ def main(argv=None) -> int:
     replay.add_argument("--timeout-s", type=float, default=60)
     replay.add_argument("--max-workers", type=int, default=32)
     replay.add_argument("--bounded-drain-s", type=float, help="Stop a fixed-window HTTP trace after this drain interval")
+    replay.add_argument("--token-window-endpoint", help="Optional nanoserve /metrics/token-window URL for exact in-window emitted-token count")
     replay.add_argument("--output", type=Path, required=True)
     analysis = sub.add_parser("analyze-replay", help="Export honest full-cohort metrics from one saved replay")
     analysis.add_argument("--trace", type=Path, required=True)
@@ -423,6 +424,8 @@ def main(argv=None) -> int:
                     args.model_dir, device=args.device, dtype=args.dtype
                 )
             if args.bounded_drain_s is None:
+                if args.token_window_endpoint is not None:
+                    raise ValueError("--token-window-endpoint requires --bounded-drain-s")
                 report = replay_completion_trace(
                     workload, adapter, max_workers=args.max_workers
                 )
@@ -432,6 +435,7 @@ def main(argv=None) -> int:
                 report = replay_bounded_http_trace(
                     workload, adapter, drain_s=args.bounded_drain_s,
                     max_workers=args.max_workers,
+                    token_window_endpoint=args.token_window_endpoint,
                 )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")

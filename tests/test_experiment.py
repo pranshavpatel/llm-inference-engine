@@ -5,7 +5,8 @@ import unittest
 from pathlib import Path
 
 from nanoserve.experiment import analyze_replay, write_analysis, write_sweep_plan, write_sweep_report
-from nanoserve.replay import make_completion_trace, validate_completion_trace
+from nanoserve.replay import _checksum, make_completion_trace, validate_completion_trace
+from nanoserve.phase6_score import score_fixed_window
 
 
 class ExperimentTests(unittest.TestCase):
@@ -39,6 +40,35 @@ class ExperimentTests(unittest.TestCase):
             "records": records,
         }
         return trace, replay
+
+    def test_phase6_goodput_excludes_drain_and_requires_true_token_tpot(self):
+        trace, replay = self.make_pair()
+        trace["offered_interval_s"] = 1.0
+        trace["sha256"] = _checksum({key: value for key, value in trace.items() if key != "sha256"})
+        replay["trace_sha256"] = trace["sha256"]
+        replay["mode"] = "fixed-window-bounded-drain"
+        replay["offered_interval_s"] = 1.0
+        replay["drain_s"] = 1.0
+        replay["drain_deadline_offset_s"] = 2.0
+        replay["records"][0]["server_metrics"] = {"mean_itl_ms": 80.0}
+        replay["records"][1]["server_metrics"] = {"mean_itl_ms": 80.0}
+        replay["records"][1]["completed_offset_s"] = 1.1
+        replay["elapsed_s"] = 1.2
+        replay["server_token_window"] = {
+            "clock": "time.monotonic", "start_s": 100.0,
+            "end_s": 101.0, "emitted_tokens": 3,
+        }
+        score = score_fixed_window(trace, replay)
+        self.assertEqual(score["completed_within_window"], 1)
+        self.assertEqual(score["completed_during_drain"], 1)
+        self.assertEqual(score["slo_goodput_rps"], 1.0)
+        self.assertEqual(score["completed_output_token_yield_within_window"], 2)
+        self.assertEqual(score["emitted_output_tokens_per_s"], 3.0)
+        self.assertTrue(score["client_send_lag_gate_passed"])
+        del replay["records"][0]["server_metrics"]
+        score = score_fixed_window(trace, replay)
+        self.assertEqual(score["slo_goodput_rps"], 0.0)
+        self.assertEqual(score["missing_window_tpot"], 1)
 
     def test_full_cohort_metrics_do_not_confuse_chunks_with_tokens(self):
         trace, replay = self.make_pair()

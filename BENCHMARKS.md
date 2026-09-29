@@ -4,6 +4,9 @@ There is **no scored sustainable-throughput frontier or SLO-goodput claim yet**.
 The saved L40S runs below include a controlled, same-host reference-versus-
 FlashInfer diagnostic. They show where the reference engine loses under the
 fixed short-prompt workload, but do not establish a universal speedup.
+The [fresh-VM scored collection protocol](environment/PHASE6_VM_SCORED.md)
+freezes its SLOs, measurement window, data-quality gates, and resource samples
+before the next run; it is a protocol, not a result.
 
 ## Paired reference-backend pilots
 
