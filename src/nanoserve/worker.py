@@ -143,6 +143,7 @@ class InferenceWorker:
             "cancelled": 0,
             "failed": 0,
             "rejected": 0,
+            "generated_tokens": 0,
         }
         self._stats_cache: dict = {}
 
@@ -269,6 +270,9 @@ class InferenceWorker:
         handle = self._handles.get(event.request_id)
         if handle is None:
             return
+        if event.token_id is not None:
+            with self._state_lock:
+                self._counters["generated_tokens"] += 1
         handle._events.put(event)
         if event.finished:
             del self._handles[event.request_id]

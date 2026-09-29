@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "completion-analysis-manifest",
+  "trace_file": "environment\\phase5-vm-pilot\\fixed-trace.json",
+  "trace_file_sha256": "b083b11609f58a25d2602c8d3238336774ca7aecaa57d0d272de58a303dbfd9f",
+  "replay_file": "environment\\phase5-vm-pilot\\vllm-fixed.json",
+  "replay_file_sha256": "a78850c79413e96d6005e94db2f3fb257a13b23ede6fd4a1502a47a75a589a41",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "adapter": "vllm-http"
+}

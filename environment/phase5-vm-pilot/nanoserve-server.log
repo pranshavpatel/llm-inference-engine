@@ -1,0 +1,1 @@
+{"status": "ready", "address": "http://127.0.0.1:8001", "model": "Qwen/Qwen2.5-1.5B-Instruct", "kv_blocks": 292, "kv_pool_bytes": 133955584, "checkpoint_files": ["model.safetensors"], "attention_backend": "reference_paged_gather"}

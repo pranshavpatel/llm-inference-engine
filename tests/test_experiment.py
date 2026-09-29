@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from nanoserve.experiment import analyze_replay, write_analysis, write_sweep_plan
+from nanoserve.experiment import analyze_replay, write_analysis, write_sweep_plan, write_sweep_report
 from nanoserve.replay import make_completion_trace, validate_completion_trace
 
 
@@ -52,6 +52,18 @@ class ExperimentTests(unittest.TestCase):
         self.assertNotIn("tpot", aggregate)
         self.assertNotIn("goodput", aggregate)
 
+    def test_server_reported_token_timing_is_optional_and_never_inferred_from_chunks(self):
+        trace, replay = self.make_pair()
+        replay["records"][0]["server_metrics"] = {"generation_time_ms": 40.0, "mean_itl_ms": 40.0}
+        aggregate, rows, _ = analyze_replay(trace, replay)
+        self.assertEqual(aggregate["server_reported_tpot"]["count"], 1)
+        self.assertEqual(aggregate["server_reported_tpot"]["p99_s"], 0.04)
+        self.assertEqual(rows[0]["server_tpot_s"], 0.04)
+        self.assertIsNone(rows[1]["server_tpot_s"])
+        replay["records"][0]["server_metrics"]["mean_itl_ms"] = -1
+        with self.assertRaisesRegex(ValueError, "mean_itl_ms"):
+            analyze_replay(trace, replay)
+
     def test_failure_and_missing_usage_remain_visible(self):
         trace, replay = self.make_pair()
         replay["records"][0]["usage"] = None
@@ -75,6 +87,22 @@ class ExperimentTests(unittest.TestCase):
         replay["records"][0]["first_content_offset_s"] = 0.0
         with self.assertRaisesRegex(ValueError, "first content"):
             analyze_replay(trace, replay)
+
+    def test_saved_fixed_output_records_must_match_token_policy(self):
+        trace, replay = self.make_pair()
+        fixed_trace = make_completion_trace(
+            count=2, rate=10, seed=4, model="test-model", revision="revision",
+            prompts=["prompt"], max_tokens=2, ignore_eos=True,
+        )
+        replay["trace_sha256"] = fixed_trace["sha256"]
+        analyze_replay(fixed_trace, replay)
+        replay["records"][0]["usage"]["completion_tokens"] = 1
+        with self.assertRaisesRegex(ValueError, "fixed-output"):
+            analyze_replay(fixed_trace, replay)
+        replay["records"][0]["usage"]["completion_tokens"] = 2
+        replay["records"][0]["finish_reason"] = "stop"
+        with self.assertRaisesRegex(ValueError, "fixed-output"):
+            analyze_replay(fixed_trace, replay)
 
     def test_export_writes_manifest_csv_events_and_aggregate(self):
         trace, replay = self.make_pair()
@@ -103,6 +131,23 @@ class ExperimentTests(unittest.TestCase):
                 aggregate, _, _ = analyze_replay(trace, replay)
                 self.assertEqual(aggregate["cohort"]["completed"], 2)
                 self.assertEqual(aggregate["full_run_completed_output_tokens"], 4)
+
+    def test_committed_phase5_vm_pilot_matches_hf_and_nanoserve_but_not_vllm(self):
+        root = Path(__file__).resolve().parents[1] / "environment" / "phase5-vm-pilot"
+        trace = json.loads((root / "fixed-trace.json").read_text(encoding="utf-8"))
+        validate_completion_trace(trace)
+        outputs = {}
+        for engine in ("hf", "nanoserve", "vllm"):
+            replay = json.loads((root / f"{engine}-fixed.json").read_text(encoding="utf-8"))
+            aggregate, rows, _ = analyze_replay(trace, replay)
+            self.assertEqual(aggregate["cohort"]["completed"], 2)
+            self.assertEqual(aggregate["cohort"]["failed"], 0)
+            self.assertEqual(aggregate["cohort"]["missing_usage"], 0)
+            self.assertTrue(all(row["completion_tokens"] == 8 and row["finish_reason"] == "length" for row in rows))
+            outputs[engine] = [record["output_text"] for record in replay["records"]]
+        self.assertEqual(outputs["hf"], outputs["nanoserve"])
+        self.assertNotEqual(outputs["hf"][0], outputs["vllm"][0])
+        self.assertEqual(outputs["nanoserve"][1], outputs["vllm"][1])
 
     def test_sweep_plan_is_fixed_window_reproducible_and_paired(self):
         arguments = dict(
@@ -135,6 +180,81 @@ class ExperimentTests(unittest.TestCase):
                     model="m", revision="r", prompts=["p"], max_tokens=2,
                 )
             self.assertFalse(output.exists())
+
+    def test_sweep_plan_fixed_output_policy_reaches_each_trace(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "fixed"
+            manifest = write_sweep_plan(
+                output, rates=[10], repetitions=1, duration_s=1, base_seed=1,
+                model="m", revision="r", prompts=["p"], max_tokens=4,
+                ignore_eos=True,
+            )
+            trace = json.loads((output / manifest["traces"][0]["file"]).read_text(encoding="utf-8"))
+            self.assertIn("require exactly", manifest["output_policy"])
+            self.assertTrue(all(request["ignore_eos"] for request in trace["requests"]))
+
+    def test_sweep_report_regenerates_paired_csv_and_diagnostic_svg(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plan_dir = root / "plan"
+            plan = write_sweep_plan(
+                plan_dir, rates=[10, 20], repetitions=2, duration_s=1, base_seed=3,
+                model="m", revision="r", prompts=["p"], max_tokens=2,
+                ignore_eos=True,
+            )
+            replay_dirs = {"nanoserve": root / "nanoserve", "vllm": root / "vllm"}
+            for engine, replay_dir in replay_dirs.items():
+                replay_dir.mkdir()
+                for entry in plan["traces"]:
+                    trace = json.loads((plan_dir / entry["file"]).read_text(encoding="utf-8"))
+                    records = []
+                    for request in trace["requests"]:
+                        sent = request["arrival_offset_s"] + 0.001
+                        records.append({
+                            "request_id": request["request_id"], "status": "completed",
+                            "actual_send_offset_s": sent,
+                            "first_content_offset_s": sent + 0.01,
+                            "completed_offset_s": sent + 0.02,
+                            "finish_reason": "length",
+                            "usage": {"prompt_tokens": 1, "completion_tokens": 2, "total_tokens": 3},
+                            "server_metrics": {"generation_time_ms": 10.0, "mean_itl_ms": 10.0},
+                            "chunks": [
+                                {"at_offset_s": sent + 0.01, "text": "a", "finish_reason": None},
+                                {"at_offset_s": sent + 0.02, "text": "b", "finish_reason": "length"},
+                            ],
+                        })
+                    replay = {
+                        "schema_version": 1, "kind": "completion-replay",
+                        "trace_sha256": trace["sha256"], "model": "m", "revision": "r",
+                        "adapter": f"{engine}-http", "elapsed_s": 1.05,
+                        "summary": {"requests": len(records), "completed": len(records), "failed": 0, "missing_usage": 0},
+                        "records": records,
+                    }
+                    (replay_dir / entry["file"]).write_text(json.dumps(replay), encoding="utf-8")
+            output_dir = root / "report"
+            report = write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, output_dir)
+            self.assertEqual(len(report["runs"]), 8)
+            self.assertEqual(len(report["by_rate"]), 4)
+            self.assertEqual(report["by_rate"][0]["repetitions"], 2)
+            self.assertEqual(report["by_rate"][0]["median_of_run_p99_server_tpot_s"], 0.01)
+            self.assertIn("median of per-run p99", " ".join(report["limitations"]))
+            with (output_dir / "runs.csv").open(newline="", encoding="utf-8") as source:
+                self.assertEqual(len(list(csv.DictReader(source))), 8)
+            self.assertIn("<svg", (output_dir / "throughput-vs-ttft.svg").read_text(encoding="utf-8"))
+            self.assertIn("<svg", (output_dir / "failure-vs-rate.svg").read_text(encoding="utf-8"))
+            with self.assertRaises(FileExistsError):
+                write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, output_dir)
+            corrupted = json.loads((plan_dir / "sweep-plan.json").read_text(encoding="utf-8"))
+            corrupted["traces"][-1] = corrupted["traces"][0]
+            (plan_dir / "sweep-plan.json").write_text(json.dumps(corrupted), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "duplicated"):
+                write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, root / "invalid-report")
+            corrupted = plan.copy()
+            corrupted["traces"] = [entry.copy() for entry in plan["traces"]]
+            corrupted["traces"][0]["target_rate_rps"] = 99
+            (plan_dir / "sweep-plan.json").write_text(json.dumps(corrupted), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "metadata disagrees"):
+                write_sweep_report(plan_dir / "sweep-plan.json", replay_dirs, root / "invalid-report")
 
 
 if __name__ == "__main__":

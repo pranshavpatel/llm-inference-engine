@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "completion-replay-analysis",
+  "trace_sha256": "6b23eae8b7abd3d2b9339fccfcf56d3481eff4604095305213847219f25969f9",
+  "adapter": "huggingface-eager",
+  "cohort": {
+    "requests": 2,
+    "completed": 2,
+    "failed": 0,
+    "timed_out": 0,
+    "not_sent": 0,
+    "missing_usage": 0,
+    "failure_types": {}
+  },
+  "target_offered_rate_rps": 100.0,
+  "offered_interval_s": null,
+  "drain_deadline_offset_s": null,
+  "full_run_elapsed_s": 1.2400531169987516,
+  "full_run_completed_output_tokens": 16,
+  "full_run_completed_output_tokens_per_s": 12.90267310381359,
+  "client_ttft": {
+    "count": 2,
+    "p50_s": 0.07454197199695045,
+    "p90_s": 0.8364016799969249,
+    "p99_s": 0.8364016799969249
+  },
+  "completed_end_to_end": {
+    "count": 2,
+    "p50_s": 0.20184013200196205,
+    "p90_s": 1.0319302330026403,
+    "p99_s": 1.0319302330026403
+  },
+  "send_lag": {
+    "count": 2,
+    "p50_s": 0.001784799557230858,
+    "p90_s": 1.03246174598652,
+    "p99_s": 1.03246174598652
+  },
+  "inter_content_chunk_gap": {
+    "count": 14,
+    "p50_s": 0.018114758997398894,
+    "p90_s": 0.01840798700141022,
+    "p99_s": 0.0866329839991522
+  },
+  "server_reported_tpot": {
+    "count": 0,
+    "p50_s": null,
+    "p90_s": null,
+    "p99_s": null
+  },
+  "limitations": [
+    "Full-run cohort metrics include startup and drain; they are not steady-state throughput.",
+    "HTTP chunks are not model tokens; inter-content-chunk gaps are not ITL or TPOT.",
+    "Server-reported TPOT is available only when the server supplies per-request token metrics; missing samples are not inferred from HTTP chunks.",
+    "TPOT SLO goodput and within-window output-token throughput are not computed by this diagnostic replay analysis.",
+    "A completed request with missing usage makes output-token throughput unavailable."
+  ]
+}

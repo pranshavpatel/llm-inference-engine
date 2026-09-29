@@ -104,6 +104,18 @@ class SchedulerTests(unittest.TestCase):
         self.assertEqual(scheduler.snapshot("eos").state, RequestState.FINISHED)
         self.assertEqual(manager.blocks.stats()["active_requests"], 0)
 
+    def test_no_eos_stop_emits_fixed_token_count_including_eos_id(self):
+        manager = make_manager()
+        scheduler = make_scheduler(manager)
+        engine = Engine(scheduler, FakeRunner(manager))
+        engine.add_request("fixed", [8], 3, eos_token_id=None)
+
+        events = run_until_idle(engine, scheduler)
+
+        self.assertEqual([event.token_id for event in events], [9, 10, 11])
+        self.assertEqual(events[-1].finish_reason, FinishReason.LENGTH)
+        self.assertEqual(scheduler.snapshot("fixed").generated_token_ids, (9, 10, 11))
+
     def test_staggered_arrivals_complete_while_existing_request_decodes(self):
         manager = make_manager()
         scheduler = make_scheduler(manager, sequences=2)

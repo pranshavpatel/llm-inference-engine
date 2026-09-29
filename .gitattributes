@@ -1,0 +1,16 @@
+# Preserve byte-for-byte VM source artifacts; generated analysis stays normalized text.
+environment/phase5-vm-pilot/*.json -text
+environment/phase5-vm-pilot/*.log -text
+environment/phase5-vm-pilot/*.txt -text
+
+# Preserve checksummed VM sweep traces and replays byte-for-byte.
+environment/phase5-vm-sweep/*.json -text
+environment/phase5-vm-sweep/*.log -text
+environment/phase5-vm-sweep/plan/* -text
+environment/phase5-vm-sweep/vllm/* -text
+environment/phase5-vm-sweep/nanoserve/* -text
+environment/phase5-vm-sweep/report/* -text
+
+# Keep the high-rate source archive intact and its small report byte-stable.
+environment/phase5-vm-sweep-high/*.zip binary
+environment/phase5-vm-sweep-high/report/* -text
