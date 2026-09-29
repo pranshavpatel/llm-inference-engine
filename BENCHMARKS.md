@@ -69,6 +69,13 @@ backend is not an exact-output replacement for BF16 gather.
 The two servers had equal 128 MiB KV pools, but FlashInfer allocated an
 additional 128 MiB planning workspace; total GPU memory was not matched.
 
+| Published observation | Saved evidence |
+| --- | --- |
+| 4 requests/s median-of-run p50 client TTFT: 168.0 versus 72.9 ms | [`phase6-vm-compare/summary.json`](environment/phase6-vm-compare/summary.json), `by_rate` entries for 4 requests/s; original trace and per-request replay files in its `source.zip` |
+| 6 requests/s completions by the 60-second boundary: 826 versus 1,049 of 1,064 | The same summary's 6 requests/s `completed_in_offered_window` entries |
+| 4,468/4,468 paired completed 16-token strings differ | The same summary's `paired_both_completed` and `paired_different_output_text` fields, regenerated from `source.zip` |
+| Targeted worst-layer float32 attention oracle: zero FlashInfer elements outside the declared tolerance | [`phase6-attention-oracle.json`](environment/phase6-attention-oracle.json) and [method notes](environment/PHASE6_FLASHINFER.md) |
+
 For a future headline comparison, use longer and mixed-length workloads,
 predeclare the goodput/SLO rule, collect enough completions per repetition
 for tail estimates, and separate paging/batching ablations. A broader vLLM
