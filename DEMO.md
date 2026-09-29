@@ -53,25 +53,28 @@ that the server requests cancellation. Stop terminal A with Ctrl+C afterward.
 
 ## 1:50–3:00 — Evidence and limitation
 
-Show [the saved Phase 6 comparison](environment/phase6-vm-compare/README.md)
-and its [latency/failure diagnostics](environment/phase6-vm-compare/report/).
-On the same L40S at 4 offered requests/s, median-of-run p50 client TTFT was
-168.0 ms with reference gather and 72.9 ms with opt-in FlashInfer. At 6,
-reference queue delay grew, while FlashInfer completed 1,049/1,064 requests
-within the 60-second offered windows. At 16, both paths overloaded. Explain
-that this is a short-prompt diagnostic, not a sustainable-throughput claim;
-longer greedy outputs differ between backends and FlashInfer uses an extra
-128 MiB planning workspace. End with what a future scored benchmark needs:
-mixed lengths, predeclared SLO goodput, enough tail samples, and explicit
-paging/batching ablations.
+Show [the saved Phase 6 scored run](environment/phase6-vm-scored/README.md)
+and its [throughput/TTFT](environment/phase6-vm-scored/report/throughput-vs-ttft.svg)
+and [goodput](environment/phase6-vm-scored/report/goodput-vs-rate.svg)
+plots. On the same L40S, with synthetic 40/131/248-token prompts, 64 fixed
+output tokens, and 2 offered requests/s, the median of three 60-second runs
+emitted 75.4 tokens/s on reference gather versus 136.6 on opt-in FlashInfer.
+SLO goodput under predeclared TTFT <= 1 s and TPOT <= 100 ms was 0.00
+versus 2.12 requests/s; the reference path was overloaded. At higher rates,
+FlashInfer also developed queueing and failures—do not imply universal or
+sustainable performance. The optimized path's longer greedy outputs differ
+from reference and it uses an extra 128 MiB planning workspace. End with
+the remaining limit: these prompts are synthetic, p99 samples are small,
+and a same-session vLLM baseline is pending.
 
 ## Evidence-backed portfolio wording
 
 - Built a single-GPU Qwen2 inference engine with allocator-owned paged KV,
   continuous batching, recompute preemption, and a streaming completions API;
   validated core model and replay behavior against saved reference runs.
-- Added an experimental FlashInfer paged-decode path. On an L40S under a
-  pinned, fixed-16-token workload at 4 offered requests/s, median-of-run p50
-  client TTFT was 72.9 ms versus 168.0 ms for the reference gather path.
-  Longer greedy output text differed, so this is a workload-specific
-  diagnostic, not an exact-output or universal-speedup claim.
+- Added an experimental FlashInfer paged-decode path and a checksummed,
+  fixed-window L40S benchmark. At 2 offered requests/s on 64-token synthetic
+  completions, measured 136.6 emitted tokens/s and 2.12 SLO-qualified
+  requests/s in the median run versus 75.4 tokens/s and 0.00 qualified
+  requests/s on an overloaded reference path. This is workload-specific,
+  not an exact-output or universal-speedup claim.
