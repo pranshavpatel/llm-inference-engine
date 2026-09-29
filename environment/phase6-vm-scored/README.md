@@ -85,5 +85,6 @@ too few completions for strong p99 inference; their counts are published.
 Sampled resource peaks are not continuous extrema. Reference and FlashInfer
 remain numerically non-identical at full-model BF16 logits, and their
 longer greedy outputs differ; the optimized path remains opt-in. An exact
-same-session vLLM baseline was requested separately because prior Phase 5
-vLLM data used a different workload and VM software stack.
+same-session vLLM baseline is now saved in
+[`environment/phase6-vm-vllm/`](../phase6-vm-vllm/README.md); it uses these
+exact traces, unlike the prior Phase 5 pilot.

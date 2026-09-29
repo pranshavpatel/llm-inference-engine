@@ -1,5 +1,10 @@
 # Phase 6 same-session vLLM baseline
 
+The run described below is complete. Its original archive, validated
+cross-engine report, and limitations are in
+[phase6-vm-vllm/README.md](phase6-vm-vllm/README.md). Keep these commands as
+the reproduction procedure.
+
 Run this only after the NanoServe scored archive is safely exported. It
 replays the *same saved short and long Poisson plans* against vLLM 0.30.0 on
 the same L40S and checkpoint. It is a feature-matched baseline: BF16,

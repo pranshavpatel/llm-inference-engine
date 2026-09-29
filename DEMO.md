@@ -65,7 +65,10 @@ FlashInfer also developed queueing and failures—do not imply universal or
 sustainable performance. The optimized path's longer greedy outputs differ
 from reference and it uses an extra 128 MiB planning workspace. End with
 the remaining limit: these prompts are synthetic, p99 samples are small,
-and a same-session vLLM baseline is pending.
+and the [same-session vLLM comparison](environment/phase6-vm-vllm/README.md)
+did not reach vLLM's capacity knee. At 6 short requests/s its median SLO
+goodput was 6.10 requests/s versus FlashInfer's 0.27; this is a workload-
+specific observed gap, not a maximum-throughput ratio.
 
 ## Evidence-backed portfolio wording
 

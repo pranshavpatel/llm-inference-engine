@@ -1,7 +1,8 @@
 # Benchmark evidence and limits
 
 There is now a scored fixed-window SLO-goodput sweep on a pinned L40S and
-synthetic short/long workloads. It is **not** a production-workload result,
+synthetic short/long workloads, including a same-session vLLM baseline on
+the exact saved traces. It is **not** a production-workload result,
 universal speedup, or strong p99 sustainable-throughput frontier. The older
 Phase 5 and Phase 6 runs below remain diagnostics. The
 [predeclared scored protocol](environment/PHASE6_VM_SCORED.md) froze its SLOs,
@@ -121,9 +122,30 @@ limit—not paging-on versus paging-off.
 | Supported 2x2 and block-size tradeoff | [Ablation figure](environment/phase6-vm-scored/report/ablation-2x2.svg) and [block-size figure](environment/phase6-vm-scored/report/block-size.svg) |
 | Reference-path per-request attention dispatch bottleneck | [Paged runner profile](environment/phase6-paged-profile/README.md) |
 
-The measured gap to vLLM still requires a feature-matched same-session
-baseline on these exact traces; the earlier Phase 5 comparison used a
-different workload and VM software stack. A 1,000-completion-per-repetition
-headline p99 and a public trace-derived workload also remain future work.
-Do not present these synthetic-workload numbers as production performance
-or exact numerical parity between attention backends.
+## Same-session vLLM baseline
+
+The [saved vLLM 0.30.0 archive](environment/phase6-vm-vllm/README.md)
+replayed all 33 short/long traces byte-for-byte on the same L40S, pinned
+model revision, BF16, and 256 MiB KV pool. Prefix caching and chunked prefill
+were disabled; FlashAttention 2, compilation, and CUDA graphs remained on.
+The independent [cross-engine report](environment/phase6-vm-vllm/report/summary.json)
+recomputed every vLLM score. All 3,691 requests completed with no failures,
+missing usage or TPOT, or client send-lag gate failures. At 2 short
+requests/s, median SLO goodput was 0.00/2.12/2.15 requests/s for reference,
+FlashInfer, and vLLM, respectively; median-of-run p99 client TTFT was
+19.20/0.145/0.023 s. At 6 short requests/s the corresponding goodputs were
+0.00/0.27/6.10 and p99 TTFTs 35.32/24.82/0.027 s. At 1.6 long requests/s,
+goodputs were 0.083/0.917/1.85. This shows FlashInfer materially improves
+our engine but still leaves a large high-load gap to vLLM on this workload.
+See the [short](environment/phase6-vm-vllm/report/short-goodput-vs-rate.svg)
+and [long](environment/phase6-vm-vllm/report/long-goodput-vs-rate.svg) goodput plots.
+
+vLLM's highest tested rates did not saturate, so its maximum sustainable
+throughput and a maximum-throughput ratio were **not measured**. It has no
+exact in-window emitted-token counter compatible with ours; do not compare
+completed-token yield with NanoServe's emitted-token throughput. KV pools
+were equal, but total device footprint and optimized execution paths were
+not. A 1,000-completion-per-repetition headline p99 and a public
+trace-derived workload also remain future work. Do not present these
+synthetic-workload numbers as production performance or exact numerical
+parity between attention backends.

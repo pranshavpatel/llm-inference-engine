@@ -111,7 +111,11 @@ meeting the predeclared TTFT <= 1 s and TPOT <= 100 ms SLOs. The reference
 path was overloaded there; this is an observed pinned-workload capacity
 result, not a universal speedup or proof of exact numerical parity. The
 archive includes raw traces, failures, resource samples, and a regenerable
-report. A same-session vLLM baseline on these traces is still pending.
+report. The [same-session vLLM 0.30.0 baseline](environment/phase6-vm-vllm/README.md)
+replayed all 33 exact short/long traces on the L40S. Its 3,691 requests all
+completed without failure or missing token metrics, but it did not saturate
+at the highest tested rates. The paired report shows an observed high-load
+gap, not a measured maximum-throughput ratio.
 
 ## Saved trace replay
 
