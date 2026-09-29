@@ -1,9 +1,9 @@
 # Benchmark evidence and limits
 
-There is **no scored release benchmark or FlashInfer speedup claim yet**. The
-saved L40S runs below are exploratory load and operator diagnostics. They show
-where the reference engine loses and motivate the next measurement, but do not
-establish a sustainable-throughput frontier or an SLO goodput comparison.
+There is **no scored sustainable-throughput frontier or SLO-goodput claim yet**.
+The saved L40S runs below include a controlled, same-host reference-versus-
+FlashInfer diagnostic. They show where the reference engine loses under the
+fixed short-prompt workload, but do not establish a universal speedup.
 
 ## Paired reference-backend pilots
 
@@ -49,17 +49,27 @@ BF16 gather did **not** pass; two of 32 top-token decisions differed. The
 the optimized kernel on the two worst-differing layers, but does not overturn
 the full-model result. The [two-request HTTP smoke](environment/phase6-flashinfer-server-smoke/README.md)
 then passed with matching text, finish reasons, and token usage. The optimized
-decode path remains opt-in and reference prefill remains in place. No
-FlashInfer-versus-reference latency or throughput comparison has been run.
+decode path remains opt-in and reference prefill remains in place.
 
-## Remaining release measurement
+## Paired Phase 6 backend diagnostic
 
-Use the [same-L40S runbook](environment/PHASE6_VM_COMPARE.md) to compare
-reference nanoserve and opt-in FlashInfer nanoserve under identical pinned
-model, trace, KV budget, output policy, and client protocol. Capture warmup,
-environment, raw replays, server logs, client send lag, and error/usage checks.
-Only after inspecting the resulting run quality and sample sizes should we
-report an optimized-path speed comparison.
-A broader vLLM comparison must separately state its feature and kernel
-differences. Until those runs exist, no headline throughput or speedup number
-belongs in the README or resume.
+The [same-L40S run](environment/phase6-vm-compare/README.md) paired reference
+and FlashInfer nanoserve on 36 replays from one checksummed 1/2/4/6/10/16
+requests/s plan, with three 60-second repetitions per rate. All client
+send-lag gates passed, and all completed requests had 16 output tokens and
+usage. At 4 requests/s, median-of-run p50 client TTFT was 168.0 ms for
+reference versus 72.9 ms for FlashInfer; 683/711 versus 708/711 requests
+finished within the 60-second offered windows. At 6, the reference path
+accumulated a queue (826/1,064 finished by 60 seconds), whereas FlashInfer
+finished 1,049/1,064 by then with no failures. Both paths overloaded at 16.
+The data supports an observed latency/backlog improvement on this pinned
+short-prompt workload, not a scored capacity frontier. The long greedy text
+differed for all 4,468 requests completed by both paths, so the optimized
+backend is not an exact-output replacement for BF16 gather.
+
+For a future headline comparison, use longer and mixed-length workloads,
+predeclare the goodput/SLO rule, collect enough completions per repetition
+for tail estimates, and separate paging/batching ablations. A broader vLLM
+comparison must also state its feature and kernel differences. Until those
+runs exist, do not put a sustained-throughput or universal speedup number in
+the README or resume.

@@ -168,8 +168,11 @@ contains the returned replay JSON and server log. The server readiness record
 identifies `flashinfer-paged-decode-reference-prefill`. Both requests completed
 without reported failures or missing usage; their text, finish reasons, and
 token counts match the reference debug trace replay. The VM can be released
-after this gate. This is a functional smoke, not a throughput comparison; the
-next GPU-dependent task is a separate controlled same-host performance run.
+after this gate. This is a functional smoke, not a throughput comparison. The
+subsequent paired same-L40S diagnostic is saved under
+[`phase6-vm-compare/`](phase6-vm-compare/README.md): it observed lower latency
+and less backlog with FlashInfer on fixed short prompts, while all paired
+16-token greedy strings differed. The optimized path remains opt-in.
 
 FlashInfer's package is Linux-only and its documented paged-decode wrapper
 accepts separate NHD K/V tensors with int32 `indptr`, `indices`, and
