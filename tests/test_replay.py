@@ -5,6 +5,7 @@ import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import SimpleNamespace
+from urllib.parse import parse_qs, urlsplit
 
 import torch
 
@@ -283,6 +284,20 @@ class ReplayTests(unittest.TestCase):
             def log_message(self, format, *args):
                 return
 
+            def do_GET(self):
+                params = parse_qs(urlsplit(self.path).query)
+                body = json.dumps({
+                    "clock": "time.monotonic",
+                    "start_s": float(params["start_s"][0]),
+                    "end_s": float(params["end_s"][0]),
+                    "emitted_tokens": 9,
+                }).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
             def do_POST(self):
                 self.rfile.read(int(self.headers["Content-Length"]))
                 events = [
@@ -308,7 +323,10 @@ class ReplayTests(unittest.TestCase):
         try:
             host, port = server.server_address
             adapter = HTTPCompletionsAdapter(f"http://{host}:{port}/v1/completions", "test-model")
-            replay = replay_bounded_http_trace(trace, adapter, drain_s=1, max_workers=4)
+            replay = replay_bounded_http_trace(
+                trace, adapter, drain_s=1, max_workers=4,
+                token_window_endpoint=f"http://{host}:{port}/metrics/token-window",
+            )
         finally:
             server.shutdown()
             server.server_close()
@@ -316,6 +334,7 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(replay["summary"]["completed"], len(trace["requests"]))
         self.assertEqual(replay["summary"]["timed_out"], 0)
         self.assertEqual(replay["summary"]["not_sent"], 0)
+        self.assertEqual(replay["server_token_window"]["emitted_tokens"], 9)
         aggregate, _, _ = analyze_replay(trace, replay)
         self.assertEqual(aggregate["cohort"]["completed"], len(trace["requests"]))
 

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "flashinfer-paged-decode-probe",
+  "status": "passed",
+  "torch": "2.13.0+cu130",
+  "flashinfer": "0.6.18.post1",
+  "device": "NVIDIA L40S",
+  "dtype": "bfloat16",
+  "page_size": 16,
+  "sequence_lengths": [
+    1,
+    16,
+    17,
+    33
+  ],
+  "query_heads": 12,
+  "kv_heads": 2,
+  "head_dim": 128,
+  "atol": 0.03,
+  "rtol": 0.03,
+  "max_absolute_error": 0.0078125,
+  "mismatched_elements": 0,
+  "elements": 6144
+}

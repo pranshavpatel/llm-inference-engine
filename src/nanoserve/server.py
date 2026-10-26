@@ -6,6 +6,7 @@ import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional
+from urllib.parse import parse_qs, urlsplit
 
 from nanoserve.scheduler import QueueFull
 from nanoserve.types import FinishReason, OutputEvent
@@ -180,6 +181,20 @@ class CompletionRequestHandler(BaseHTTPRequestHandler):
             )
         elif self.path == "/metrics":
             self._write_json(HTTPStatus.OK, self.service.worker.stats())
+        elif urlsplit(self.path).path == "/metrics/token-window":
+            try:
+                params = parse_qs(urlsplit(self.path).query, strict_parsing=True)
+                if set(params) != {"start_s", "end_s"} or any(len(values) != 1 for values in params.values()):
+                    raise ValueError("start_s and end_s are required once each")
+                start_s = float(params["start_s"][0])
+                end_s = float(params["end_s"][0])
+                count = self.service.worker.count_emitted_tokens(start_s, end_s)
+                self._write_json(HTTPStatus.OK, {
+                    "clock": "time.monotonic", "start_s": start_s, "end_s": end_s,
+                    "emitted_tokens": count,
+                })
+            except (ValueError, OverflowError) as error:
+                self._write_json(HTTPStatus.BAD_REQUEST, _error(str(error)))
         else:
             self._write_json(HTTPStatus.NOT_FOUND, _error("route not found"))
 

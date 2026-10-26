@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "kind": "flashinfer-model-backend-parity",
+  "status": "failed",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "torch": "2.13.0+cu132",
+  "device": "NVIDIA L40S",
+  "reference_backend": "pytorch-gather-reference",
+  "candidate_backend": "flashinfer-paged-decode-reference-prefill",
+  "prompt_lengths": [
+    1,
+    16,
+    17,
+    33
+  ],
+  "decode_steps": 8,
+  "atol": 0.125,
+  "rtol": 0.02,
+  "mismatched_logits": 1547252,
+  "top_token_mismatches": 2,
+  "maximum_absolute_logit_error": 12.03125,
+  "comparisons": [
+    {
+      "stage": "prefill",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.0,
+      "mismatched_logits": 0,
+      "logits": 151936,
+      "reference_top_token": 2701,
+      "flashinfer_top_token": 2701
+    },
+    {
+      "stage": "prefill",
+      "request_id": "r1",
+      "max_absolute_logit_error": 0.0,
+      "mismatched_logits": 0,
+      "logits": 151936,
+      "reference_top_token": 6722,
+      "flashinfer_top_token": 6722
+    },
+    {
+      "stage": "prefill",
+      "request_id": "r2",
+      "max_absolute_logit_error": 0.0,
+      "mismatched_logits": 0,
+      "logits": 151936,
+      "reference_top_token": 315,
+      "flashinfer_top_token": 315
+    },
+    {
+      "stage": "prefill",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.0,
+      "mismatched_logits": 0,
+      "logits": 151936,
+      "reference_top_token": 9625,
+      "flashinfer_top_token": 9625
+    },
+    {
+      "stage": "decode-1",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.8984375,
+      "mismatched_logits": 55053,
+      "logits": 151936,
+      "reference_top_token": 374,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-1",
+      "request_id": "r1",
+      "max_absolute_logit_error": 0.1953125,
+      "mismatched_logits": 66,
+      "logits": 151936,
+      "reference_top_token": 315,
+      "flashinfer_top_token": 315
+    },
+    {
+      "stage": "decode-1",
+      "request_id": "r2",
+      "max_absolute_logit_error": 0.4375,
+      "mismatched_logits": 19188,
+      "logits": 151936,
+      "reference_top_token": 9625,
+      "flashinfer_top_token": 9625
+    },
+    {
+      "stage": "decode-1",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.24462890625,
+      "mismatched_logits": 587,
+      "logits": 151936,
+      "reference_top_token": 374,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-2",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.75,
+      "mismatched_logits": 36462,
+      "logits": 151936,
+      "reference_top_token": 264,
+      "flashinfer_top_token": 264
+    },
+    {
+      "stage": "decode-2",
+      "request_id": "r1",
+      "max_absolute_logit_error": 0.4921875,
+      "mismatched_logits": 31722,
+      "logits": 151936,
+      "reference_top_token": 9625,
+      "flashinfer_top_token": 9625
+    },
+    {
+      "stage": "decode-2",
+      "request_id": "r2",
+      "max_absolute_logit_error": 0.4140625,
+      "mismatched_logits": 9005,
+      "logits": 151936,
+      "reference_top_token": 374,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-2",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.6875,
+      "mismatched_logits": 32543,
+      "logits": 151936,
+      "reference_top_token": 785,
+      "flashinfer_top_token": 785
+    },
+    {
+      "stage": "decode-3",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.40234375,
+      "mismatched_logits": 9426,
+      "logits": 151936,
+      "reference_top_token": 3175,
+      "flashinfer_top_token": 3175
+    },
+    {
+      "stage": "decode-3",
+      "request_id": "r1",
+      "max_absolute_logit_error": 0.265625,
+      "mismatched_logits": 1170,
+      "logits": 151936,
+      "reference_top_token": 374,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-3",
+      "request_id": "r2",
+      "max_absolute_logit_error": 0.76123046875,
+      "mismatched_logits": 36511,
+      "logits": 151936,
+      "reference_top_token": 59604,
+      "flashinfer_top_token": 59604
+    },
+    {
+      "stage": "decode-3",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.453125,
+      "mismatched_logits": 8112,
+      "logits": 151936,
+      "reference_top_token": 6722,
+      "flashinfer_top_token": 6722
+    },
+    {
+      "stage": "decode-4",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.9375,
+      "mismatched_logits": 48944,
+      "logits": 151936,
+      "reference_top_token": 62626,
+      "flashinfer_top_token": 62626
+    },
+    {
+      "stage": "decode-4",
+      "request_id": "r1",
+      "max_absolute_logit_error": 0.6875,
+      "mismatched_logits": 38527,
+      "logits": 151936,
+      "reference_top_token": 59604,
+      "flashinfer_top_token": 59604
+    },
+    {
+      "stage": "decode-4",
+      "request_id": "r2",
+      "max_absolute_logit_error": 0.4375,
+      "mismatched_logits": 4862,
+      "logits": 151936,
+      "reference_top_token": 13,
+      "flashinfer_top_token": 13
+    },
+    {
+      "stage": "decode-4",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.5,
+      "mismatched_logits": 15629,
+      "logits": 151936,
+      "reference_top_token": 315,
+      "flashinfer_top_token": 315
+    },
+    {
+      "stage": "decode-5",
+      "request_id": "r0",
+      "max_absolute_logit_error": 1.0,
+      "mismatched_logits": 55858,
+      "logits": 151936,
+      "reference_top_token": 3405,
+      "flashinfer_top_token": 3405
+    },
+    {
+      "stage": "decode-5",
+      "request_id": "r1",
+      "max_absolute_logit_error": 0.5,
+      "mismatched_logits": 9732,
+      "logits": 151936,
+      "reference_top_token": 13,
+      "flashinfer_top_token": 13
+    },
+    {
+      "stage": "decode-5",
+      "request_id": "r2",
+      "max_absolute_logit_error": 5.9140625,
+      "mismatched_logits": 122991,
+      "logits": 151936,
+      "reference_top_token": 12095,
+      "flashinfer_top_token": 12095
+    },
+    {
+      "stage": "decode-5",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.5625,
+      "mismatched_logits": 31444,
+      "logits": 151936,
+      "reference_top_token": 9625,
+      "flashinfer_top_token": 9625
+    },
+    {
+      "stage": "decode-6",
+      "request_id": "r0",
+      "max_absolute_logit_error": 1.03125,
+      "mismatched_logits": 54606,
+      "logits": 151936,
+      "reference_top_token": 504,
+      "flashinfer_top_token": 504
+    },
+    {
+      "stage": "decode-6",
+      "request_id": "r1",
+      "max_absolute_logit_error": 6.046875,
+      "mismatched_logits": 122046,
+      "logits": 151936,
+      "reference_top_token": 12095,
+      "flashinfer_top_token": 12095
+    },
+    {
+      "stage": "decode-6",
+      "request_id": "r2",
+      "max_absolute_logit_error": 3.15625,
+      "mismatched_logits": 116390,
+      "logits": 151936,
+      "reference_top_token": 13,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-6",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.7587890625,
+      "mismatched_logits": 52828,
+      "logits": 151936,
+      "reference_top_token": 374,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-7",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.7734375,
+      "mismatched_logits": 48678,
+      "logits": 151936,
+      "reference_top_token": 264,
+      "flashinfer_top_token": 264
+    },
+    {
+      "stage": "decode-7",
+      "request_id": "r1",
+      "max_absolute_logit_error": 3.25,
+      "mismatched_logits": 116810,
+      "logits": 151936,
+      "reference_top_token": 13,
+      "flashinfer_top_token": 374
+    },
+    {
+      "stage": "decode-7",
+      "request_id": "r2",
+      "max_absolute_logit_error": 11.6875,
+      "mismatched_logits": 124645,
+      "logits": 151936,
+      "reference_top_token": 12095,
+      "flashinfer_top_token": 12095
+    },
+    {
+      "stage": "decode-7",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.875,
+      "mismatched_logits": 63975,
+      "logits": 151936,
+      "reference_top_token": 785,
+      "flashinfer_top_token": 785
+    },
+    {
+      "stage": "decode-8",
+      "request_id": "r0",
+      "max_absolute_logit_error": 0.6015625,
+      "mismatched_logits": 20673,
+      "logits": 151936,
+      "reference_top_token": 8453,
+      "flashinfer_top_token": 8453
+    },
+    {
+      "stage": "decode-8",
+      "request_id": "r1",
+      "max_absolute_logit_error": 12.03125,
+      "mismatched_logits": 124484,
+      "logits": 151936,
+      "reference_top_token": 12095,
+      "flashinfer_top_token": 12095
+    },
+    {
+      "stage": "decode-8",
+      "request_id": "r2",
+      "max_absolute_logit_error": 2.84375,
+      "mismatched_logits": 125691,
+      "logits": 151936,
+      "reference_top_token": 13,
+      "flashinfer_top_token": 13
+    },
+    {
+      "stage": "decode-8",
+      "request_id": "r3",
+      "max_absolute_logit_error": 0.4951171875,
+      "mismatched_logits": 8594,
+      "logits": 151936,
+      "reference_top_token": 6722,
+      "flashinfer_top_token": 6722
+    }
+  ]
+}

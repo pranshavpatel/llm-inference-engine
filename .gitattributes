@@ -14,3 +14,10 @@ environment/phase5-vm-sweep/report/* -text
 # Keep the high-rate source archive intact and its small report byte-stable.
 environment/phase5-vm-sweep-high/*.zip binary
 environment/phase5-vm-sweep-high/report/* -text
+
+# Keep the received Phase 6 functional replay and server log byte-for-byte.
+environment/phase6-flashinfer-server-smoke/*.json -text
+environment/phase6-flashinfer-server-smoke/*.log -text
+
+# Keep the paired Phase 6 VM source archive byte-for-byte.
+environment/phase6-vm-compare/source.zip binary

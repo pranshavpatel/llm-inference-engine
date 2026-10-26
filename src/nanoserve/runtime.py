@@ -8,7 +8,7 @@ from pathlib import Path
 
 import torch
 
-from nanoserve.attention import ReferencePagedAttention
+from nanoserve.attention import FlashInferPagedAttention, ReferencePagedAttention, probe_flashinfer
 from nanoserve.engine import Engine
 from nanoserve.memory import BlockManager, KVCacheSpec, PagedKVCache, PagedKVCacheManager
 from nanoserve.model import PagedQwen2Runner, Qwen2Config, Qwen2ForCausalLM, load_safetensors
@@ -29,6 +29,7 @@ class ServingConfig:
     max_waiting_requests: int = 128
     command_capacity: int = 128
     watermark: float = 0.05
+    attention_backend: str = "reference"
 
 
 @dataclass(frozen=True)
@@ -39,6 +40,7 @@ class ServingRuntime:
     num_blocks: int
     kv_pool_bytes: int
     checkpoint_files: tuple[str, ...]
+    attention_backend: str
 
 
 def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
@@ -52,6 +54,8 @@ def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
         raise ValueError("model_name must be nonempty")
     if config.dtype not in ("float32", "bfloat16"):
         raise ValueError("dtype must be float32 or bfloat16")
+    if config.attention_backend not in ("reference", "flashinfer"):
+        raise ValueError("attention_backend must be reference or flashinfer")
     dtype = {"float32": torch.float32, "bfloat16": torch.bfloat16}[config.dtype]
     device = torch.device(config.device)
     if device.type == "cuda":
@@ -65,8 +69,24 @@ def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
         raise ValueError("CPU serving requires float32")
     elif device.type not in ("cuda", "cpu"):
         raise ValueError("device must be cpu or cuda")
+    if config.attention_backend == "flashinfer":
+        if device.type != "cuda" or dtype != torch.bfloat16:
+            raise ValueError("FlashInfer backend requires CUDA and bfloat16")
+        if config.block_size != 16:
+            raise ValueError("FlashInfer backend has been gated only for 16-token pages")
+        availability = probe_flashinfer()
+        if not availability.available:
+            raise ValueError(f"FlashInfer backend unavailable: {availability.reason}")
+        if availability.version != "0.6.18.post1":
+            raise ValueError("FlashInfer backend requires the probed 0.6.18.post1 release")
 
     model_config = Qwen2Config.from_json(model_dir / "config.json")
+    if config.attention_backend == "flashinfer" and (
+        model_config.num_attention_heads != 12
+        or model_config.num_key_value_heads != 2
+        or model_config.resolved_head_dim != 128
+    ):
+        raise ValueError("FlashInfer backend has been gated only for 12 query / 2 KV heads and head_dim 128")
     if config.max_context_tokens > model_config.max_position_embeddings:
         raise ValueError("max_context_tokens exceeds model max_position_embeddings")
     if config.kv_pool_mib <= 0:
@@ -115,7 +135,12 @@ def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
         device=device,
     )
     manager = PagedKVCacheManager(blocks, cache)
-    runner = PagedQwen2Runner(model, manager, ReferencePagedAttention())
+    attention_backend = (
+        FlashInferPagedAttention(model_config.num_attention_heads)
+        if config.attention_backend == "flashinfer"
+        else ReferencePagedAttention()
+    )
+    runner = PagedQwen2Runner(model, manager, attention_backend)
     scheduler = Scheduler(manager, scheduler_config)
     worker = InferenceWorker(
         Engine(scheduler, runner), command_capacity=config.command_capacity
@@ -127,4 +152,5 @@ def build_serving_runtime(config: ServingConfig) -> ServingRuntime:
         num_blocks=num_blocks,
         kv_pool_bytes=cache.stats()["physical_pool_bytes"],
         checkpoint_files=coverage.checkpoint_files,
+        attention_backend=attention_backend.name,
     )

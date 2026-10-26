@@ -2,7 +2,23 @@
 
 `nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
 
-This is still a correctness milestone. The paged backend deliberately gathers K/V before ordinary PyTorch attention. An optimized paged kernel and controlled performance benchmarks are not implemented, and there are no performance claims.
+The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter passed a targeted L40S kernel probe, matched a float32 attention oracle on the real model's worst-differing layers, and completed a two-request functional HTTP replay. In a paired same-L40S diagnostic at 4 requests/s, median-of-run p50 client TTFT was 168.0 ms for reference versus 72.9 ms for FlashInfer. Its prefill path still uses the gather oracle, and longer greedy outputs differ from the BF16 reference path; the optimized backend is not an exact-output replacement. See [BENCHMARKS.md](BENCHMARKS.md) for measurement context and limits.
+
+For a short presentation of the live scheduler and saved GPU evidence, see
+[DEMO.md](DEMO.md).
+
+```mermaid
+flowchart LR
+    Client[Completion clients] --> HTTP[HTTP and SSE service]
+    HTTP --> Worker[Single-owner inference worker]
+    Worker --> Scheduler[Decode-first continuous scheduler]
+    Scheduler --> Pages[Block manager and physical KV pages]
+    Scheduler --> Runner[Qwen2 model runner]
+    Pages --> Runner
+    Runner --> Attention[Reference gather or opt-in FlashInfer decode]
+    Runner --> Worker
+    Worker --> HTTP
+```
 
 ## Reproducible setup
 
@@ -30,7 +46,7 @@ $env:NANOSERVE_RUN_GPU_PAGING = "1"
 
 The exact validated versions are PyTorch `2.13.0+cu130`, Transformers `4.57.6`, safetensors `0.6.2`, and pytest `8.4.2`. `requirements/model.txt` is the platform-neutral model stack; `requirements/flashinfer-linux.txt` records the proposed optimized-backend pin.
 
-FlashInfer `0.6.18.post1` publishes Linux-only wheels. This Windows host has neither WSL nor Docker, so FlashInfer was not installed and no optimized-backend compatibility is claimed. The Phase 0 fallback smoke test gathers noncontiguous physical pages and executes PyTorch SDPA. It is a correctness check, not an optimized backend.
+FlashInfer `0.6.18.post1` is Linux-only and is not needed for Windows reference-path development. On the Ubuntu L40S VM, its paged-decode BF16 kernel passed the targeted page-boundary compatibility probe with matching prebuilt cubin/JIT-cache packages and no `nvcc`; see `environment/phase6-flashinfer-probe/`. This does not establish full model parity or serving speed. The Phase 0 PyTorch SDPA smoke remains a separate reference check.
 
 ## Continuous scheduling
 
@@ -55,7 +71,7 @@ The implemented API subset is:
 
 - `POST /v1/completions` with `model`, string `prompt`, positive `max_tokens`, `stream`, `n=1`, greedy `temperature=0`, and optional boolean `ignore_eos` for fixed-output experiments.
 - JSON completions with exact prompt/completion token accounting, or SSE chunks terminated by `data: [DONE]`. When streaming usage is requested, the final nanoserve usage chunk also reports server-side `generation_time_ms` and `mean_itl_ms` from actual token events; the latter is null for one-token outputs.
-- `GET /health`, `GET /ready`, and JSON `GET /metrics`. The worker metrics include a cumulative `generated_tokens` counter: one increment per emitted model token, excluding recomputed history and terminal events without a token. Take differences between boundary samples for an internal output-token count; the counter alone does not define a benchmark measurement window.
+- `GET /health`, `GET /ready`, JSON `GET /metrics`, and a benchmark-only `GET /metrics/token-window?start_s=...&end_s=...` query using the host's monotonic clock. The worker counts one event per emitted model token, excluding recomputed history and tokenless terminal events. The window query is used for exact in-interval token throughput in the saved Phase 6 NanoServe run; it is not a cross-host clock protocol.
 - `400` for unsupported inputs, `429` for bounded-queue overload, `503` when the worker is unavailable, and disconnect cancellation for streaming responses.
 
 Run a local contract demo backed by a deterministic, randomly initialized tiny Qwen2 model:
@@ -83,6 +99,23 @@ $snapshot = ".hf-cache\hub\models--Qwen--Qwen2.5-1.5B-Instruct\snapshots\989aa79
 ```
 
 The `serve` command defaults to a loopback bind, BF16 CUDA, a 2 GiB KV pool, and a 2,048-token context. The smaller settings above are for a short correctness smoke. On this host, the pinned real checkpoint started with 292 KV pages in a 128 MiB pool and returned ` Paris.` for a two-token completion to `The capital of France is`, with five prompt tokens and two completion tokens counted. This is one functional check, not a throughput measurement. The server currently has no authentication, TLS, chat endpoint, sampling, or multi-process deployment support.
+
+On the probed Linux stack only, `--attention-backend flashinfer` opts into the experimental decode adapter for the pinned 1.5B model geometry. The default is `--attention-backend reference`. The two-request functional replay and paired same-L40S diagnostic are saved under `environment/phase6-flashinfer-server-smoke/` and `environment/phase6-vm-compare/`. Longer outputs differ between backends; use the opt-in path with that limitation.
+
+A later [fixed-window L40S sweep](environment/phase6-vm-scored/README.md) scored
+the reference and FlashInfer paths on paired synthetic short/long requests.
+At 2 offered short requests/s (40/131/248 prompt tokens, 64 fixed output
+tokens), the median of three runs measured 75.4 versus 136.6 output tokens
+emitted within each 60-second interval, with 0.00 versus 2.12 requests/s
+meeting the predeclared TTFT <= 1 s and TPOT <= 100 ms SLOs. The reference
+path was overloaded there; this is an observed pinned-workload capacity
+result, not a universal speedup or proof of exact numerical parity. The
+archive includes raw traces, failures, resource samples, and a regenerable
+report. The [same-session vLLM 0.30.0 baseline](environment/phase6-vm-vllm/README.md)
+replayed all 33 exact short/long traces on the L40S. Its 3,691 requests all
+completed without failure or missing token metrics, but it did not saturate
+at the highest tested rates. The paired report shows an observed high-load
+gap, not a measured maximum-throughput ratio.
 
 ## Saved trace replay
 
@@ -120,13 +153,13 @@ For a fixed-window trace, HTTP replay can now stop after an explicit drain inter
 .\.venv\Scripts\python.exe -m nanoserve replay --trace phase5-pilot-plan/trace-rate-00-rep-00.json --engine nanoserve --endpoint http://127.0.0.1:8000/v1/completions --bounded-drain-s 10 --max-workers 32 --output phase5-pilot-nanoserve.json
 ```
 
-The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, inter-content-chunk gaps, and optional server-reported TPOT with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. It intentionally does **not** call chunk gaps token ITL/TPOT or report SLO goodput: HTTP chunks need not equal model tokens. vLLM 0.30 can supply per-request token timing in the final usage chunk when started with [`--enable-per-request-metrics`](https://docs.vllm.ai/en/v0.30.0/features/per_request_metrics/); that mode may add CPU overhead, so its effect needs checking before scored runs. Full-run throughput includes startup and drain, not a steady measurement window. The installed-vLLM fixed-output policy pilot passed; HF eager matches nanoserve exactly on both requests, while vLLM's longer generated text diverged on one. Saved L40S HF and vLLM probes reproduce their respective replays and show different fourth-token rankings, not a near-tie; eager vLLM retained its original output. The discrepancy is documented without further Phase 5 kernel probing. See [the saved pilot evidence](environment/phase5-vm-pilot/README.md). The paired L40S load pilots are archived below. Scored same-GPU sweeps, profiles, and plots remain before any comparative performance claim.
+The aggregate reports full-run completed output tokens per second, client time-to-first-content, end-to-end latency, send lag, inter-content-chunk gaps, and optional server-reported TPOT with sample counts. Rejections, drain timeouts, unsent work, and missing usage remain visible. This Phase 5 diagnostic command intentionally does **not** call chunk gaps token ITL/TPOT or score SLO goodput: HTTP chunks need not equal model tokens. The separate [Phase 6 scored protocol](environment/PHASE6_VM_SCORED.md) applies fixed measurement-window rules and NanoServe's server-side token counter to the saved L40S run. vLLM 0.30 can supply per-request token timing in the final usage chunk when started with [`--enable-per-request-metrics`](https://docs.vllm.ai/en/v0.30.0/features/per_request_metrics/); that mode may add CPU overhead. The installed-vLLM fixed-output policy pilot passed; HF eager matches nanoserve exactly on both requests, while vLLM's longer generated text diverged on one. Saved L40S HF and vLLM probes reproduce their respective replays and show different fourth-token rankings, not a near-tie; eager vLLM retained its original output. See [the saved pilot evidence](environment/phase5-vm-pilot/README.md) and [BENCHMARKS.md](BENCHMARKS.md) for the paired pilots and scored NanoServe comparison.
 
 For the first Ubuntu L40S same-GPU policy check, follow [the Phase 5 VM pilot runbook](environment/PHASE5_VM_PILOT.md). It runs vLLM and nanoserve sequentially, saves both full replay files, and records the environment and server startup configuration.
 
 The first [paired L40S load pilot](environment/phase5-vm-sweep/README.md) replayed nine matching traces per engine at 0.5, 1, and 2 requests/s. Both engines completed all 348 requests with 16 output tokens, no missing usage, and under 1.8 ms maximum per-run p99 send lag. KV capacity was 4,672 token slots on each. nanoserve's median-of-run p99 client TTFT rose from 111 to 173 ms; vLLM's stayed near 17 ms. Neither engine saturated at these offered rates, so matching delivered output rates are not evidence of equal capacity.
 
-The [4/8/16 requests/s pilot](environment/phase5-vm-sweep-high/README.md) completed cleanly at 4 requests/s (362/362 per engine), but nanoserve's 8/16 runs had seconds of client send lag with the 32-worker replay pool. They are not valid server-only capacity points. The [5/6/7 requests/s knee pilot](environment/phase5-vm-sweep-knee/README.md) used 256 non-polling workers: both engines completed all 1,673 paired requests, with per-run p99 send lag below 1 ms. nanoserve's median-of-run p99 client TTFT rose from 1.90 to 12.43 seconds between 5 and 7 requests/s, with growing post-window drain, while vLLM remained near 18 ms. The exploratory pilot is complete; profiling and scored measurements remain before any capacity or SLO-goodput claim.
+The [4/8/16 requests/s pilot](environment/phase5-vm-sweep-high/README.md) completed cleanly at 4 requests/s (362/362 per engine), but nanoserve's 8/16 runs had seconds of client send lag with the 32-worker replay pool. They are not valid server-only capacity points. The [5/6/7 requests/s knee pilot](environment/phase5-vm-sweep-knee/README.md) used 256 non-polling workers: both engines completed all 1,673 paired requests, with per-run p99 send lag below 1 ms. nanoserve's median-of-run p99 client TTFT rose from 1.90 to 12.43 seconds between 5 and 7 requests/s, with growing post-window drain, while vLLM remained near 18 ms. The exploratory pilot and reference operator profile are complete; scored measurements remain before any capacity or SLO-goodput claim.
 
 After a larger paired pilot, save each engine's replay files under its own directory using the trace filenames from `sweep-plan.json` (for example `phase5-runs/nanoserve/trace-rate-00-rep-00.json`). The report command validates every trace/replay pairing and regenerates run-level CSV, per-rate CSV, and two labeled SVG diagnostics:
 
@@ -190,7 +223,7 @@ On the RTX 6000 Ada environment in `environment/phase0-manifest.json`:
 - The real-model FP32 paged static-batch path matched all 32 greedy tokens. Its largest prefill logit error versus individual contiguous forwards was `1.329183578491211e-4` and largest mean error was `1.3605588719656225e-5`.
 - The BF16 paged static-batch path matched 31/32 greedy tokens. The one divergence occurred at a contiguous-reference top-two margin of exactly `0.0`; the paged margin was `0.125`. This near-tie is preserved in the evidence rather than hidden by weakening a tolerance.
 - The Phase 3 CPU suite exercises staggered continuous admission, decode-first execution, simultaneous progress, EOS, cancellation, queue and context bounds, transactional runner failures, forced recompute preemption, and a real tiny-Qwen scheduler integration.
-- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, sweep provenance, optional server TPOT, honest metric labels, and export files. The full non-GPU suite passes `107` tests; `9` GPU tests remain opt-in.
+- The Phase 4 suite verifies single-thread engine ownership, concurrent submissions, bounded ingress, cancellation after in-flight work, worker failure propagation, JSON completions, SSE framing, tokenizer byte boundaries, validation, overload responses, health/readiness, metrics, startup from a saved tiny checkpoint, trace checksums, failed-request retention, and streamed usage parsing. The Phase 5 CPU additions validate fixed-window sweep planning, bounded HTTP drain with queued/in-flight accounting, ignore-EOS fixed token counts, saved-record consistency, sweep provenance, optional server TPOT, honest metric labels, and export files. The full non-GPU suite passes `113` tests; `9` GPU tests remain opt-in.
 
 These are correctness observations, not latency or throughput measurements. Raw reports are committed under `environment/`.
 
@@ -204,4 +237,4 @@ python -m nanoserve trace --count 100 --rate 2 --seed 42
 
 `BlockManager` remains the CPU ownership authority. `PagedKVCacheManager` now maps its immutable page tables to physical tensors, distinguishes reserved from completed KV tokens, and zeroes pages before returning them to the allocator.
 
-The deferred Phase 2 optimization gate is to validate FlashInfer on a Linux CUDA host and compare its kernels against both contiguous and gather-based paged references. Phase 4 has complete functional replay records for all three engines; controlled performance claims still require a comparable, isolated target GPU environment.
+The targeted FlashInfer paged-decode kernel gate and two-request opt-in server replay passed on the Linux L40S. The first model-level comparison to BF16 gather failed, while the worst attention layers matched a float32 oracle. A paired same-L40S diagnostic measured lower latency and less backlog with FlashInfer on fixed short prompts, but long greedy text differed on every paired completed request; no scored sustainable-capacity or universal speedup claim is made. Phase 4 has complete functional replay records for all three engines.

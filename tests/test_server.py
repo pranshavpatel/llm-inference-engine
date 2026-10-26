@@ -61,6 +61,11 @@ class StubWorker:
     def stats(self):
         return {"worker": {"running": self.is_running, "submitted": self.counter}}
 
+    def count_emitted_tokens(self, start_s, end_s):
+        if end_s <= start_s:
+            raise ValueError("invalid token window")
+        return 7
+
 
 class Utf8Codec:
     eos_token_id = None
@@ -135,6 +140,12 @@ class ServerTests(unittest.TestCase):
         status, _, body = self.request("GET", "/metrics")
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)["worker"]["running"])
+
+        status, _, body = self.request("GET", "/metrics/token-window?start_s=1&end_s=2")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["emitted_tokens"], 7)
+        status, _, _ = self.request("GET", "/metrics/token-window?start_s=2&end_s=1")
+        self.assertEqual(status, 400)
 
     def test_nonstreaming_completion_has_usage_and_finish_reason(self):
         status, content_type, body = self.request(

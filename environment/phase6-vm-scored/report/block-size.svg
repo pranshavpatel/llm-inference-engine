@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="340" viewBox="0 0 700 340">
+<rect width="100%" height="100%" fill="white"/>
+<text x="350" y="30" text-anchor="middle" font-family="sans-serif" font-size="18">Block size at batch cap 16, 2 offered requests/s</text>
+<text x="110" y="86" font-family="sans-serif" font-size="16">16-token blocks</text>
+<rect x="110" y="111" width="79.4" height="26" fill="#b486c2"/>
+<text x="110" y="157" font-family="sans-serif" font-size="13">fragmentation 4.4%</text>
+<rect x="110" y="187" width="150.7" height="26" fill="#3566a8"/>
+<text x="110" y="233" font-family="sans-serif" font-size="13">75.4 emitted tokens/s</text>
+<text x="410" y="86" font-family="sans-serif" font-size="16">32-token blocks</text>
+<rect x="410" y="111" width="156.5" height="26" fill="#b486c2"/>
+<text x="410" y="157" font-family="sans-serif" font-size="13">fragmentation 8.7%</text>
+<rect x="410" y="187" width="152.9" height="26" fill="#3566a8"/>
+<text x="410" y="233" font-family="sans-serif" font-size="13">76.5 emitted tokens/s</text>
+<text x="350" y="300" text-anchor="middle" font-family="sans-serif" font-size="12">Bars use separate scales; compare labeled values. Both runs overloaded.</text>
+</svg>
