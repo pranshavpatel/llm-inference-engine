@@ -1,11 +1,47 @@
-# nanoserve
+# NanoServe
 
-`nanoserve` is an educational single-GPU LLM inference engine. It now has a custom Qwen2 reference implementation, allocator-owned physical KV pages, gather-based paged attention, and a Phase 3 continuous scheduler that drives the paged model runner.
+NanoServe is an educational, single-GPU Qwen2.5 inference server built from
+model loading through streamed HTTP responses. It manages the model's attention
+memory in pages, batches live requests, and recovers from GPU-memory pressure.
+The default path uses a clear PyTorch reference implementation; an opt-in
+FlashInfer backend accelerates paged decoding.
 
-The gather-based paged backend remains the default correctness path. An opt-in FlashInfer paged-decode adapter passed a targeted L40S kernel probe, matched a float32 attention oracle on the real model's worst-differing layers, and completed a two-request functional HTTP replay. In a paired same-L40S diagnostic at 4 requests/s, median-of-run p50 client TTFT was 168.0 ms for reference versus 72.9 ms for FlashInfer. Its prefill path still uses the gather oracle, and longer greedy outputs differ from the BF16 reference path; the optimized backend is not an exact-output replacement. See [BENCHMARKS.md](BENCHMARKS.md) for measurement context and limits.
+## Measured result
 
-For a short presentation of the live scheduler and saved GPU evidence, see
-[DEMO.md](DEMO.md).
+On an NVIDIA L40S, three paired 60-second runs offered **2 requests/second**
+from the same synthetic short-prompt traces, with 64 output tokens requested
+per completion:
+
+| Metric | Reference attention | Opt-in FlashInfer |
+| --- | ---: | ---: |
+| Output tokens emitted per measurement second, median run | 75.4 | 136.6 |
+| p99 time to first token, median of three run-level p99s | 19.2 s | 145 ms |
+| Failed requests across all three runs | 92 / 387 | 0 / 387 |
+| Requests/second meeting both latency SLOs, median run | 0.00 | 2.12 |
+
+The reference path was overloaded at this rate; these are **workload-specific
+observations, not universal speedups or production p99 guarantees**. FlashInfer
+uses additional planning memory, and longer greedy outputs differ from the BF16
+reference path. The [same-session vLLM comparison](environment/phase6-vm-vllm/README.md)
+uses 33 identical traces and documents the remaining high-load gap. See
+[benchmark methods, figures, and limitations](BENCHMARKS.md) or inspect the
+[original scored runs](environment/phase6-vm-scored/README.md).
+
+## Start here
+
+- [Three-minute walkthrough](DEMO.md): run the tiny local server and inspect
+  saved GPU results; its random-model text is a transport demo, not a quality
+  or speed claim.
+- [Request scheduling](src/nanoserve/scheduler.py),
+  [KV page ownership](src/nanoserve/memory/block_manager.py),
+  [model execution](src/nanoserve/model/qwen2.py), and
+  [optimized attention](src/nanoserve/attention/flashinfer.py): the main code paths.
+- [Cross-engine results](environment/phase6-vm-vllm/report/summary.json),
+  [goodput plot](environment/phase6-vm-vllm/report/short-goodput-vs-rate.svg),
+  and [reproduction procedure](environment/PHASE6_VM_SCORED.md): follow the
+  numbers back to their source.
+
+## Architecture
 
 ```mermaid
 flowchart LR
